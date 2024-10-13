@@ -9,6 +9,7 @@ type Game struct {
 	Data         map[string]interface{}
 	screenWidth  int32
 	screenHeight int32
+	Run          *Run
 }
 
 func (g *Game) LoadAssets() {
@@ -38,6 +39,19 @@ func (g *Game) LoadAssets() {
 		},
 		Color: rl.White,
 	}
+	image = rl.LoadImage("assets/tech/chicken_coop.png")
+	rl.ImageResize(image, 45, 45)
+
+	g.Data["ChickenCoopTile"] = Tile{
+		Texture: rl.LoadTextureFromImage(image),
+		TileFrame: rl.Rectangle{
+			X:      0,
+			Y:      0,
+			Width:  45,
+			Height: 45,
+		},
+		Color: rl.White,
+	}
 }
 
 func (g *Game) LoadScenes() {
@@ -49,6 +63,15 @@ func (g *Game) LoadScenes() {
 		Data:        make(map[string]interface{}),
 	}
 	g.InitBoard()
+
+	g.Scenes["HUD"] = &Scene{
+		Active:      true,
+		AutoDisable: false,
+		DrawScene:   DrawHUD,
+		UpdateScene: UpdateHUD,
+		Buttons:     make([]Button, 1),
+	}
+	g.InitHUD()
 
 }
 
@@ -64,6 +87,8 @@ func main() {
 
 	g.LoadAssets()
 	g.LoadScenes()
+
+	g.InitRun()
 
 	rl.SetTargetFPS(60)
 	for !rl.WindowShouldClose() {

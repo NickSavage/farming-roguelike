@@ -19,7 +19,7 @@ func (g *Game) InitBoard() {
 	scene := g.Scenes["Board"]
 	scene.Camera = rl.Camera2D{}
 	scene.Camera.Zoom = 1.0
-	scene.Camera.Target = rl.Vector2{X: 100, Y: 100}
+	scene.Camera.Target = rl.Vector2{X: 0, Y: 0}
 
 	rows := 100
 	cols := 100
@@ -51,8 +51,29 @@ func (g *Game) drawTiles() {
 	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
 	for i := range grid {
 		for j := range grid[i] {
+			// if j >= int(g.screenHeight)-100 {
+			// 	continue
+			// }
+			if grid[i][j].TileType != "Dirt" {
+				log.Printf("type %v", grid[i][j].TileType)
+			}
+
 			DrawTile(grid[i][j].Tile, float32(i*TILE_HEIGHT), float32(j*TILE_WIDTH))
 		}
+	}
+
+}
+
+func (g *Game) drawTechnology() {
+
+	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
+	for _, tech := range g.Run.Technology {
+		for _, tile := range tech.Tiles {
+			grid[tile.Row][tile.Column] = tile
+			// log.Printf("draw %v/%v", float32(tile.Row*TILE_HEIGHT), float32(tile.Column*TILE_WIDTH))
+			// DrawTile(tile.Tile, float32(tile.Row*TILE_HEIGHT), float32(tile.Column*TILE_WIDTH))
+		}
+
 	}
 
 }
@@ -65,6 +86,7 @@ func (g *Game) drawGrid() {
 	rows := g.Scenes["Board"].Data["Rows"].(int)
 
 	maxX := float32(columns) * spacing
+	//maxY := float32(g.screenHeight - 100)
 	maxY := float32(columns) * spacing
 	x = 0
 	//	y := 0
@@ -105,6 +127,7 @@ func DrawBoard(g *Game) {
 
 	scene := g.Scenes["Board"]
 	rl.BeginMode2D(g.Scenes["Board"].Camera)
+	g.drawTechnology()
 	g.drawTiles()
 	g.drawGrid()
 
@@ -116,18 +139,15 @@ func DrawBoard(g *Game) {
 		scene.Data["DragSelectionStop"] = nil
 
 	}
-	log.Printf("gesture %v", currentGesture)
 	if currentGesture == rl.GestureHold {
 		scene.Data["DragSelectionStart"] = rl.GetMousePosition()
 	}
 	if currentGesture == rl.GestureDrag {
-		log.Printf("???")
 		current := rl.GetMousePosition()
 		scene.Data["DragSelectionStop"] = rl.GetMousePosition()
 		startVec := scene.Data["DragSelectionStart"].(rl.Vector2)
 		width := current.X - startVec.X
 		height := current.Y - startVec.Y
-		log.Printf("draw (%v/%v) (%v/%v)", startVec.X, startVec.Y, width, height)
 		rl.DrawRectangleLines(
 			int32(startVec.X),
 			int32(startVec.Y),
@@ -136,6 +156,7 @@ func DrawBoard(g *Game) {
 			rl.Black,
 		)
 	}
+	DrawHUD(g)
 }
 
 func (g *Game) SelectTiles() {
@@ -164,7 +185,7 @@ func (g *Game) SelectTiles() {
 				if tile.TileType == "Grass" {
 					tile.Tile = g.Data["DirtTile"].(Tile)
 					tile.TileType = "Dirt"
-				} else {
+				} else if tile.TileType == "Dirt" {
 					tile.Tile = g.Data["GrassTile"].(Tile)
 					tile.TileType = "Grass"
 

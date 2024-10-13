@@ -9,6 +9,7 @@ type Button struct {
 	Color     rl.Color
 	Text      string
 	TextColor rl.Color
+	TextSize  int32
 	OnClick   func(*Game)
 }
 type Scene struct {
@@ -59,11 +60,15 @@ func (g *Game) ActivateScene(sceneName string) {
 func (g *Game) DrawButtons(buttons []Button) {
 	for _, button := range buttons {
 		rl.DrawRectangle(button.Rectangle.ToInt32().X, button.Rectangle.ToInt32().Y, button.Rectangle.ToInt32().Width, button.Rectangle.ToInt32().Height, button.Color)
+		textSize := button.TextSize
+		if textSize == 0 {
+			textSize = int32(button.Rectangle.Height - 15)
+		}
 		rl.DrawText(
 			button.Text,
 			button.Rectangle.ToInt32().X+5,
 			button.Rectangle.ToInt32().Y+5,
-			10,
+			textSize,
 			button.TextColor,
 		)
 	}
