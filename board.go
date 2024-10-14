@@ -13,6 +13,9 @@ type BoardSquare struct {
 	TileType string
 	Row      int
 	Column   int
+	Width    int // in tiles
+	Height   int // in tiles
+	Skip     bool
 }
 
 func (g *Game) InitBoard() {
@@ -38,6 +41,9 @@ func (g *Game) InitBoard() {
 				TileType: "Dirt",
 				Row:      i,
 				Column:   j,
+				Width:    1,
+				Height:   1,
+				Skip:     false,
 			}
 			grid[i][j] = square
 		}
@@ -51,14 +57,19 @@ func (g *Game) drawTiles() {
 	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
 	for i := range grid {
 		for j := range grid[i] {
-			// if j >= int(g.screenHeight)-100 {
-			// 	continue
-			// }
-			if grid[i][j].TileType != "Dirt" {
-				log.Printf("type %v", grid[i][j].TileType)
+			tile := grid[i][j]
+			if tile.Skip {
+				continue
+			}
+			if tile.TileType != "Dirt" {
+				log.Printf("type %v", tile.TileType)
 			}
 
-			DrawTile(grid[i][j].Tile, float32(i*TILE_HEIGHT), float32(j*TILE_WIDTH))
+			DrawTile(
+				tile.Tile,
+				float32(i*TILE_HEIGHT),
+				float32(j*TILE_WIDTH),
+			)
 		}
 	}
 
@@ -69,9 +80,13 @@ func (g *Game) drawTechnology() {
 	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
 	for _, tech := range g.Run.Technology {
 		for _, tile := range tech.Tiles {
+			for x := range tile.Width {
+				for y := range tile.Height {
+					grid[tile.Row+x][tile.Column+y] = tile
+					grid[tile.Row+x][tile.Column+y].Skip = true
+				}
+			}
 			grid[tile.Row][tile.Column] = tile
-			// log.Printf("draw %v/%v", float32(tile.Row*TILE_HEIGHT), float32(tile.Column*TILE_WIDTH))
-			// DrawTile(tile.Tile, float32(tile.Row*TILE_HEIGHT), float32(tile.Column*TILE_WIDTH))
 		}
 
 	}

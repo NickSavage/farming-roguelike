@@ -40,15 +40,15 @@ func (g *Game) LoadAssets() {
 		Color: rl.White,
 	}
 	image = rl.LoadImage("assets/tech/chicken_coop.png")
-	rl.ImageResize(image, 45, 45)
+	rl.ImageResize(image, 90, 90)
 
 	g.Data["ChickenCoopTile"] = Tile{
 		Texture: rl.LoadTextureFromImage(image),
 		TileFrame: rl.Rectangle{
 			X:      0,
 			Y:      0,
-			Width:  45,
-			Height: 45,
+			Width:  90,
+			Height: 90,
 		},
 		Color: rl.White,
 	}

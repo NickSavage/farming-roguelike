@@ -28,7 +28,6 @@ func (g *Game) InitRun() {
 func (g *Game) EndRound() {
 	g.Run.Money += 100
 }
-
 func (g *Game) CreateChickenCoopTech() Technology {
 	result := Technology{
 		Name:  "Chicken Coop",
@@ -39,6 +38,8 @@ func (g *Game) CreateChickenCoopTech() Technology {
 		TileType: "Technology",
 		Row:      10,
 		Column:   10,
+		Width:    2,
+		Height:   2,
 	})
 	return result
 }
