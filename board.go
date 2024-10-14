@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gen2brain/raylib-go/raylib"
-	"log"
+	//"log"
 )
 
 const TILE_HEIGHT = 45
@@ -61,9 +61,12 @@ func (g *Game) drawTiles() {
 			if tile.Skip {
 				continue
 			}
-			if tile.TileType != "Dirt" {
-				log.Printf("type %v", tile.TileType)
-			}
+			// if tile.TileType == "Technology" {
+			// 	log.Printf("tech %v/%v",
+			// 		float32(i*TILE_HEIGHT),
+			// 		float32(j*TILE_WIDTH),
+			// 	)
+			// }
 
 			DrawTile(
 				tile.Tile,
@@ -79,15 +82,14 @@ func (g *Game) drawTechnology() {
 
 	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
 	for _, tech := range g.Run.Technology {
-		for _, tile := range tech.Tiles {
-			for x := range tile.Width {
-				for y := range tile.Height {
-					grid[tile.Row+x][tile.Column+y] = tile
-					grid[tile.Row+x][tile.Column+y].Skip = true
-				}
+		tile := tech.Tile
+		for x := range tile.Width {
+			for y := range tile.Height {
+				grid[tile.Row+x][tile.Column+y] = tile
+				grid[tile.Row+x][tile.Column+y].Skip = true
 			}
-			grid[tile.Row][tile.Column] = tile
 		}
+		grid[tile.Row][tile.Column] = tile
 
 	}
 
@@ -138,12 +140,41 @@ func (g *Game) drawGrid() {
 
 }
 
+func (g *Game) DrawPlaceTech() {
+	scene := g.Scenes["Board"]
+	if scene.Data["PlaceTech"] == nil || !scene.Data["PlaceTech"].(bool) {
+		return
+	}
+
+	if scene.Data["PlaceTechSkip"].(bool) {
+		scene.Data["PlaceTechSkip"] = false
+		return
+	}
+	chosenTech := scene.Data["PlaceChosenTech"].(*Technology)
+	mousePosition := rl.GetMousePosition()
+
+	DrawTile(
+		chosenTech.Tile.Tile,
+		float32(mousePosition.X)-(chosenTech.Tile.Tile.TileFrame.Width/2),
+		float32(mousePosition.Y)-(chosenTech.Tile.Tile.TileFrame.Height/2),
+	)
+	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+		scene.Data["PlaceTech"] = false
+		g.PlaceTech(
+			chosenTech,
+			float32(mousePosition.X)-(chosenTech.Tile.Tile.TileFrame.Width/2),
+			float32(mousePosition.Y)-(chosenTech.Tile.Tile.TileFrame.Height/2),
+		)
+	}
+}
+
 func DrawBoard(g *Game) {
 
 	scene := g.Scenes["Board"]
 	rl.BeginMode2D(g.Scenes["Board"].Camera)
 	g.drawTechnology()
 	g.drawTiles()
+	g.DrawPlaceTech()
 	g.drawGrid()
 
 	rl.EndMode2D()

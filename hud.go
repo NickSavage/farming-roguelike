@@ -3,10 +3,42 @@ package main
 import (
 	"fmt"
 	"github.com/gen2brain/raylib-go/raylib"
+	// "log"
 )
 
+func (g *Game) HideOtherWindows() {
+	scene := g.Scenes["HUD"]
+	scene.Data["DisplayShopWindow"] = false
+	scene.Data["DisplayTechWindow"] = false
+}
+
+func OnClickShopWindowButton(g *Game) {
+	scene := g.Scenes["HUD"]
+	if scene.Data["DisplayShopWindow"].(bool) == true {
+		scene.Data["DisplayShopWindow"] = false
+	} else {
+		g.HideOtherWindows()
+		scene.Data["DisplayShopWindow"] = true
+	}
+
+}
+
 func OnClickTestButton(g *Game) {
-	g.EndRound()
+
+	g.HideOtherWindows()
+	g.Scenes["Board"].Data["PlaceTech"] = true
+	g.Scenes["Board"].Data["PlaceTechSkip"] = true
+	g.Scenes["Board"].Data["PlaceChosenTech"] = &g.Run.Technology[0]
+}
+
+func OnClickTechWindowButton(g *Game) {
+	scene := g.Scenes["HUD"]
+	if scene.Data["DisplayTechWindow"].(bool) == true {
+		scene.Data["DisplayTechWindow"] = false
+	} else {
+		g.HideOtherWindows()
+		scene.Data["DisplayTechWindow"] = true
+	}
 }
 
 func (g *Game) InitHUD() {
@@ -25,6 +57,35 @@ func (g *Game) InitHUD() {
 		OnClick:   OnClickTestButton,
 	}
 	scene.Buttons = append(scene.Buttons, endButton)
+	techButton := Button{
+		Rectangle: rl.Rectangle{
+			X:      10,
+			Y:      50,
+			Width:  150,
+			Height: 40,
+		},
+		Color:     rl.SkyBlue,
+		Text:      "Technology",
+		TextColor: rl.Black,
+		OnClick:   OnClickTechWindowButton,
+	}
+	scene.Buttons = append(scene.Buttons, techButton)
+	scene.Data["DisplayTechWindow"] = false
+
+	shopButton := Button{
+		Rectangle: rl.Rectangle{
+			X:      10,
+			Y:      100,
+			Width:  150,
+			Height: 40,
+		},
+		Color:     rl.SkyBlue,
+		Text:      "Shop",
+		TextColor: rl.Black,
+		OnClick:   OnClickShopWindowButton,
+	}
+	scene.Buttons = append(scene.Buttons, shopButton)
+	scene.Data["DisplayShopWindow"] = false
 
 }
 
@@ -47,5 +108,12 @@ func DrawHUD(g *Game) {
 
 	rl.DrawText(fmt.Sprintf("Money: $%v", g.Run.Money), 30, 30, 20, rl.White)
 	g.DrawButtons(scene.Buttons)
+
+	if scene.Data["DisplayTechWindow"].(bool) {
+		rl.DrawRectangle(200, 50, 900, 500, rl.Blue)
+	}
+	if scene.Data["DisplayShopWindow"].(bool) {
+		g.DrawShopWindow()
+	}
 
 }

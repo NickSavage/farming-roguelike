@@ -52,6 +52,17 @@ func (g *Game) LoadAssets() {
 		},
 		Color: rl.White,
 	}
+	rl.ImageResize(image, 45, 45)
+	g.Data["ChickenCoopShopTile"] = Tile{
+		Texture: rl.LoadTextureFromImage(image),
+		TileFrame: rl.Rectangle{
+			X:      0,
+			Y:      0,
+			Width:  45,
+			Height: 45,
+		},
+		Color: rl.White,
+	}
 }
 
 func (g *Game) LoadScenes() {
@@ -69,6 +80,7 @@ func (g *Game) LoadScenes() {
 		AutoDisable: false,
 		DrawScene:   DrawHUD,
 		UpdateScene: UpdateHUD,
+		Data:        make(map[string]interface{}),
 		Buttons:     make([]Button, 1),
 	}
 	g.InitHUD()
@@ -89,6 +101,7 @@ func main() {
 	g.LoadScenes()
 
 	g.InitRun()
+	g.InitShopWindow()
 
 	rl.SetTargetFPS(60)
 	for !rl.WindowShouldClose() {
