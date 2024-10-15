@@ -20,6 +20,7 @@ type BoardSquare struct {
 	Width    int // in tiles
 	Height   int // in tiles
 	Skip     bool
+	Occupied bool
 }
 
 func generateCoordinates(numPairs, maxX, maxY int) []rl.Vector2 {
@@ -34,29 +35,31 @@ func generateCoordinates(numPairs, maxX, maxY int) []rl.Vector2 {
 
 	return coordinates
 }
-func (g *Game) InitPlaceRandomTrees() {
+func (g *Game) InitPlaceRandomTrees(numTrees int) {
 	scene := g.Scenes["Board"]
 	grid := scene.Data["Grid"].([][]BoardSquare)
 	tile := g.Data["TreeTile"].(Tile)
 
-	coords := generateCoordinates(30, TILE_ROWS/2, TILE_COLUMNS/2)
+	coords := generateCoordinates(numTrees, TILE_ROWS/2, TILE_COLUMNS/2)
 
 	for _, coord := range coords {
 		x := int(coord.X * 2)
 		y := int(coord.Y * 2)
-		tileSquare := grid[x][y]
-		tileSquare.Tile = tile
-		tileSquare.TileType = "Tree"
-		tileSquare.Width = 2
-		tileSquare.Height = 2
+		boardSquare := grid[x][y]
+		boardSquare.Tile = tile
+		boardSquare.TileType = "Tree"
+		boardSquare.Width = 2
+		boardSquare.Height = 2
+		boardSquare.Occupied = true
 
-		for i := range tileSquare.Width {
-			for j := range tileSquare.Height {
-				grid[x+i][y+j] = tileSquare
+		for i := range boardSquare.Width {
+			for j := range boardSquare.Height {
+				grid[x+i][y+j] = boardSquare
 				grid[x+i][y+j].Skip = true
+				grid[x+i][y+j].Occupied = true
 			}
 		}
-		grid[x][y] = tileSquare
+		grid[x][y] = boardSquare
 	}
 
 }
@@ -86,12 +89,13 @@ func (g *Game) InitBoard() {
 				Width:    1,
 				Height:   1,
 				Skip:     false,
+				Occupied: false,
 			}
 			grid[i][j] = square
 		}
 	}
 	g.Scenes["Board"].Data["Grid"] = grid
-	g.InitPlaceRandomTrees()
+	g.InitPlaceRandomTrees(40)
 
 }
 
@@ -135,6 +139,7 @@ func (g *Game) drawTechnology() {
 			for y := range tile.Height {
 				grid[tile.Row+x][tile.Column+y] = tile
 				grid[tile.Row+x][tile.Column+y].Skip = true
+				grid[tile.Row+x][tile.Column+y].Occupied = true
 			}
 		}
 		grid[tile.Row][tile.Column] = tile
@@ -197,6 +202,37 @@ func (g *Game) drawGrid() {
 
 }
 
+func (g *Game) CheckTilesOccupied(newBoardSquare BoardSquare, mouseX, mouseY float32) bool {
+	scene := g.Scenes["Board"]
+
+	row := int((mouseX + TILE_WIDTH/2) / TILE_WIDTH)
+	col := int((mouseY + TILE_HEIGHT/2) / TILE_HEIGHT)
+
+	for x := range newBoardSquare.Width {
+		for y := range newBoardSquare.Height {
+			testX := row + x - 1
+			if testX < 0 {
+				testX = 0
+			}
+			if testX >= TILE_COLUMNS {
+				testX = TILE_COLUMNS - 1
+			}
+			testY := col + y - 1
+			if testY < 0 {
+				testY = 0
+			}
+			if testY >= TILE_ROWS {
+				testY = TILE_ROWS - 1
+			}
+			if scene.Data["Grid"].([][]BoardSquare)[testX][testY].Occupied {
+				return true
+			}
+		}
+	}
+	return false
+
+}
+
 func (g *Game) DrawPlaceTech() {
 	scene := g.Scenes["Board"]
 	if scene.Data["PlaceTech"] == nil || !scene.Data["PlaceTech"].(bool) {
@@ -210,19 +246,32 @@ func (g *Game) DrawPlaceTech() {
 	chosenTech := scene.Data["PlaceChosenTech"].(*Technology)
 	mousePosition := rl.GetMousePosition()
 
-	DrawTile(
-		chosenTech.Tile.Tile,
-		float32(mousePosition.X)-(chosenTech.Tile.Tile.TileFrame.Width/2),
-		float32(mousePosition.Y)-(chosenTech.Tile.Tile.TileFrame.Height/2),
-	)
-	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-		scene.Data["PlaceTech"] = false
-		g.PlaceTech(
-			chosenTech,
+	if g.CheckTilesOccupied(chosenTech.Tile, mousePosition.X, mousePosition.Y) {
+		occupiedTile := chosenTech.Tile.Tile
+		occupiedTile.Color = rl.Red
+		DrawTile(
+			occupiedTile,
 			float32(mousePosition.X)-(chosenTech.Tile.Tile.TileFrame.Width/2),
 			float32(mousePosition.Y)-(chosenTech.Tile.Tile.TileFrame.Height/2),
 		)
+
+	} else {
+		DrawTile(
+			chosenTech.Tile.Tile,
+			float32(mousePosition.X)-(chosenTech.Tile.Tile.TileFrame.Width/2),
+			float32(mousePosition.Y)-(chosenTech.Tile.Tile.TileFrame.Height/2),
+		)
+		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+			scene.Data["PlaceTech"] = false
+			g.PlaceTech(
+				chosenTech,
+				float32(mousePosition.X)-(chosenTech.Tile.Tile.TileFrame.Width/2),
+				float32(mousePosition.Y)-(chosenTech.Tile.Tile.TileFrame.Height/2),
+			)
+		}
+
 	}
+
 }
 
 func DrawBoard(g *Game) {

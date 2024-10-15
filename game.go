@@ -62,6 +62,7 @@ func (g *Game) CreateChickenCoopTech() Technology {
 		Column:   10,
 		Width:    2,
 		Height:   2,
+		Occupied: true,
 	}
 	return result
 }
