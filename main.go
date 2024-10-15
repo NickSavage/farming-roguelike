@@ -63,6 +63,21 @@ func (g *Game) LoadAssets() {
 		},
 		Color: rl.White,
 	}
+
+	image = rl.LoadImage("assets/trees.png")
+	rl.ImageResize(image, 432, 240)
+
+	g.Data["TreeTile"] = Tile{
+
+		Texture: rl.LoadTextureFromImage(image),
+		TileFrame: rl.Rectangle{
+			X:      54,
+			Y:      0,
+			Width:  90,
+			Height: 90,
+		},
+		Color: rl.White,
+	}
 }
 
 func (g *Game) LoadScenes() {
@@ -104,6 +119,7 @@ func main() {
 	g.InitShopWindow()
 
 	rl.SetTargetFPS(60)
+
 	for !rl.WindowShouldClose() {
 
 		g.Draw()

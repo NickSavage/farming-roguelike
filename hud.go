@@ -110,7 +110,7 @@ func DrawHUD(g *Game) {
 	g.DrawButtons(scene.Buttons)
 
 	if scene.Data["DisplayTechWindow"].(bool) {
-		rl.DrawRectangle(200, 50, 900, 500, rl.Blue)
+		g.DrawTechnologyWindow()
 	}
 	if scene.Data["DisplayShopWindow"].(bool) {
 		g.DrawShopWindow()

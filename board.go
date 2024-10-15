@@ -2,11 +2,15 @@ package main
 
 import (
 	"github.com/gen2brain/raylib-go/raylib"
+	"math/rand"
 	//"log"
 )
 
 const TILE_HEIGHT = 45
 const TILE_WIDTH = 45
+
+const TILE_ROWS = 30
+const TILE_COLUMNS = 30
 
 type BoardSquare struct {
 	Tile     Tile
@@ -18,14 +22,52 @@ type BoardSquare struct {
 	Skip     bool
 }
 
+func generateCoordinates(numPairs, maxX, maxY int) []rl.Vector2 {
+	coordinates := make([]rl.Vector2, numPairs)
+
+	for i := 0; i < numPairs; i++ {
+		coordinates[i] = rl.Vector2{
+			X: float32(rand.Intn(maxX)),
+			Y: float32(rand.Intn(maxY)),
+		}
+	}
+
+	return coordinates
+}
+func (g *Game) InitPlaceRandomTrees() {
+	scene := g.Scenes["Board"]
+	grid := scene.Data["Grid"].([][]BoardSquare)
+	tile := g.Data["TreeTile"].(Tile)
+
+	coords := generateCoordinates(30, TILE_ROWS/2, TILE_COLUMNS/2)
+
+	for _, coord := range coords {
+		x := int(coord.X * 2)
+		y := int(coord.Y * 2)
+		tileSquare := grid[x][y]
+		tileSquare.Tile = tile
+		tileSquare.TileType = "Tree"
+		tileSquare.Width = 2
+		tileSquare.Height = 2
+
+		for i := range tileSquare.Width {
+			for j := range tileSquare.Height {
+				grid[x+i][y+j] = tileSquare
+				grid[x+i][y+j].Skip = true
+			}
+		}
+		grid[x][y] = tileSquare
+	}
+
+}
 func (g *Game) InitBoard() {
 	scene := g.Scenes["Board"]
 	scene.Camera = rl.Camera2D{}
 	scene.Camera.Zoom = 1.0
 	scene.Camera.Target = rl.Vector2{X: 0, Y: 0}
 
-	rows := 100
-	cols := 100
+	rows := 30
+	cols := 30
 
 	scene.Data["Rows"] = rows
 	scene.Data["Columns"] = cols
@@ -37,8 +79,8 @@ func (g *Game) InitBoard() {
 	for i := 0; i < int(rows); i++ {
 		for j := 0; j < int(cols); j++ {
 			square := BoardSquare{
-				Tile:     g.Data["DirtTile"].(Tile),
-				TileType: "Dirt",
+				Tile:     g.Data["GrassTile"].(Tile),
+				TileType: "Grass",
 				Row:      i,
 				Column:   j,
 				Width:    1,
@@ -49,6 +91,7 @@ func (g *Game) InitBoard() {
 		}
 	}
 	g.Scenes["Board"].Data["Grid"] = grid
+	g.InitPlaceRandomTrees()
 
 }
 
@@ -67,6 +110,11 @@ func (g *Game) drawTiles() {
 			// 		float32(j*TILE_WIDTH),
 			// 	)
 			// }
+			DrawTile(
+				g.Data["GrassTile"].(Tile),
+				float32(i*TILE_HEIGHT),
+				float32(j*TILE_WIDTH),
+			)
 
 			DrawTile(
 				tile.Tile,
@@ -137,6 +185,15 @@ func (g *Game) drawGrid() {
 		}
 
 	}
+	rl.DrawRectangleLinesEx(rl.Rectangle{
+		X:      0,
+		Y:      0,
+		Width:  maxX,
+		Height: maxY,
+	},
+		5,
+		rl.Black,
+	)
 
 }
 
@@ -176,7 +233,6 @@ func DrawBoard(g *Game) {
 	g.drawTiles()
 	g.DrawPlaceTech()
 	g.drawGrid()
-
 	rl.EndMode2D()
 
 	currentGesture := rl.GetGestureDetected()
@@ -256,14 +312,26 @@ func UpdateBoard(g *Game) {
 	}
 	if rl.IsKeyDown(rl.KeyRight) {
 		scene.Camera.Target.X += 5
-		if scene.Camera.Target.X > 1000 {
-			scene.Camera.Target.X = 1000
+		if scene.Camera.Target.X > TILE_COLUMNS*TILE_WIDTH-float32(g.screenWidth-50) {
+			scene.Camera.Target.X = TILE_COLUMNS*TILE_WIDTH - float32(g.screenWidth-50)
 		}
 	}
 	if rl.IsKeyDown(rl.KeyLeft) {
 		scene.Camera.Target.X -= 5
-		if scene.Camera.Target.X < 0 {
-			scene.Camera.Target.X = 0
+		if scene.Camera.Target.X < -200 {
+			scene.Camera.Target.X = -200
+		}
+	}
+	if rl.IsKeyDown(rl.KeyDown) {
+		scene.Camera.Target.Y += 5
+		if scene.Camera.Target.Y > TILE_ROWS*TILE_HEIGHT-float32(g.screenHeight-200) {
+			scene.Camera.Target.Y = TILE_ROWS*TILE_HEIGHT - float32(g.screenHeight-200)
+		}
+	}
+	if rl.IsKeyDown(rl.KeyUp) {
+		scene.Camera.Target.Y -= 5
+		if scene.Camera.Target.Y < -300 {
+			scene.Camera.Target.Y = -300
 		}
 	}
 	g.SelectTiles()
