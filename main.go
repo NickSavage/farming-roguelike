@@ -78,6 +78,19 @@ func (g *Game) LoadAssets() {
 		},
 		Color: rl.White,
 	}
+
+	image = rl.LoadImage("assets/plants.png")
+	rl.ImageResize(image, 225, 675)
+	g.Data["CornTile"] = Tile{
+		Texture: rl.LoadTextureFromImage(image),
+		TileFrame: rl.Rectangle{
+			X:      138,
+			Y:      357,
+			Width:  45,
+			Height: 45,
+		},
+		Color: rl.White,
+	}
 }
 
 func (g *Game) LoadScenes() {
@@ -115,6 +128,7 @@ func main() {
 	g.LoadAssets()
 	g.LoadScenes()
 
+	g.InitTechnology()
 	g.InitRun()
 	g.InitShopWindow()
 

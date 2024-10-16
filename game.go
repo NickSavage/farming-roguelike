@@ -9,30 +9,44 @@ type Technology struct {
 	Name        string
 	Description string
 	Tile        BoardSquare
+	OnRoundEnd  func(*Game)
+	OnBuild     func(*Game)
 }
 
 type Person struct {
 }
 
 type Run struct {
-	Technology []Technology
-	People     []Person
-	Money      int32
+	Technology            []*Technology
+	People                []Person
+	Money                 float32
+	Productivity          float32
+	EndRoundMoney         float32
+	RoundActions          int
+	RoundActionsRemaining int
 }
 
 func (g *Game) InitRun() {
 
 	g.Run = &Run{
-		Money:      100,
-		Technology: make([]Technology, 0),
-		People:     make([]Person, 1),
+		Money:                 100,
+		Productivity:          1.0,
+		RoundActions:          5,
+		RoundActionsRemaining: 5,
+		Technology:            make([]*Technology, 0),
+		People:                make([]Person, 1),
 	}
 	g.Run.Technology = append(g.Run.Technology, g.CreateChickenCoopTech())
+	g.Run.Technology = append(g.Run.Technology, g.CreateCornTech())
 
 }
-
-func (g *Game) EndRound() {
-	g.Run.Money += 100
+func OnClickEndRound(g *Game) {
+	g.Run.EndRoundMoney += 100
+	for _, tech := range g.Run.Technology {
+		tech.OnRoundEnd(g)
+	}
+	g.Run.Money += g.Run.EndRoundMoney * g.Run.Productivity
+	g.Run.EndRoundMoney = 0
 }
 
 func (g *Game) PlaceTech(tech *Technology, x, y float32) {
@@ -45,16 +59,35 @@ func (g *Game) PlaceTech(tech *Technology, x, y float32) {
 	tech.Tile.Column = col
 
 	log.Printf("tech %v", len(g.Run.Technology))
-	g.Run.Technology = append(g.Run.Technology, *tech)
+	g.Run.Technology = append(g.Run.Technology, tech)
 	log.Printf("tech afte %v", len(g.Run.Technology))
 
 }
 
-func (g *Game) CreateChickenCoopTech() Technology {
-	result := Technology{
-		Name: "Chicken Coop",
-		Tile: BoardSquare{},
+func (g *Game) InitTechnology() {
+	tech := make(map[string]Technology)
+	chicken := Technology{
+		Name:        "Chicken Coop",
+		Tile:        BoardSquare{},
+		Description: "asdasd",
+		OnRoundEnd:  ChickenCoopRoundEnd,
 	}
+	tech["ChickenCoop"] = chicken
+
+	tech["CornField"] = Technology{
+		Name:        "Corn",
+		Tile:        BoardSquare{},
+		Description: "asdasd",
+		OnRoundEnd:  CornFieldRoundEnd,
+	}
+
+	g.Data["Technology"] = tech
+}
+
+func (g *Game) CreateChickenCoopTech() *Technology {
+
+	tech := g.Data["Technology"].(map[string]Technology)
+	result := tech["ChickenCoop"]
 	result.Tile = BoardSquare{
 		Tile:     g.Data["ChickenCoopTile"].(Tile),
 		TileType: "Technology",
@@ -64,7 +97,23 @@ func (g *Game) CreateChickenCoopTech() Technology {
 		Height:   2,
 		Occupied: true,
 	}
-	return result
+	return &result
+}
+
+func (g *Game) CreateCornTech() *Technology {
+
+	tech := g.Data["Technology"].(map[string]Technology)
+	result := tech["CornField"]
+	result.Tile = BoardSquare{
+		Tile:     g.Data["CornTile"].(Tile),
+		TileType: "Technology",
+		Row:      8,
+		Column:   8,
+		Width:    5,
+		Height:   10,
+		Occupied: true,
+	}
+	return &result
 }
 
 func (g *Game) drawRunTech(tech Technology, x, y float32) {
@@ -98,8 +147,21 @@ func (g *Game) DrawTechnologyWindow() {
 	rl.DrawText("Technology", 205, 55, 30, rl.Black)
 
 	for _, tech := range g.Run.Technology {
-		g.drawRunTech(tech, 210, 90)
+		g.drawRunTech(*tech, 210, 90)
 
 	}
 
+}
+
+func ChickenCoopOnBuild(g *Game) {
+	g.Run.Productivity += 0.05
+
+}
+
+func ChickenCoopRoundEnd(g *Game) {
+	g.Run.EndRoundMoney += 5
+}
+
+func CornFieldRoundEnd(g *Game) {
+	g.Run.EndRoundMoney += 5
 }

@@ -54,7 +54,7 @@ func (g *Game) InitHUD() {
 		Color:     rl.SkyBlue,
 		Text:      "End Season",
 		TextColor: rl.Black,
-		OnClick:   OnClickTestButton,
+		OnClick:   OnClickEndRound,
 	}
 	scene.Buttons = append(scene.Buttons, endButton)
 	techButton := Button{

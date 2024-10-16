@@ -63,6 +63,19 @@ func (g *Game) InitPlaceRandomTrees(numTrees int) {
 	}
 
 }
+
+func (g *Game) InitPlaceTech() {
+
+	scene := g.Scenes["Board"]
+	scene.Data["PlaceTechCancelButton"] = ShopButton{
+		Width:           200,
+		Height:          40,
+		Title:           "Cancel Placement",
+		OnClick:         OnClickCancelTechPlacement,
+		BackgroundColor: rl.SkyBlue,
+	}
+
+}
 func (g *Game) InitBoard() {
 	scene := g.Scenes["Board"]
 	scene.Camera = rl.Camera2D{}
@@ -96,6 +109,7 @@ func (g *Game) InitBoard() {
 	}
 	g.Scenes["Board"].Data["Grid"] = grid
 	g.InitPlaceRandomTrees(40)
+	g.InitPlaceTech()
 
 }
 
@@ -233,6 +247,11 @@ func (g *Game) CheckTilesOccupied(newBoardSquare BoardSquare, mouseX, mouseY flo
 
 }
 
+func OnClickCancelTechPlacement(g *Game) {
+	scene := g.Scenes["Board"]
+	scene.Data["PlaceTech"] = false
+
+}
 func (g *Game) DrawPlaceTech() {
 	scene := g.Scenes["Board"]
 	if scene.Data["PlaceTech"] == nil || !scene.Data["PlaceTech"].(bool) {
@@ -246,6 +265,18 @@ func (g *Game) DrawPlaceTech() {
 	chosenTech := scene.Data["PlaceChosenTech"].(*Technology)
 	mousePosition := rl.GetMousePosition()
 
+	cancelButton := scene.Data["PlaceTechCancelButton"].(ShopButton)
+	g.DrawShopButton(cancelButton, 200, 50)
+
+	if rl.CheckCollisionPointRec(mousePosition, rl.Rectangle{
+		X:      200,
+		Y:      50,
+		Width:  float32(cancelButton.Width),
+		Height: float32(cancelButton.Height),
+	}) {
+		// don't display placement if you're over the cancel button
+		return
+	}
 	if g.CheckTilesOccupied(chosenTech.Tile, mousePosition.X, mousePosition.Y) {
 		occupiedTile := chosenTech.Tile.Tile
 		occupiedTile.Color = rl.Red
