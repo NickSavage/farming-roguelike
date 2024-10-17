@@ -11,11 +11,11 @@ func ShopClickChickenCoop(g *Game) {
 	g.Scenes["Board"].Data["PlaceChosenTech"] = g.CreateChickenCoopTech()
 }
 
-func ShopClickCornField(g *Game) {
+func ShopClickWheatField(g *Game) {
 	g.Scenes["HUD"].Data["DisplayShopWindow"] = false
 	g.Scenes["Board"].Data["PlaceTech"] = true
 	g.Scenes["Board"].Data["PlaceTechSkip"] = true
-	g.Scenes["Board"].Data["PlaceChosenTech"] = g.CreateCornTech()
+	g.Scenes["Board"].Data["PlaceChosenTech"] = g.CreateWheatTech()
 
 }
 
@@ -33,10 +33,10 @@ func (g *Game) InitShopWindow() {
 		ShopButton{
 			Width:       400,
 			Height:      50,
-			Title:       "Corn Field",
+			Title:       "Wheat Field",
 			Description: "sdasda",
-			Image:       g.Data["CornTile"].(Tile),
-			OnClick:     ShopClickCornField,
+			Image:       g.Data["WheatTile"].(Tile),
+			OnClick:     ShopClickWheatField,
 		},
 	}
 	scene.Data["ShopButtons"] = buttons

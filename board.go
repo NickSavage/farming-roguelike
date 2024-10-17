@@ -13,14 +13,15 @@ const TILE_ROWS = 30
 const TILE_COLUMNS = 30
 
 type BoardSquare struct {
-	Tile     Tile
-	TileType string
-	Row      int
-	Column   int
-	Width    int // in tiles
-	Height   int // in tiles
-	Skip     bool
-	Occupied bool
+	Tile        Tile
+	TileType    string
+	Row         int
+	Column      int
+	Width       int // in tiles
+	Height      int // in tiles
+	Skip        bool
+	Occupied    bool
+	MultiSquare bool
 }
 
 func generateCoordinates(numPairs, maxX, maxY int) []rl.Vector2 {
@@ -51,6 +52,7 @@ func (g *Game) InitPlaceRandomTrees(numTrees int) {
 		boardSquare.Width = 2
 		boardSquare.Height = 2
 		boardSquare.Occupied = true
+		boardSquare.MultiSquare = true
 
 		for i := range boardSquare.Width {
 			for j := range boardSquare.Height {
@@ -122,12 +124,6 @@ func (g *Game) drawTiles() {
 			if tile.Skip {
 				continue
 			}
-			// if tile.TileType == "Technology" {
-			// 	log.Printf("tech %v/%v",
-			// 		float32(i*TILE_HEIGHT),
-			// 		float32(j*TILE_WIDTH),
-			// 	)
-			// }
 			DrawTile(
 				g.Data["GrassTile"].(Tile),
 				float32(i*TILE_HEIGHT),
@@ -151,9 +147,11 @@ func (g *Game) drawTechnology() {
 		tile := tech.Tile
 		for x := range tile.Width {
 			for y := range tile.Height {
+				tile.Occupied = true
+				if tile.MultiSquare {
+					tile.Skip = true
+				}
 				grid[tile.Row+x][tile.Column+y] = tile
-				grid[tile.Row+x][tile.Column+y].Skip = true
-				grid[tile.Row+x][tile.Column+y].Occupied = true
 			}
 		}
 		grid[tile.Row][tile.Column] = tile

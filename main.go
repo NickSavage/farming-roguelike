@@ -10,6 +10,8 @@ type Game struct {
 	screenWidth  int32
 	screenHeight int32
 	Run          *Run
+	Counter      int32
+	Seconds      int32
 }
 
 func (g *Game) LoadAssets() {
@@ -81,10 +83,10 @@ func (g *Game) LoadAssets() {
 
 	image = rl.LoadImage("assets/plants.png")
 	rl.ImageResize(image, 225, 675)
-	g.Data["CornTile"] = Tile{
+	g.Data["WheatTile"] = Tile{
 		Texture: rl.LoadTextureFromImage(image),
 		TileFrame: rl.Rectangle{
-			X:      138,
+			X:      0,
 			Y:      357,
 			Width:  45,
 			Height: 45,
@@ -121,7 +123,10 @@ func main() {
 		Data:         make(map[string]interface{}),
 		screenWidth:  int32(1280),
 		screenHeight: int32(800),
+		Counter:      0,
 	}
+
+	g.Data["Message"] = ""
 
 	rl.InitWindow(g.screenWidth, g.screenHeight, "Farming Roguelike")
 
@@ -135,6 +140,11 @@ func main() {
 	rl.SetTargetFPS(60)
 
 	for !rl.WindowShouldClose() {
+		g.Counter += 1
+		if g.Counter == 60 {
+			g.Seconds += 1
+			g.Counter = 0
+		}
 
 		g.Draw()
 		g.Update()
