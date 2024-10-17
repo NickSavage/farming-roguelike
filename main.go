@@ -4,16 +4,6 @@ import (
 	"github.com/gen2brain/raylib-go/raylib"
 )
 
-type Game struct {
-	Scenes       map[string]*Scene
-	Data         map[string]interface{}
-	screenWidth  int32
-	screenHeight int32
-	Run          *Run
-	Counter      int32
-	Seconds      int32
-}
-
 func (g *Game) LoadAssets() {
 	image := rl.LoadImage("assets/grass.png")
 	rl.ImageResize(image, 264, 168)

@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/gen2brain/raylib-go/raylib"
+	"log"
 	"math/rand"
-	//"log"
 )
 
 const TILE_HEIGHT = 45
@@ -11,18 +11,6 @@ const TILE_WIDTH = 45
 
 const TILE_ROWS = 30
 const TILE_COLUMNS = 30
-
-type BoardSquare struct {
-	Tile        Tile
-	TileType    string
-	Row         int
-	Column      int
-	Width       int // in tiles
-	Height      int // in tiles
-	Skip        bool
-	Occupied    bool
-	MultiSquare bool
-}
 
 func generateCoordinates(numPairs, maxX, maxY int) []rl.Vector2 {
 	coordinates := make([]rl.Vector2, numPairs)
@@ -110,6 +98,9 @@ func (g *Game) InitBoard() {
 		}
 	}
 	g.Scenes["Board"].Data["Grid"] = grid
+
+	g.Scenes["Board"].Data["HoverVector"] = rl.Vector2{}
+	g.Scenes["Board"].Data["HoverVectorCounter"] = 0
 	g.InitPlaceRandomTrees(40)
 	g.InitPlaceTech()
 
@@ -148,6 +139,7 @@ func (g *Game) drawTechnology() {
 		for x := range tile.Width {
 			for y := range tile.Height {
 				tile.Occupied = true
+				tile.Technology = tech
 				if tile.MultiSquare {
 					tile.Skip = true
 				}
@@ -305,7 +297,7 @@ func (g *Game) DrawPlaceTech() {
 
 func DrawBoard(g *Game) {
 
-	scene := g.Scenes["Board"]
+	//	scene := g.Scenes["Board"]
 	rl.BeginMode2D(g.Scenes["Board"].Camera)
 	g.drawTechnology()
 	g.drawTiles()
@@ -313,30 +305,9 @@ func DrawBoard(g *Game) {
 	g.drawGrid()
 	rl.EndMode2D()
 
-	currentGesture := rl.GetGestureDetected()
-	if currentGesture == rl.GestureNone {
-		scene.Data["DragSelectionStart"] = nil
-		scene.Data["DragSelectionStop"] = nil
-
-	}
-	if currentGesture == rl.GestureHold {
-		scene.Data["DragSelectionStart"] = rl.GetMousePosition()
-	}
-	if currentGesture == rl.GestureDrag {
-		current := rl.GetMousePosition()
-		scene.Data["DragSelectionStop"] = rl.GetMousePosition()
-		startVec := scene.Data["DragSelectionStart"].(rl.Vector2)
-		width := current.X - startVec.X
-		height := current.Y - startVec.Y
-		rl.DrawRectangleLines(
-			int32(startVec.X),
-			int32(startVec.Y),
-			int32(width),
-			int32(height),
-			rl.Black,
-		)
-	}
+	g.HandleHover()
 	DrawHUD(g)
+	g.DrawRightClickMenu()
 }
 
 func (g *Game) SelectTiles() {
@@ -378,6 +349,96 @@ func (g *Game) SelectTiles() {
 
 }
 
+func (g *Game) HandleRightClick() {
+
+	scene := g.Scenes["Board"]
+
+	if rl.IsMouseButtonPressed(rl.MouseRightButton) {
+		mousePosition := rl.GetMousePosition()
+
+		grid := scene.Data["Grid"].([][]BoardSquare)
+		x := int((mousePosition.X + scene.Camera.Target.X) / scene.Camera.Zoom / float32(TILE_WIDTH))
+		y := int((mousePosition.Y + scene.Camera.Target.Y) / scene.Camera.Zoom / float32(TILE_HEIGHT))
+		log.Printf("tile %v", grid[x][y])
+		menu := &BoardRightClickMenu{
+			Rectangle: rl.Rectangle{
+				X:      mousePosition.X,
+				Y:      mousePosition.Y,
+				Height: 100,
+				Width:  100,
+			},
+			BoardSquare: &grid[x][y],
+		}
+		scene.Data["RenderRightClickMenu"] = menu
+		return
+	}
+	if scene.Data["RenderRightClickMenu"] != nil {
+		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+
+			mousePosition := rl.GetMousePosition()
+			menu := scene.Data["RenderRightClickMenu"].(*BoardRightClickMenu)
+			if !rl.CheckCollisionPointRec(mousePosition, menu.Rectangle) {
+				scene.Data["RenderRightClickMenu"] = nil
+			}
+
+		}
+	}
+
+}
+
+func (g *Game) DrawRightClickMenu() {
+	scene := g.Scenes["Board"]
+	if scene.Data["RenderRightClickMenu"] == nil {
+		return
+	}
+	menu := scene.Data["RenderRightClickMenu"].(*BoardRightClickMenu)
+
+	rl.DrawRectangleRec(menu.Rectangle, rl.White)
+
+}
+
+func (g *Game) HandleHover() {
+
+	scene := g.Scenes["Board"]
+	mousePosition := rl.GetMousePosition()
+
+	newVec := rl.Vector2{
+		X: (mousePosition.X + scene.Camera.Target.X) / scene.Camera.Zoom / float32(TILE_WIDTH),
+		Y: (mousePosition.Y + scene.Camera.Target.Y) / scene.Camera.Zoom / float32(TILE_HEIGHT),
+	}
+	oldVec := scene.Data["HoverVector"].(rl.Vector2)
+	if newVec.X < 0 || newVec.X > TILE_ROWS-1 {
+		return
+	}
+	if newVec.Y < 0 || newVec.Y > TILE_COLUMNS-1 {
+		return
+	}
+	if oldVec.X == newVec.X && oldVec.Y == newVec.Y {
+		counter := scene.Data["HoverVectorCounter"].(int)
+		if counter == 0 {
+			square := scene.Data["Grid"].([][]BoardSquare)[int(newVec.X)][int(newVec.Y)]
+
+			if square.Technology != nil {
+				g.DrawTechHoverWindow(
+					*square.Technology,
+					mousePosition.X,
+					mousePosition.Y,
+				)
+
+			}
+		} else {
+			counter = counter - 1
+			scene.Data["HoverVectorCounter"] = counter
+		}
+
+	} else {
+
+		scene.Data["HoverVector"] = newVec
+		scene.Data["HoverVectorCounter"] = 10
+	}
+
+}
+
 func UpdateBoard(g *Game) {
 	scene := g.Scenes["Board"]
 
@@ -413,6 +474,7 @@ func UpdateBoard(g *Game) {
 		}
 	}
 	g.SelectTiles()
+	g.HandleRightClick()
 
 	// mousePosition := rl.GetMousePosition()
 }

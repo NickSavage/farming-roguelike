@@ -6,33 +6,6 @@ import (
 	"math"
 )
 
-type Technology struct {
-	Name            string
-	Description     string
-	Tile            BoardSquare
-	Cost            float32
-	OnRoundEnd      func(*Game, *Technology)
-	OnBuild         func(*Game, *Technology)
-	RoundEndText    func(*Game, *Technology) string
-	RoundEndValue   func(*Game, *Technology) float32
-	RoundCounterMax int
-	RoundCounter    int
-}
-
-type Person struct {
-}
-
-type Run struct {
-	Technology            []*Technology
-	People                []Person
-	Money                 float32
-	Productivity          float32
-	EndRoundMoney         float32
-	RoundActions          int
-	RoundActionsRemaining int
-	Round                 int
-}
-
 func (g *Game) InitRun() {
 
 	g.Run = &Run{
@@ -81,65 +54,18 @@ func (g *Game) PlaceTech(tech *Technology, x, y float32) {
 
 }
 
-func (g *Game) InitTechnology() {
-	tech := make(map[string]Technology)
-	chicken := Technology{
-		Name:          "Chicken Coop",
-		Tile:          BoardSquare{},
-		Description:   "asdasd",
-		Cost:          50,
-		OnBuild:       ChickenCoopOnBuild,
-		OnRoundEnd:    ChickenCoopRoundEnd,
-		RoundEndValue: ChickenCoopRoundEndValue,
+func (g *Game) DrawTechHoverWindow(tech Technology, x, y float32) {
+	toolTipRect := rl.Rectangle{
+		X:      x,
+		Y:      y,
+		Width:  200,
+		Height: 100,
 	}
-	tech["ChickenCoop"] = chicken
+	rl.DrawRectangleRec(toolTipRect, rl.White)
+	rl.DrawRectangleLinesEx(toolTipRect, 1, rl.Black)
+	rl.DrawText(tech.Name, int32(x+5), int32(y+5), 20, rl.Black)
+	rl.DrawText(tech.Description, int32(x+5), int32(y+25), 10, rl.Black)
 
-	tech["WheatField"] = Technology{
-		Name:            "Wheat",
-		Tile:            BoardSquare{},
-		Cost:            50,
-		Description:     "asdasd",
-		OnBuild:         WheatFieldOnBuild,
-		OnRoundEnd:      WheatFieldRoundEnd,
-		RoundCounterMax: 4,
-		RoundCounter:    4,
-		RoundEndValue:   WheatFieldRoundEndValue,
-	}
-
-	g.Data["Technology"] = tech
-}
-
-func (g *Game) CreateChickenCoopTech() *Technology {
-
-	tech := g.Data["Technology"].(map[string]Technology)
-	result := tech["ChickenCoop"]
-	result.Tile = BoardSquare{
-		Tile:        g.Data["ChickenCoopTile"].(Tile),
-		TileType:    "Technology",
-		Row:         10,
-		Column:      10,
-		Width:       2,
-		Height:      2,
-		Occupied:    true,
-		MultiSquare: true,
-	}
-	return &result
-}
-
-func (g *Game) CreateWheatTech() *Technology {
-
-	tech := g.Data["Technology"].(map[string]Technology)
-	result := tech["WheatField"]
-	result.Tile = BoardSquare{
-		Tile:     g.Data["WheatTile"].(Tile),
-		TileType: "Technology",
-		Row:      8,
-		Column:   8,
-		Width:    5,
-		Height:   5,
-		Occupied: true,
-	}
-	return &result
 }
 
 func (g *Game) drawRunTech(tech Technology, x, y float32) {
@@ -154,15 +80,7 @@ func (g *Game) drawRunTech(tech Technology, x, y float32) {
 
 	mousePosition := rl.GetMousePosition()
 	if rl.CheckCollisionPointRec(mousePosition, rect) {
-		toolTipRect := rl.Rectangle{
-			X:      x + 30,
-			Y:      y + 30,
-			Width:  200,
-			Height: 100,
-		}
-		rl.DrawRectangleRec(toolTipRect, rl.White)
-		rl.DrawRectangleLinesEx(toolTipRect, 1, rl.Black)
-		rl.DrawText("tooltip", int32(x+35), int32(y+35), 20, rl.Black)
+		g.DrawTechHoverWindow(tech, x+30, y+30)
 	}
 
 }
@@ -177,58 +95,6 @@ func (g *Game) DrawTechnologyWindow() {
 	for i, tech := range g.Run.Technology {
 		g.drawRunTech(*tech, float32(210+(i*offset)), 90)
 
-	}
-
-}
-
-func ChickenCoopOnBuild(g *Game, tech *Technology) {
-	g.Run.Productivity += 0.05
-	g.Run.RoundActionsRemaining -= 1
-	g.Run.Money -= tech.Cost
-}
-
-func ChickenCoopRoundEndText(g *Game, tech *Technology) string {
-	return "Chicken Coop: $5"
-}
-
-func ChickenCoopRoundEndValue(g *Game, tech *Technology) float32 {
-	return 5
-}
-
-func ChickenCoopRoundEnd(g *Game, tech *Technology) {
-	g.Run.EndRoundMoney += 5
-}
-
-func WheatFieldOnBuild(g *Game, tech *Technology) {
-
-	g.Run.RoundActionsRemaining -= 1
-	g.Run.Money -= tech.Cost
-}
-
-func WheatFieldRoundEndValue(g *Game, tech *Technology) float32 {
-	if tech.RoundCounter-1 == 0 {
-		return 125
-	} else {
-		return 0
-	}
-}
-func WheatFieldRoundEndText(g *Game, tech *Technology) string {
-	if tech.RoundCounter-1 == 0 {
-		return "Wheat Field: $125"
-	} else {
-		return "Wheat Field: $0"
-	}
-
-}
-
-func WheatFieldRoundEnd(g *Game, tech *Technology) {
-
-	g.Run.RoundActionsRemaining -= 1
-	tech.Tile.Tile.TileFrame.X += 45
-	tech.RoundCounter -= 1
-	g.Run.EndRoundMoney += WheatFieldRoundEndValue(g, tech)
-	if tech.RoundCounter == 0 {
-		tech.RoundCounter = tech.RoundCounterMax
 	}
 
 }
