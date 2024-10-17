@@ -41,6 +41,13 @@ func OnClickTechWindowButton(g *Game) {
 	}
 }
 
+func OnClickOpenEndRoundWindow(g *Game) {
+	scene := g.Scenes["HUD"]
+	// warn about remaining actions?
+	scene.Data["DisplayEndRoundWindow"] = true
+
+}
+
 func (g *Game) InitHUD() {
 	scene := g.Scenes["HUD"]
 
@@ -54,7 +61,7 @@ func (g *Game) InitHUD() {
 		Color:     rl.SkyBlue,
 		Text:      "End Season",
 		TextColor: rl.Black,
-		OnClick:   OnClickEndRound,
+		OnClick:   OnClickOpenEndRoundWindow,
 	}
 	scene.Buttons = append(scene.Buttons, endButton)
 	techButton := Button{
@@ -86,6 +93,19 @@ func (g *Game) InitHUD() {
 	}
 	scene.Buttons = append(scene.Buttons, shopButton)
 	scene.Data["DisplayShopWindow"] = false
+	scene.Data["EndRoundConfirmButton"] = Button{
+		Rectangle: rl.Rectangle{
+			X:      0,
+			Y:      0,
+			Width:  150,
+			Height: 40,
+		},
+		Color:     rl.SkyBlue,
+		Text:      "End Round",
+		TextColor: rl.Black,
+		OnClick:   OnClickEndRound,
+	}
+	scene.Data["DisplayEndRoundWindow"] = false
 
 }
 
@@ -128,5 +148,42 @@ func DrawHUD(g *Game) {
 	if scene.Data["DisplayShopWindow"].(bool) {
 		g.DrawShopWindow()
 	}
+	if scene.Data["DisplayEndRoundWindow"].(bool) {
+		g.DrawEndRoundWindow()
+	}
 
+}
+
+func (g *Game) DrawEndRoundWindow() {
+
+	window := rl.NewRectangle(220, 50, 900, 500)
+	rl.DrawRectangleRec(window, rl.White)
+	rl.DrawRectangleLinesEx(window, 5, rl.Black)
+	button := g.Scenes["HUD"].Data["EndRoundConfirmButton"].(Button)
+	button.Rectangle.X = 500
+	button.Rectangle.Y = 500
+
+	var totalEarned float32 = 0
+
+	var x, y int32
+	for i, tech := range g.Run.Technology {
+		x = int32(window.X + 10)
+		y = int32(window.Y + 50 + float32(i*30))
+		value := tech.RoundEndValue(g, tech)
+		totalEarned += value
+		text := fmt.Sprintf("%s: $%v", tech.Name, value)
+		rl.DrawText(text, x, y, 20, rl.Black)
+	}
+
+	text := fmt.Sprintf("Total: $%v", totalEarned)
+	rl.DrawText(text, x, y+30, 20, rl.Black)
+	g.DrawButton(button)
+	mousePosition := rl.GetMousePosition()
+
+	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+		if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {
+			g.Scenes["HUD"].Data["DisplayEndRoundWindow"] = false
+			button.OnClick(g)
+		}
+	}
 }

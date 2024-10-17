@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gen2brain/raylib-go/raylib"
 	"log"
+	"math"
 )
 
 type Technology struct {
@@ -12,6 +13,8 @@ type Technology struct {
 	Cost            float32
 	OnRoundEnd      func(*Game, *Technology)
 	OnBuild         func(*Game, *Technology)
+	RoundEndText    func(*Game, *Technology) string
+	RoundEndValue   func(*Game, *Technology) float32
 	RoundCounterMax int
 	RoundCounter    int
 }
@@ -52,6 +55,7 @@ func OnClickEndRound(g *Game) {
 		tech.OnRoundEnd(g, tech)
 	}
 	g.Run.Money += g.Run.EndRoundMoney * g.Run.Productivity
+	g.Run.Money = float32(math.Round(float64(g.Run.Money)))
 	g.Run.EndRoundMoney = 0
 }
 
@@ -80,12 +84,13 @@ func (g *Game) PlaceTech(tech *Technology, x, y float32) {
 func (g *Game) InitTechnology() {
 	tech := make(map[string]Technology)
 	chicken := Technology{
-		Name:        "Chicken Coop",
-		Tile:        BoardSquare{},
-		Description: "asdasd",
-		Cost:        50,
-		OnBuild:     ChickenCoopOnBuild,
-		OnRoundEnd:  ChickenCoopRoundEnd,
+		Name:          "Chicken Coop",
+		Tile:          BoardSquare{},
+		Description:   "asdasd",
+		Cost:          50,
+		OnBuild:       ChickenCoopOnBuild,
+		OnRoundEnd:    ChickenCoopRoundEnd,
+		RoundEndValue: ChickenCoopRoundEndValue,
 	}
 	tech["ChickenCoop"] = chicken
 
@@ -98,6 +103,7 @@ func (g *Game) InitTechnology() {
 		OnRoundEnd:      WheatFieldRoundEnd,
 		RoundCounterMax: 4,
 		RoundCounter:    4,
+		RoundEndValue:   WheatFieldRoundEndValue,
 	}
 
 	g.Data["Technology"] = tech
@@ -181,6 +187,14 @@ func ChickenCoopOnBuild(g *Game, tech *Technology) {
 	g.Run.Money -= tech.Cost
 }
 
+func ChickenCoopRoundEndText(g *Game, tech *Technology) string {
+	return "Chicken Coop: $5"
+}
+
+func ChickenCoopRoundEndValue(g *Game, tech *Technology) float32 {
+	return 5
+}
+
 func ChickenCoopRoundEnd(g *Game, tech *Technology) {
 	g.Run.EndRoundMoney += 5
 }
@@ -191,13 +205,29 @@ func WheatFieldOnBuild(g *Game, tech *Technology) {
 	g.Run.Money -= tech.Cost
 }
 
+func WheatFieldRoundEndValue(g *Game, tech *Technology) float32 {
+	if tech.RoundCounter-1 == 0 {
+		return 125
+	} else {
+		return 0
+	}
+}
+func WheatFieldRoundEndText(g *Game, tech *Technology) string {
+	if tech.RoundCounter-1 == 0 {
+		return "Wheat Field: $125"
+	} else {
+		return "Wheat Field: $0"
+	}
+
+}
+
 func WheatFieldRoundEnd(g *Game, tech *Technology) {
 
 	g.Run.RoundActionsRemaining -= 1
 	tech.Tile.Tile.TileFrame.X += 45
 	tech.RoundCounter -= 1
+	g.Run.EndRoundMoney += WheatFieldRoundEndValue(g, tech)
 	if tech.RoundCounter == 0 {
-		g.Run.EndRoundMoney += 125
 		tech.RoundCounter = tech.RoundCounterMax
 	}
 
