@@ -225,13 +225,9 @@ func (g *Game) DrawEndRoundWindowPage1(window rl.Rectangle) {
 	button.Rectangle.Y = 500
 
 	g.DrawButton(button)
-	mousePosition := rl.GetMousePosition()
-	//
-	if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
-		if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {
-			g.Scenes["HUD"].Data["DisplayEndRoundWindowPage"] = 2
-			g.ScreenSkip = true
-		}
+	if g.WasButtonClicked(&button) {
+		g.ScreenSkip = true
+		g.Scenes["HUD"].Data["DisplayEndRoundWindowPage"] = 2
 	}
 }
 
@@ -250,14 +246,10 @@ func (g *Game) DrawEndRoundWindowPage2(window rl.Rectangle) {
 	button.Rectangle.Y = 500
 
 	g.DrawButton(button)
-	mousePosition := rl.GetMousePosition()
-	//
-	if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
-		if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {
-			g.Scenes["HUD"].Data["DisplayEndRoundWindow"] = false
-			g.ScreenSkip = true
-			button.OnClick(g)
-		}
+	if g.WasButtonClicked(&button) {
+		g.ScreenSkip = true
+		g.Scenes["HUD"].Data["DisplayEndRoundWindow"] = false
+		button.OnClick(g)
 	}
 }
 
@@ -280,16 +272,13 @@ func (g *Game) DrawNextEventWindow() {
 	button.Rectangle.Y = 500
 
 	g.DrawButton(button)
-	mousePosition := rl.GetMousePosition()
-
 	rl.DrawText("NEW EVENT", 225, 60, 30, rl.Black)
 	rl.DrawText(g.Run.Events[g.Run.CurrentRound].Name, 225, 95, 15, rl.Black)
 
-	if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
-		if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {
-			g.Scenes["HUD"].Data["DisplayNextEventWindow"] = false
-			button.OnClick(g)
-		}
+	if g.WasButtonClicked(&button) {
+		g.Scenes["HUD"].Data["DisplayNextEventWindow"] = false
+		g.ScreenSkip = true
+		button.OnClick(g)
 	}
 
 }

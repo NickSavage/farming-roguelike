@@ -114,7 +114,7 @@ func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {
 }
 
 func (g *Game) WasButtonClicked(button *Button) bool {
-	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+	if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
 		mousePosition := rl.GetMousePosition()
 		if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {
 			return true
