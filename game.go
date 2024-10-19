@@ -55,6 +55,10 @@ func OnClickEndRound(g *Game) {
 
 func (g *Game) GetNextEvent() {
 
+	newEvent := g.NewRandomEvent()
+	newEvent.RoundIndex = g.Run.CurrentRound
+	g.Run.Events[newEvent.RoundIndex] = newEvent
+
 	// display event window
 	g.ScreenSkip = true
 	g.Scenes["HUD"].Data["DisplayNextEventWindow"] = true

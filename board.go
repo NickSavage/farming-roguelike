@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gen2brain/raylib-go/raylib"
-	"log"
+	//	"log"
 	"math/rand"
 )
 
@@ -165,7 +165,6 @@ func (g *Game) DrawTechnology(tech *Technology) {
 	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
 
 	tile := tech.Tile
-	log.Printf("tile %v", tile)
 	for x := range tile.Width {
 		for y := range tile.Height {
 			tile.Occupied = true
@@ -387,7 +386,6 @@ func (g *Game) HandleRightClick() {
 		grid := scene.Data["Grid"].([][]BoardSquare)
 		x := int((mousePosition.X + scene.Camera.Target.X) / scene.Camera.Zoom / float32(TILE_WIDTH))
 		y := int((mousePosition.Y + scene.Camera.Target.Y) / scene.Camera.Zoom / float32(TILE_HEIGHT))
-		log.Printf("tile %v", grid[x][y])
 		menu := &BoardRightClickMenu{
 			Rectangle: rl.Rectangle{
 				X:      mousePosition.X,

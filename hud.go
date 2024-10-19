@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gen2brain/raylib-go/raylib"
-	//	"log"
+	"log"
 )
 
 func OnClickShopWindowButton(g *Game) {
@@ -270,8 +270,10 @@ func DrawNextEventWindow(g *Game, win *Window) {
 	button.Rectangle.X = 500
 	button.Rectangle.Y = 500
 
+	event := g.Run.Events[g.Run.CurrentRound]
+	log.Printf("event %v", event)
 	g.DrawButton(button)
-	rl.DrawText("NEW EVENT", 225, 60, 30, rl.Black)
+	rl.DrawText(event.Name, 225, 60, 30, rl.Black)
 	rl.DrawText(g.Run.Events[g.Run.CurrentRound].Name, 225, 95, 15, rl.Black)
 
 	if g.WasButtonClicked(&button) {

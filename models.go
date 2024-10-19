@@ -76,14 +76,16 @@ type Event struct {
 	Name       string
 	Effects    []Effect
 }
+type Effect struct {
+	ProductImpacted string
+	PriceChange     float32 // percentage
+}
 
 type Product struct {
 	Name     string
 	Quantity float32
 	Price    float32
 }
-
-type Effect struct{}
 
 // Define the type for the enum
 type Season int
