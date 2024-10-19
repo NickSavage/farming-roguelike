@@ -2,29 +2,9 @@ package main
 
 func (g *Game) InitTechnology() {
 	tech := make(map[string]Technology)
-	chicken := Technology{
-		Name:          "Chicken Coop",
-		Tile:          BoardSquare{},
-		Description:   "asdasd",
-		Cost:          50,
-		OnBuild:       ChickenCoopOnBuild,
-		OnRoundEnd:    ChickenCoopRoundEnd,
-		RoundEndValue: ChickenCoopRoundEndValue,
-	}
-	tech["ChickenCoop"] = chicken
+	tech["ChickenCoop"] = g.ChickenCoop()
 
-	tech["WheatField"] = Technology{
-		Name:            "Wheat",
-		Tile:            BoardSquare{},
-		Cost:            50,
-		Description:     "asdasd",
-		OnBuild:         WheatFieldOnBuild,
-		OnRoundEnd:      WheatFieldRoundEnd,
-		RoundCounterMax: 4,
-		RoundCounter:    4,
-		RoundEndValue:   WheatFieldRoundEndValue,
-	}
-
+	tech["WheatField"] = g.WheatField()
 	g.Data["Technology"] = tech
 }
 
@@ -61,6 +41,29 @@ func (g *Game) CreateWheatTech() *Technology {
 	return &result
 }
 
+func (g *Game) ChickenCoop() Technology {
+	result := Technology{
+		Name:        "Chicken Coop",
+		Tile:        BoardSquare{},
+		Description: "asdasd",
+		Cost:        50,
+		OnBuild:     ChickenCoopOnBuild,
+		Redraw:      false,
+		RoundHandler: []TechnologyRoundHandler{
+			{
+				OnRoundEnd:    ChickenCoopRoundEnd,
+				RoundEndValue: ChickenCoopRoundEndValue,
+			},
+		},
+		RoundHandlerIndex: 0,
+	}
+	return result
+}
+
+func ChickenCoopCanBeBuilt(g *Game) bool {
+	return true
+}
+
 func ChickenCoopOnBuild(g *Game, tech *Technology) {
 	g.Run.Productivity += 0.05
 	g.Run.RoundActionsRemaining -= 1
@@ -79,6 +82,47 @@ func ChickenCoopRoundEnd(g *Game, tech *Technology) {
 	g.Run.EndRoundMoney += 5
 }
 
+func (g *Game) WheatField() Technology {
+	return Technology{
+		Name:        "Wheat",
+		Tile:        BoardSquare{},
+		Cost:        50,
+		Description: "asdasd",
+		OnBuild:     WheatFieldOnBuild,
+		Redraw:      false,
+		RoundHandler: []TechnologyRoundHandler{
+			{
+				Season:        Spring,
+				OnRoundEnd:    WheatFieldRoundSpring,
+				RoundEndValue: WheatFieldRoundEndValue,
+			},
+			{
+				Season:        Summer,
+				OnRoundEnd:    WheatFieldRoundSummer,
+				RoundEndValue: WheatFieldRoundEndValue,
+			},
+			{
+				Season:        Autumn,
+				OnRoundEnd:    WheatFieldRoundAutumn,
+				RoundEndValue: WheatFieldRoundEndValue,
+			},
+			{
+				Season:        Winter,
+				OnRoundEnd:    WheatFieldRoundWinter,
+				RoundEndValue: WheatFieldRoundEndValue,
+			},
+		},
+		RoundCounterMax:   0,
+		RoundCounter:      0,
+		RoundHandlerIndex: 0,
+	}
+
+}
+
+func WheatFieldCanBeBuilt(g *Game) bool {
+	return true
+}
+
 func WheatFieldOnBuild(g *Game, tech *Technology) {
 
 	g.Run.RoundActionsRemaining -= 1
@@ -86,14 +130,14 @@ func WheatFieldOnBuild(g *Game, tech *Technology) {
 }
 
 func WheatFieldRoundEndValue(g *Game, tech *Technology) float32 {
-	if tech.RoundCounter-1 == 0 {
+	if g.Run.CurrentSeason == Autumn {
 		return 125
 	} else {
 		return 0
 	}
 }
 func WheatFieldRoundEndText(g *Game, tech *Technology) string {
-	if tech.RoundCounter-1 == 0 {
+	if g.Run.CurrentSeason == Autumn {
 		return "Wheat Field: $125"
 	} else {
 		return "Wheat Field: $0"
@@ -101,14 +145,24 @@ func WheatFieldRoundEndText(g *Game, tech *Technology) string {
 
 }
 
-func WheatFieldRoundEnd(g *Game, tech *Technology) {
-
-	g.Run.RoundActionsRemaining -= 1
+func WheatFieldRoundSpring(g *Game, tech *Technology) {
+	tech.RoundHandlerIndex += 1
 	tech.Tile.Tile.TileFrame.X += 45
-	tech.RoundCounter -= 1
-	g.Run.EndRoundMoney += WheatFieldRoundEndValue(g, tech)
-	if tech.RoundCounter == 0 {
-		tech.RoundCounter = tech.RoundCounterMax
-	}
-
+	tech.Redraw = true
+}
+func WheatFieldRoundSummer(g *Game, tech *Technology) {
+	tech.RoundHandlerIndex += 1
+	tech.Tile.Tile.TileFrame.X += 45
+	tech.Redraw = true
+}
+func WheatFieldRoundAutumn(g *Game, tech *Technology) {
+	g.Run.EndRoundMoney += 125
+	tech.RoundHandlerIndex += 1
+	tech.Tile.Tile.TileFrame.X += 45
+	tech.Redraw = true
+}
+func WheatFieldRoundWinter(g *Game, tech *Technology) {
+	tech.RoundHandlerIndex += 0
+	tech.Tile.Tile.TileFrame.X += 45
+	tech.Redraw = true
 }

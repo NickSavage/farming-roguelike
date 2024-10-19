@@ -3,13 +3,14 @@ package main
 import (
 	"fmt"
 	"github.com/gen2brain/raylib-go/raylib"
-	"log"
+	//	"log"
 )
 
 func (g *Game) HideOtherWindows() {
 	scene := g.Scenes["HUD"]
 	scene.Data["DisplayShopWindow"] = false
 	scene.Data["DisplayTechWindow"] = false
+	scene.Data["DisplayEndRoundWindow"] = false
 }
 
 func OnClickShopWindowButton(g *Game) {
@@ -21,14 +22,6 @@ func OnClickShopWindowButton(g *Game) {
 		scene.Data["DisplayShopWindow"] = true
 	}
 
-}
-
-func OnClickTestButton(g *Game) {
-
-	g.HideOtherWindows()
-	g.Scenes["Board"].Data["PlaceTech"] = true
-	g.Scenes["Board"].Data["PlaceTechSkip"] = true
-	g.Scenes["Board"].Data["PlaceChosenTech"] = &g.Run.Technology[0]
 }
 
 func OnClickTechWindowButton(g *Game) {
@@ -44,26 +37,20 @@ func OnClickTechWindowButton(g *Game) {
 func OnClickOpenEndRoundWindow(g *Game) {
 	scene := g.Scenes["HUD"]
 	// warn about remaining actions?
-	scene.Data["DisplayEndRoundWindow"] = true
 
+	if scene.Data["DisplayEndRoundWindow"].(bool) == true {
+		scene.Data["DisplayEndRoundWindow"] = false
+	} else {
+		g.HideOtherWindows()
+		g.ScreenSkip = true
+		scene.Data["DisplayEndRoundWindowPage"] = 1
+		scene.Data["DisplayEndRoundWindow"] = true
+	}
 }
 
 func (g *Game) InitHUD() {
 	scene := g.Scenes["HUD"]
 
-	endButton := Button{
-		Rectangle: rl.Rectangle{
-			X:      500,
-			Y:      700,
-			Width:  150,
-			Height: 40,
-		},
-		Color:     rl.SkyBlue,
-		Text:      "End Season",
-		TextColor: rl.Black,
-		OnClick:   OnClickOpenEndRoundWindow,
-	}
-	scene.Buttons = append(scene.Buttons, endButton)
 	techButton := Button{
 		Rectangle: rl.Rectangle{
 			X:      10,
@@ -93,6 +80,32 @@ func (g *Game) InitHUD() {
 	}
 	scene.Buttons = append(scene.Buttons, shopButton)
 	scene.Data["DisplayShopWindow"] = false
+
+	viewEndRoundButton := Button{
+		Rectangle: rl.Rectangle{
+			X:      10,
+			Y:      250,
+			Width:  150,
+			Height: 40,
+		},
+		Color:     rl.SkyBlue,
+		Text:      "End Round",
+		TextColor: rl.Black,
+		OnClick:   OnClickOpenEndRoundWindow,
+	}
+	scene.Buttons = append(scene.Buttons, viewEndRoundButton)
+
+	scene.Data["EndRoundToPageTwoButton"] = Button{
+		Rectangle: rl.Rectangle{
+			X:      0,
+			Y:      0,
+			Width:  150,
+			Height: 40,
+		},
+		Color:     rl.SkyBlue,
+		Text:      "Next Page",
+		TextColor: rl.Black,
+	}
 	scene.Data["EndRoundConfirmButton"] = Button{
 		Rectangle: rl.Rectangle{
 			X:      0,
@@ -176,17 +189,29 @@ func (g *Game) DrawEndRoundWindow() {
 	window := rl.NewRectangle(220, 50, 900, 500)
 	rl.DrawRectangleRec(window, rl.White)
 	rl.DrawRectangleLinesEx(window, 5, rl.Black)
-	button := g.Scenes["HUD"].Data["EndRoundConfirmButton"].(Button)
-	button.Rectangle.X = 500
-	button.Rectangle.Y = 500
 
+	displayPage := g.Scenes["HUD"].Data["DisplayEndRoundWindowPage"].(int)
+	if displayPage == 1 {
+		g.DrawEndRoundWindowPage1(window)
+	} else {
+		g.DrawEndRoundWindowPage2(window)
+	}
+
+}
+
+func (g *Game) DrawEndRoundWindowPage1(window rl.Rectangle) {
+	if g.ScreenSkip {
+		if rl.IsMouseButtonUp(rl.MouseButtonLeft) {
+			g.ScreenSkip = false
+		}
+	}
 	var totalEarned float32 = 0
 
 	var x, y int32
 	for i, tech := range g.Run.Technology {
 		x = int32(window.X + 10)
 		y = int32(window.Y + 50 + float32(i*30))
-		value := tech.RoundEndValue(g, tech)
+		value := tech.RoundHandler[0].RoundEndValue(g, tech)
 		totalEarned += value
 		text := fmt.Sprintf("%s: $%v", tech.Name, value)
 		rl.DrawText(text, x, y, 20, rl.Black)
@@ -194,28 +219,58 @@ func (g *Game) DrawEndRoundWindow() {
 
 	text := fmt.Sprintf("Total: $%v", totalEarned)
 	rl.DrawText(text, x, y+30, 20, rl.Black)
+
+	button := g.Scenes["HUD"].Data["EndRoundToPageTwoButton"].(Button)
+	button.Rectangle.X = 500
+	button.Rectangle.Y = 500
+
 	g.DrawButton(button)
 	mousePosition := rl.GetMousePosition()
+	//
+	if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
+		if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {
+			g.Scenes["HUD"].Data["DisplayEndRoundWindowPage"] = 2
+			g.ScreenSkip = true
+		}
+	}
+}
 
-	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+func (g *Game) DrawEndRoundWindowPage2(window rl.Rectangle) {
+
+	if g.ScreenSkip {
+		if rl.IsMouseButtonUp(rl.MouseButtonLeft) {
+			g.ScreenSkip = false
+		}
+	}
+
+	rl.DrawText("Investments", int32(window.X+5), int32(window.Y+5), 30, rl.Black)
+
+	button := g.Scenes["HUD"].Data["EndRoundConfirmButton"].(Button)
+	button.Rectangle.X = 500
+	button.Rectangle.Y = 500
+
+	g.DrawButton(button)
+	mousePosition := rl.GetMousePosition()
+	//
+	if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
 		if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {
 			g.Scenes["HUD"].Data["DisplayEndRoundWindow"] = false
+			g.ScreenSkip = true
 			button.OnClick(g)
 		}
 	}
 }
 
 func (g *Game) DrawNextEventWindow() {
-	scene := g.Scenes["HUD"]
+	//	scene := g.Scenes["HUD"]
 
-	if g.Scenes["HUD"].Data["DisplayNextEventWindowSkip"].(bool) {
+	if g.ScreenSkip {
 		if rl.IsMouseButtonUp(rl.MouseButtonLeft) {
-			scene.Data["DisplayNextEventWindowSkip"] = false
+			g.ScreenSkip = false
 		}
 
 	}
 
-	log.Printf("?")
 	window := rl.NewRectangle(220, 50, 900, 500)
 	rl.DrawRectangleRec(window, rl.White)
 	rl.DrawRectangleLinesEx(window, 5, rl.Black)
@@ -230,7 +285,7 @@ func (g *Game) DrawNextEventWindow() {
 	rl.DrawText("NEW EVENT", 225, 60, 30, rl.Black)
 	rl.DrawText(g.Run.Events[g.Run.CurrentRound].Name, 225, 95, 15, rl.Black)
 
-	if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !scene.Data["DisplayNextEventWindowSkip"].(bool) {
+	if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
 		if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {
 			g.Scenes["HUD"].Data["DisplayNextEventWindow"] = false
 			button.OnClick(g)

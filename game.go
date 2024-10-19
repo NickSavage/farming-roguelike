@@ -29,7 +29,9 @@ func OnClickEndRound(g *Game) {
 	g.Run.CurrentRound += 1
 	g.Run.RoundActionsRemaining = g.Run.RoundActions
 	for _, tech := range g.Run.Technology {
-		tech.OnRoundEnd(g, tech)
+		tech.RoundHandler[tech.RoundHandlerIndex].OnRoundEnd(g, tech)
+		g.Run.RoundActionsRemaining -= int(tech.RoundHandler[tech.RoundHandlerIndex].CostActions)
+		g.Run.EndRoundMoney -= tech.RoundHandler[tech.RoundHandlerIndex].CostMoney
 	}
 	g.Run.Money += g.Run.EndRoundMoney * g.Run.Productivity
 	g.Run.Money = float32(math.Round(float64(g.Run.Money)))
@@ -43,7 +45,7 @@ func OnClickEndRound(g *Game) {
 func (g *Game) GetNextEvent() {
 
 	// display event window
-	g.Scenes["HUD"].Data["DisplayNextEventWindowSkip"] = true
+	g.ScreenSkip = true
 	g.Scenes["HUD"].Data["DisplayNextEventWindow"] = true
 }
 

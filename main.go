@@ -93,7 +93,6 @@ func (g *Game) LoadScenes() {
 		UpdateScene: UpdateBoard,
 		Data:        make(map[string]interface{}),
 	}
-	g.InitBoard()
 
 	g.Scenes["HUD"] = &Scene{
 		Active:      true,
@@ -127,6 +126,7 @@ func main() {
 	g.InitRun()
 	g.InitShopWindow()
 
+	g.InitBoard()
 	rl.SetTargetFPS(60)
 
 	for !rl.WindowShouldClose() {

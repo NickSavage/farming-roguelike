@@ -103,6 +103,7 @@ func (g *Game) InitBoard() {
 	g.Scenes["Board"].Data["HoverVectorCounter"] = 0
 	g.InitPlaceRandomTrees(40)
 	g.InitPlaceTech()
+	g.InitDrawTechnology()
 
 }
 
@@ -131,10 +132,32 @@ func (g *Game) drawTiles() {
 
 }
 
-func (g *Game) drawTechnology() {
+func (g *Game) InitDrawTechnology() {
 
 	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
 	for _, tech := range g.Run.Technology {
+		tile := tech.Tile
+		for x := range tile.Width {
+			for y := range tile.Height {
+				tile.Occupied = true
+				tile.Technology = tech
+				if tile.MultiSquare {
+					tile.Skip = true
+				}
+				grid[tile.Row+x][tile.Column+y] = tile
+			}
+		}
+		grid[tile.Row][tile.Column] = tile
+
+	}
+
+}
+func (g *Game) RedrawTechnology() {
+	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
+	for _, tech := range g.Run.Technology {
+		if !tech.Redraw {
+			continue
+		}
 		tile := tech.Tile
 		for x := range tile.Width {
 			for y := range tile.Height {
@@ -248,8 +271,8 @@ func (g *Game) DrawPlaceTech() {
 		return
 	}
 
-	if scene.Data["PlaceTechSkip"].(bool) {
-		scene.Data["PlaceTechSkip"] = false
+	if g.ScreenSkip {
+		g.ScreenSkip = false
 		return
 	}
 	chosenTech := scene.Data["PlaceChosenTech"].(*Technology)
@@ -299,7 +322,6 @@ func DrawBoard(g *Game) {
 
 	//	scene := g.Scenes["Board"]
 	rl.BeginMode2D(g.Scenes["Board"].Camera)
-	g.drawTechnology()
 	g.drawTiles()
 	g.DrawPlaceTech()
 	g.drawGrid()
@@ -307,6 +329,7 @@ func DrawBoard(g *Game) {
 
 	g.HandleHover()
 	DrawHUD(g)
+	g.RedrawTechnology()
 	// g.DrawRightClickMenu()
 }
 

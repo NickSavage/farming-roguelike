@@ -7,14 +7,14 @@ import (
 func ShopClickChickenCoop(g *Game) {
 	g.Scenes["HUD"].Data["DisplayShopWindow"] = false
 	g.Scenes["Board"].Data["PlaceTech"] = true
-	g.Scenes["Board"].Data["PlaceTechSkip"] = true
+	g.ScreenSkip = true
 	g.Scenes["Board"].Data["PlaceChosenTech"] = g.CreateChickenCoopTech()
 }
 
 func ShopClickWheatField(g *Game) {
 	g.Scenes["HUD"].Data["DisplayShopWindow"] = false
 	g.Scenes["Board"].Data["PlaceTech"] = true
-	g.Scenes["Board"].Data["PlaceTechSkip"] = true
+	g.ScreenSkip = true
 	g.Scenes["Board"].Data["PlaceChosenTech"] = g.CreateWheatTech()
 
 }

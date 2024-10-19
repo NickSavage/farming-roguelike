@@ -10,6 +10,7 @@ type Game struct {
 	Run          *Run
 	Counter      int32
 	Seconds      int32
+	ScreenSkip   bool
 }
 
 type BoardSquare struct {
@@ -31,16 +32,26 @@ type BoardRightClickMenu struct {
 }
 
 type Technology struct {
-	Name            string
-	Description     string
-	Tile            BoardSquare
-	Cost            float32
-	OnRoundEnd      func(*Game, *Technology)
-	OnBuild         func(*Game, *Technology)
-	RoundEndText    func(*Game, *Technology) string
-	RoundEndValue   func(*Game, *Technology) float32
-	RoundCounterMax int
-	RoundCounter    int
+	Name              string
+	Description       string
+	Tile              BoardSquare
+	Cost              float32
+	CanBeBuilt        func(*Game) bool
+	OnBuild           func(*Game, *Technology)
+	RoundHandler      []TechnologyRoundHandler
+	RoundCounterMax   int
+	RoundCounter      int
+	RoundHandlerIndex int
+	Redraw            bool
+}
+
+type TechnologyRoundHandler struct {
+	Season        Season
+	CostActions   float32
+	CostMoney     float32
+	OnRoundEnd    func(*Game, *Technology)
+	RoundEndText  func(*Game, *Technology) string
+	RoundEndValue func(*Game, *Technology) float32
 }
 
 type Person struct {
