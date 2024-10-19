@@ -3,49 +3,22 @@ package main
 import (
 	"fmt"
 	"github.com/gen2brain/raylib-go/raylib"
-	//	"log"
+	"log"
 )
-
-func (g *Game) HideOtherWindows() {
-	scene := g.Scenes["HUD"]
-	scene.Data["DisplayShopWindow"] = false
-	scene.Data["DisplayTechWindow"] = false
-	scene.Data["DisplayEndRoundWindow"] = false
-}
 
 func OnClickShopWindowButton(g *Game) {
 	scene := g.Scenes["HUD"]
-	if scene.Data["DisplayShopWindow"].(bool) == true {
-		scene.Data["DisplayShopWindow"] = false
-	} else {
-		g.HideOtherWindows()
-		scene.Data["DisplayShopWindow"] = true
-	}
-
+	g.ActivateWindow(scene.Windows, scene.Windows["ShopWindow"])
 }
 
 func OnClickTechWindowButton(g *Game) {
 	scene := g.Scenes["HUD"]
-	if scene.Data["DisplayTechWindow"].(bool) == true {
-		scene.Data["DisplayTechWindow"] = false
-	} else {
-		g.HideOtherWindows()
-		scene.Data["DisplayTechWindow"] = true
-	}
+	g.ActivateWindow(scene.Windows, scene.Windows["TechWindow"])
 }
 
-func OnClickOpenEndRoundWindow(g *Game) {
+func OnClickOpenEndRoundPage1Window(g *Game) {
 	scene := g.Scenes["HUD"]
-	// warn about remaining actions?
-
-	if scene.Data["DisplayEndRoundWindow"].(bool) == true {
-		scene.Data["DisplayEndRoundWindow"] = false
-	} else {
-		g.HideOtherWindows()
-		g.ScreenSkip = true
-		scene.Data["DisplayEndRoundWindowPage"] = 1
-		scene.Data["DisplayEndRoundWindow"] = true
-	}
+	g.ActivateWindow(scene.Windows, scene.Windows["EndRound1"])
 }
 
 func (g *Game) InitHUD() {
@@ -91,7 +64,7 @@ func (g *Game) InitHUD() {
 		Color:     rl.SkyBlue,
 		Text:      "End Round",
 		TextColor: rl.Black,
-		OnClick:   OnClickOpenEndRoundWindow,
+		OnClick:   OnClickOpenEndRoundPage1Window,
 	}
 	scene.Buttons = append(scene.Buttons, viewEndRoundButton)
 
@@ -133,11 +106,36 @@ func (g *Game) InitHUD() {
 		OnClick:   OnClickConfirmNextEvent,
 	}
 	scene.Data["DisplayNextEventWindow"] = false
+
+	scene.Windows = make(map[string]*Window)
+	scene.Windows["ShopWindow"] = &Window{
+		Name:       "Shop Window",
+		Display:    false,
+		DrawWindow: DrawShopWindow,
+	}
+	scene.Windows["TechWindow"] = &Window{
+		Name:       "Tech Window",
+		Display:    false,
+		DrawWindow: DrawTechnologyWindow,
+	}
+
+	scene.Windows["EndRound1"] = &Window{
+		Name:       "End Round 1",
+		Display:    false,
+		DrawWindow: DrawEndRoundWindowPage1,
+	}
+	scene.Windows["EndRound2"] = &Window{
+		Name:       "End Round 2",
+		Display:    false,
+		DrawWindow: DrawEndRoundWindowPage2,
+	}
+
 }
 
 func UpdateHUD(g *Game) {
 	scene := g.Scenes["HUD"]
 	for _, button := range scene.Buttons {
+		log.Printf("aoeoa")
 		if g.WasButtonClicked(&button) {
 			button.OnClick(g)
 		}
@@ -169,37 +167,42 @@ func DrawHUD(g *Game) {
 		}
 
 	}
-	if scene.Data["DisplayTechWindow"].(bool) {
-		g.DrawTechnologyWindow()
+	for _, window := range scene.Windows {
+		if window.Display {
+			window.DrawWindow(g, window)
+		}
 	}
-	if scene.Data["DisplayShopWindow"].(bool) {
-		g.DrawShopWindow()
-	}
-	if scene.Data["DisplayEndRoundWindow"].(bool) {
-		g.DrawEndRoundWindow()
-	}
-	if scene.Data["DisplayNextEventWindow"].(bool) {
-		g.DrawNextEventWindow()
-	}
+
+	// if scene.Data["DisplayEndRoundWindow"].(bool) {
+	// 	DrawEndRoundWindow(g)
+	// }
+	// if scene.Data["DisplayNextEventWindow"].(bool) {
+	// 	DrawNextEventWindow(g)
+	// }
 
 }
 
-func (g *Game) DrawEndRoundWindow() {
+// func DrawEndRoundWindow(g *Game) {
 
-	window := rl.NewRectangle(220, 50, 900, 500)
-	rl.DrawRectangleRec(window, rl.White)
-	rl.DrawRectangleLinesEx(window, 5, rl.Black)
+// 	window := rl.NewRectangle(220, 50, 900, 500)
+// 	rl.DrawRectangleRec(window, rl.White)
+// 	rl.DrawRectangleLinesEx(window, 5, rl.Black)
 
-	displayPage := g.Scenes["HUD"].Data["DisplayEndRoundWindowPage"].(int)
-	if displayPage == 1 {
-		g.DrawEndRoundWindowPage1(window)
-	} else {
-		g.DrawEndRoundWindowPage2(window)
-	}
+// 	displayPage := g.Scenes["HUD"].Data["DisplayEndRoundWindowPage"].(int)
+// 	if displayPage == 1 {
+// 		g.DrawEndRoundWindowPage1(window)
+// 	} else {
+// 		g.DrawEndRoundWindowPage2(window)
+// 	}
 
-}
+// }
 
-func (g *Game) DrawEndRoundWindowPage1(window rl.Rectangle) {
+func DrawEndRoundWindowPage1(g *Game, window *Window) {
+
+	windowRect := rl.NewRectangle(220, 50, 900, 500)
+	rl.DrawRectangleRec(windowRect, rl.White)
+	rl.DrawRectangleLinesEx(windowRect, 5, rl.Black)
+
 	if g.ScreenSkip {
 		if rl.IsMouseButtonUp(rl.MouseButtonLeft) {
 			g.ScreenSkip = false
@@ -209,8 +212,8 @@ func (g *Game) DrawEndRoundWindowPage1(window rl.Rectangle) {
 
 	var x, y int32
 	for i, tech := range g.Run.Technology {
-		x = int32(window.X + 10)
-		y = int32(window.Y + 50 + float32(i*30))
+		x = int32(windowRect.X + 10)
+		y = int32(windowRect.Y + 50 + float32(i*30))
 		value := tech.RoundHandler[0].RoundEndValue(g, tech)
 		totalEarned += value
 		text := fmt.Sprintf("%s: $%v", tech.Name, value)
@@ -226,34 +229,33 @@ func (g *Game) DrawEndRoundWindowPage1(window rl.Rectangle) {
 
 	g.DrawButton(button)
 	if g.WasButtonClicked(&button) {
-		g.ScreenSkip = true
-		g.Scenes["HUD"].Data["DisplayEndRoundWindowPage"] = 2
+
+		g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["EndRound2"])
+
 	}
 }
 
-func (g *Game) DrawEndRoundWindowPage2(window rl.Rectangle) {
+func DrawEndRoundWindowPage2(g *Game, win *Window) {
 
-	if g.ScreenSkip {
-		if rl.IsMouseButtonUp(rl.MouseButtonLeft) {
-			g.ScreenSkip = false
-		}
-	}
+	windowRect := rl.NewRectangle(220, 50, 900, 500)
+	rl.DrawRectangleRec(windowRect, rl.White)
+	rl.DrawRectangleLinesEx(windowRect, 5, rl.Black)
 
-	rl.DrawText("Investments", int32(window.X+5), int32(window.Y+5), 30, rl.Black)
+	rl.DrawText("Investments", int32(windowRect.X+5), int32(windowRect.Y+5), 30, rl.Black)
 
 	button := g.Scenes["HUD"].Data["EndRoundConfirmButton"].(Button)
 	button.Rectangle.X = 500
 	button.Rectangle.Y = 500
 
 	g.DrawButton(button)
-	if g.WasButtonClicked(&button) {
-		g.ScreenSkip = true
-		g.Scenes["HUD"].Data["DisplayEndRoundWindow"] = false
-		button.OnClick(g)
-	}
+	// if g.WasButtonClicked(&button) {
+	// 	g.ScreenSkip = true
+	// 	g.Scenes["HUD"].Data["DisplayEndRoundWindow"] = false
+	// 	button.OnClick(g)
+	// }
 }
 
-func (g *Game) DrawNextEventWindow() {
+func DrawNextEventWindow(g *Game) {
 	//	scene := g.Scenes["HUD"]
 
 	if g.ScreenSkip {

@@ -5,14 +5,14 @@ import (
 )
 
 func ShopClickChickenCoop(g *Game) {
-	g.Scenes["HUD"].Data["DisplayShopWindow"] = false
+	g.Scenes["HUD"].Windows["ShopWindow"].Display = false
 	g.Scenes["Board"].Data["PlaceTech"] = true
 	g.ScreenSkip = true
 	g.Scenes["Board"].Data["PlaceChosenTech"] = g.CreateChickenCoopTech()
 }
 
 func ShopClickWheatField(g *Game) {
-	g.Scenes["HUD"].Data["DisplayShopWindow"] = false
+	g.Scenes["HUD"].Windows["ShopWindow"].Display = false
 	g.Scenes["Board"].Data["PlaceTech"] = true
 	g.ScreenSkip = true
 	g.Scenes["Board"].Data["PlaceChosenTech"] = g.CreateWheatTech()
@@ -42,7 +42,7 @@ func (g *Game) InitShopWindow() {
 	scene.Data["ShopButtons"] = buttons
 }
 
-func (g *Game) DrawShopWindow() {
+func DrawShopWindow(g *Game, window *Window) {
 	scene := g.Scenes["Board"]
 
 	rl.DrawRectangle(200, 50, 900, 500, rl.White)

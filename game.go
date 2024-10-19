@@ -102,7 +102,7 @@ func (g *Game) drawRunTech(tech Technology, x, y float32) {
 
 }
 
-func (g *Game) DrawTechnologyWindow() {
+func DrawTechnologyWindow(g *Game, win *Window) {
 	windowWidth := 900
 	offset := 90
 	rl.DrawRectangle(200, 50, int32(windowWidth), 500, rl.White)

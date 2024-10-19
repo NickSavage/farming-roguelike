@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gen2brain/raylib-go/raylib"
+	"log"
 )
 
 type Button struct {
@@ -33,6 +34,13 @@ type Scene struct {
 	skip        bool
 	Data        map[string]interface{}
 	Camera      rl.Camera2D
+	Windows     map[string]*Window
+}
+
+type Window struct {
+	Name       string
+	DrawWindow func(*Game, *Window)
+	Display    bool
 }
 
 type Tile struct {
@@ -142,5 +150,29 @@ func (g *Game) Update() {
 			continue
 		}
 		scene.UpdateScene(g)
+	}
+
+	if g.ScreenSkip {
+		if rl.IsMouseButtonUp(rl.MouseButtonLeft) {
+			g.ScreenSkip = false
+		}
+	}
+}
+
+// window handling
+func (g *Game) DisableAllWindows(windows map[string]*Window) {
+	for _, window := range windows {
+		window.Display = false
+	}
+}
+
+func (g *Game) ActivateWindow(windows map[string]*Window, window *Window) {
+	log.Printf("triffer")
+	g.ScreenSkip = true
+	if window.Display {
+		g.DisableAllWindows(windows)
+	} else {
+		g.DisableAllWindows(windows)
+		window.Display = true
 	}
 }
