@@ -55,6 +55,7 @@ type Run struct {
 	RoundActions          int
 	RoundActionsRemaining int
 	CurrentRound          int
+	CurrentSeason         Season
 	Events                []Event
 }
 
@@ -65,3 +66,22 @@ type Event struct {
 }
 
 type Effect struct{}
+
+// Define the type for the enum
+type Season int
+
+// Declare constants using iota
+const (
+	Spring Season = iota
+	Summer
+	Autumn
+	Winter
+)
+
+func (s Season) String() string {
+	return [...]string{"Spring", "Summer", "Autumn", "Winter"}[s]
+}
+
+func (s *Season) Next() {
+	*s = (*s + 1) % 4 // Cycle back to Spring after Winter
+}

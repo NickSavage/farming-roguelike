@@ -67,7 +67,7 @@ func (g *Game) InitHUD() {
 	techButton := Button{
 		Rectangle: rl.Rectangle{
 			X:      10,
-			Y:      100,
+			Y:      150,
 			Width:  150,
 			Height: 40,
 		},
@@ -82,7 +82,7 @@ func (g *Game) InitHUD() {
 	shopButton := Button{
 		Rectangle: rl.Rectangle{
 			X:      10,
-			Y:      150,
+			Y:      200,
 			Width:  150,
 			Height: 40,
 		},
@@ -145,6 +145,7 @@ func DrawHUD(g *Game) {
 	)
 	rl.DrawText(fmt.Sprintf("Money: $%v", g.Run.Money), 30, 50, 20, rl.White)
 	rl.DrawText(fmt.Sprintf("Round: %v", g.Run.CurrentRound), 30, 70, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("Season: %v", g.Run.CurrentSeason.String()), 30, 90, 20, rl.White)
 	g.DrawButtons(scene.Buttons)
 
 	if g.Data["Message"].(string) != "" {
@@ -225,6 +226,9 @@ func (g *Game) DrawNextEventWindow() {
 
 	g.DrawButton(button)
 	mousePosition := rl.GetMousePosition()
+
+	rl.DrawText("NEW EVENT", 225, 60, 30, rl.Black)
+	rl.DrawText(g.Run.Events[g.Run.CurrentRound].Name, 225, 95, 15, rl.Black)
 
 	if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !scene.Data["DisplayNextEventWindowSkip"].(bool) {
 		if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {

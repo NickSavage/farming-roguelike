@@ -35,14 +35,16 @@ func OnClickEndRound(g *Game) {
 	g.Run.Money = float32(math.Round(float64(g.Run.Money)))
 	g.Run.EndRoundMoney = 0
 
+	g.Run.CurrentSeason.Next()
 	g.GetNextEvent()
 
 }
 
 func (g *Game) GetNextEvent() {
+
+	// display event window
 	g.Scenes["HUD"].Data["DisplayNextEventWindowSkip"] = true
 	g.Scenes["HUD"].Data["DisplayNextEventWindow"] = true
-	log.Printf("trigger")
 }
 
 func (g *Game) PlaceTech(tech *Technology, x, y float32) {
