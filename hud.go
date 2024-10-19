@@ -129,6 +129,11 @@ func (g *Game) InitHUD() {
 		Display:    false,
 		DrawWindow: DrawEndRoundWindowPage2,
 	}
+	scene.Windows["NextEvent"] = &Window{
+		Name:       "Next Event",
+		Display:    false,
+		DrawWindow: DrawNextEventWindow,
+	}
 
 }
 
@@ -172,30 +177,7 @@ func DrawHUD(g *Game) {
 			window.DrawWindow(g, window)
 		}
 	}
-
-	// if scene.Data["DisplayEndRoundWindow"].(bool) {
-	// 	DrawEndRoundWindow(g)
-	// }
-	// if scene.Data["DisplayNextEventWindow"].(bool) {
-	// 	DrawNextEventWindow(g)
-	// }
-
 }
-
-// func DrawEndRoundWindow(g *Game) {
-
-// 	window := rl.NewRectangle(220, 50, 900, 500)
-// 	rl.DrawRectangleRec(window, rl.White)
-// 	rl.DrawRectangleLinesEx(window, 5, rl.Black)
-
-// 	displayPage := g.Scenes["HUD"].Data["DisplayEndRoundWindowPage"].(int)
-// 	if displayPage == 1 {
-// 		g.DrawEndRoundWindowPage1(window)
-// 	} else {
-// 		g.DrawEndRoundWindowPage2(window)
-// 	}
-
-// }
 
 func DrawEndRoundWindowPage1(g *Game, window *Window) {
 
@@ -229,9 +211,7 @@ func DrawEndRoundWindowPage1(g *Game, window *Window) {
 
 	g.DrawButton(button)
 	if g.WasButtonClicked(&button) {
-
 		g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["EndRound2"])
-
 	}
 }
 
@@ -248,22 +228,12 @@ func DrawEndRoundWindowPage2(g *Game, win *Window) {
 	button.Rectangle.Y = 500
 
 	g.DrawButton(button)
-	// if g.WasButtonClicked(&button) {
-	// 	g.ScreenSkip = true
-	// 	g.Scenes["HUD"].Data["DisplayEndRoundWindow"] = false
-	// 	button.OnClick(g)
-	// }
+	if g.WasButtonClicked(&button) {
+		g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["NextEvent"])
+	}
 }
 
-func DrawNextEventWindow(g *Game) {
-	//	scene := g.Scenes["HUD"]
-
-	if g.ScreenSkip {
-		if rl.IsMouseButtonUp(rl.MouseButtonLeft) {
-			g.ScreenSkip = false
-		}
-
-	}
+func DrawNextEventWindow(g *Game, win *Window) {
 
 	window := rl.NewRectangle(220, 50, 900, 500)
 	rl.DrawRectangleRec(window, rl.White)
@@ -278,13 +248,13 @@ func DrawNextEventWindow(g *Game) {
 	rl.DrawText(g.Run.Events[g.Run.CurrentRound].Name, 225, 95, 15, rl.Black)
 
 	if g.WasButtonClicked(&button) {
-		g.Scenes["HUD"].Data["DisplayNextEventWindow"] = false
-		g.ScreenSkip = true
 		button.OnClick(g)
+		win.Display = false
 	}
 
 }
 
 func OnClickConfirmNextEvent(g *Game) {
+	OnClickEndRound(g)
 
 }
