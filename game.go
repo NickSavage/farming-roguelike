@@ -1,28 +1,32 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gen2brain/raylib-go/raylib"
 	"log"
 	"math"
 )
+
+const YEARS int = 8
 
 func (g *Game) InitRun() {
 
 	g.Run = &Run{
 		Money:                 100,
 		Productivity:          1.0,
-		Round:                 1,
+		CurrentRound:          1,
 		RoundActions:          5,
 		RoundActionsRemaining: 5,
 		Technology:            make([]*Technology, 0),
 		People:                make([]Person, 1),
+		Events:                GenerateRandomEvents(),
 	}
 	g.Run.Technology = append(g.Run.Technology, g.CreateChickenCoopTech())
 	g.Run.Technology = append(g.Run.Technology, g.CreateWheatTech())
 
 }
 func OnClickEndRound(g *Game) {
-	g.Run.Round += 1
+	g.Run.CurrentRound += 1
 	g.Run.RoundActionsRemaining = g.Run.RoundActions
 	for _, tech := range g.Run.Technology {
 		tech.OnRoundEnd(g, tech)
@@ -30,6 +34,15 @@ func OnClickEndRound(g *Game) {
 	g.Run.Money += g.Run.EndRoundMoney * g.Run.Productivity
 	g.Run.Money = float32(math.Round(float64(g.Run.Money)))
 	g.Run.EndRoundMoney = 0
+
+	g.GetNextEvent()
+
+}
+
+func (g *Game) GetNextEvent() {
+	g.Scenes["HUD"].Data["DisplayNextEventWindowSkip"] = true
+	g.Scenes["HUD"].Data["DisplayNextEventWindow"] = true
+	log.Printf("trigger")
 }
 
 func (g *Game) PlaceTech(tech *Technology, x, y float32) {
@@ -96,5 +109,19 @@ func (g *Game) DrawTechnologyWindow() {
 		g.drawRunTech(*tech, float32(210+(i*offset)), 90)
 
 	}
+
+}
+
+func GenerateRandomEvents() []Event {
+	results := []Event{}
+	for i := range 4 * YEARS {
+		results = append(results, Event{
+			RoundIndex: i,
+			Name:       fmt.Sprintf("Event %v", i),
+		})
+
+	}
+
+	return results
 
 }

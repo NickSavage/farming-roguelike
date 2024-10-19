@@ -307,7 +307,7 @@ func DrawBoard(g *Game) {
 
 	g.HandleHover()
 	DrawHUD(g)
-	g.DrawRightClickMenu()
+	// g.DrawRightClickMenu()
 }
 
 func (g *Game) SelectTiles() {
@@ -474,7 +474,7 @@ func UpdateBoard(g *Game) {
 		}
 	}
 	g.SelectTiles()
-	g.HandleRightClick()
+	// g.HandleRightClick()
 
 	// mousePosition := rl.GetMousePosition()
 }

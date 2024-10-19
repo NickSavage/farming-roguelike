@@ -54,5 +54,14 @@ type Run struct {
 	EndRoundMoney         float32
 	RoundActions          int
 	RoundActionsRemaining int
-	Round                 int
+	CurrentRound          int
+	Events                []Event
 }
+
+type Event struct {
+	RoundIndex int
+	Name       string
+	Effects    []Effect
+}
+
+type Effect struct{}

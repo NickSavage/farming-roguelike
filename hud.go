@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gen2brain/raylib-go/raylib"
-	// "log"
+	"log"
 )
 
 func (g *Game) HideOtherWindows() {
@@ -107,6 +107,19 @@ func (g *Game) InitHUD() {
 	}
 	scene.Data["DisplayEndRoundWindow"] = false
 
+	scene.Data["NextEventConfirmButton"] = Button{
+		Rectangle: rl.Rectangle{
+			X:      0,
+			Y:      0,
+			Width:  150,
+			Height: 40,
+		},
+		Color:     rl.SkyBlue,
+		Text:      "Confirm",
+		TextColor: rl.Black,
+		OnClick:   OnClickConfirmNextEvent,
+	}
+	scene.Data["DisplayNextEventWindow"] = false
 }
 
 func UpdateHUD(g *Game) {
@@ -131,7 +144,7 @@ func DrawHUD(g *Game) {
 		30, 30, 20, rl.White,
 	)
 	rl.DrawText(fmt.Sprintf("Money: $%v", g.Run.Money), 30, 50, 20, rl.White)
-	rl.DrawText(fmt.Sprintf("Round: %v", g.Run.Round), 30, 70, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("Round: %v", g.Run.CurrentRound), 30, 70, 20, rl.White)
 	g.DrawButtons(scene.Buttons)
 
 	if g.Data["Message"].(string) != "" {
@@ -150,6 +163,9 @@ func DrawHUD(g *Game) {
 	}
 	if scene.Data["DisplayEndRoundWindow"].(bool) {
 		g.DrawEndRoundWindow()
+	}
+	if scene.Data["DisplayNextEventWindow"].(bool) {
+		g.DrawNextEventWindow()
 	}
 
 }
@@ -186,4 +202,39 @@ func (g *Game) DrawEndRoundWindow() {
 			button.OnClick(g)
 		}
 	}
+}
+
+func (g *Game) DrawNextEventWindow() {
+	scene := g.Scenes["HUD"]
+
+	if g.Scenes["HUD"].Data["DisplayNextEventWindowSkip"].(bool) {
+		if rl.IsMouseButtonUp(rl.MouseButtonLeft) {
+			scene.Data["DisplayNextEventWindowSkip"] = false
+		}
+
+	}
+
+	log.Printf("?")
+	window := rl.NewRectangle(220, 50, 900, 500)
+	rl.DrawRectangleRec(window, rl.White)
+	rl.DrawRectangleLinesEx(window, 5, rl.Black)
+
+	button := g.Scenes["HUD"].Data["NextEventConfirmButton"].(Button)
+	button.Rectangle.X = 500
+	button.Rectangle.Y = 500
+
+	g.DrawButton(button)
+	mousePosition := rl.GetMousePosition()
+
+	if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !scene.Data["DisplayNextEventWindowSkip"].(bool) {
+		if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {
+			g.Scenes["HUD"].Data["DisplayNextEventWindow"] = false
+			button.OnClick(g)
+		}
+	}
+
+}
+
+func OnClickConfirmNextEvent(g *Game) {
+
 }
