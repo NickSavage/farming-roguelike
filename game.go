@@ -20,11 +20,21 @@ func (g *Game) InitRun() {
 		Technology:            make([]*Technology, 0),
 		People:                make([]Person, 1),
 		Events:                GenerateRandomEvents(),
+		Products:              make(map[string]*Product),
 	}
 	g.Run.Technology = append(g.Run.Technology, g.CreateChickenCoopTech())
 	g.Run.Technology = append(g.Run.Technology, g.CreateWheatTech())
 
 }
+
+func (r *Run) sellAllProducts() float32 {
+	var result float32 = 0
+	for _, product := range r.Products {
+		result = +product.Quantity * product.Price
+	}
+	return result
+}
+
 func OnClickEndRound(g *Game) {
 	g.Run.CurrentRound += 1
 	g.Run.RoundActionsRemaining = g.Run.RoundActions
@@ -33,6 +43,7 @@ func OnClickEndRound(g *Game) {
 		g.Run.RoundActionsRemaining -= int(tech.RoundHandler[tech.RoundHandlerIndex].CostActions)
 		g.Run.EndRoundMoney -= tech.RoundHandler[tech.RoundHandlerIndex].CostMoney
 	}
+	g.Run.EndRoundMoney += g.Run.sellAllProducts()
 	g.Run.Money += g.Run.EndRoundMoney * g.Run.Productivity
 	g.Run.Money = float32(math.Round(float64(g.Run.Money)))
 	g.Run.EndRoundMoney = 0

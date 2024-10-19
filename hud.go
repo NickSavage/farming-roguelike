@@ -191,9 +191,10 @@ func DrawEndRoundWindowPage1(g *Game, window *Window) {
 	for i, tech := range g.Run.Technology {
 		x = int32(windowRect.X + 10)
 		y = int32(windowRect.Y + 50 + float32(i*30))
-		value := tech.RoundHandler[0].RoundEndValue(g, tech)
+		index := tech.RoundHandlerIndex
+		value := tech.RoundHandler[index].RoundEndValue(g, tech)
 		totalEarned += value
-		text := fmt.Sprintf("%s: $%v", tech.Name, value)
+		text := tech.RoundHandler[index].RoundEndText(g, tech)
 		rl.DrawText(text, x, y, 20, rl.Black)
 	}
 

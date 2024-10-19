@@ -60,6 +60,7 @@ type Person struct {
 type Run struct {
 	Technology            []*Technology
 	People                []Person
+	Products              map[string]*Product
 	Money                 float32
 	Productivity          float32
 	EndRoundMoney         float32
@@ -74,6 +75,12 @@ type Event struct {
 	RoundIndex int
 	Name       string
 	Effects    []Effect
+}
+
+type Product struct {
+	Name     string
+	Quantity float32
+	Price    float32
 }
 
 type Effect struct{}

@@ -1,5 +1,9 @@
 package main
 
+import (
+	"fmt"
+)
+
 func (g *Game) InitTechnology() {
 	tech := make(map[string]Technology)
 
@@ -23,6 +27,12 @@ func (g *Game) CreateChickenCoopTech() *Technology {
 		Occupied:    true,
 		MultiSquare: true,
 	}
+	g.Run.Products["Chicken"] = &Product{
+		Name:     "Chicken",
+		Quantity: 0,
+		Price:    5,
+	}
+
 	return &result
 }
 
@@ -39,6 +49,12 @@ func (g *Game) CreateWheatTech() *Technology {
 		Height:   5,
 		Occupied: true,
 	}
+	g.Run.Products["Wheat"] = &Product{
+		Name:     "Wheat",
+		Quantity: 0,
+		Price:    1,
+	}
+
 	return &result
 }
 
@@ -54,6 +70,7 @@ func (g *Game) ChickenCoop() Technology {
 			{
 				OnRoundEnd:    ChickenCoopRoundEnd,
 				RoundEndValue: ChickenCoopRoundEndValue,
+				RoundEndText:  ChickenCoopRoundEndText,
 			},
 		},
 		RoundHandlerIndex: 0,
@@ -96,24 +113,28 @@ func (g *Game) WheatField() Technology {
 				Season:        Spring,
 				OnRoundEnd:    WheatFieldRoundSpring,
 				RoundEndValue: WheatFieldRoundEndValue,
+				RoundEndText:  WheatFieldRoundEndText,
 				CostActions:   1,
 			},
 			{
 				Season:        Summer,
 				OnRoundEnd:    WheatFieldRoundSummer,
 				RoundEndValue: WheatFieldRoundEndValue,
+				RoundEndText:  WheatFieldRoundEndText,
 				CostActions:   1,
 			},
 			{
 				Season:        Autumn,
 				OnRoundEnd:    WheatFieldRoundAutumn,
 				RoundEndValue: WheatFieldRoundEndValue,
+				RoundEndText:  WheatFieldRoundEndText,
 				CostActions:   1,
 			},
 			{
 				Season:        Winter,
 				OnRoundEnd:    WheatFieldRoundWinter,
 				RoundEndValue: WheatFieldRoundEndValue,
+				RoundEndText:  WheatFieldRoundEndText,
 				CostActions:   1,
 			},
 		},
@@ -130,6 +151,11 @@ func WheatFieldCanBeBuilt(g *Game) bool {
 
 func WheatFieldOnBuild(g *Game, tech *Technology) {
 
+	g.Run.Products["Wheat"] = &Product{
+		Name:     "Wheat",
+		Quantity: 0,
+		Price:    1,
+	}
 	g.Run.RoundActionsRemaining -= 1
 	g.Run.Money -= tech.Cost
 }
@@ -143,7 +169,14 @@ func WheatFieldRoundEndValue(g *Game, tech *Technology) float32 {
 }
 func WheatFieldRoundEndText(g *Game, tech *Technology) string {
 	if g.Run.CurrentSeason == Autumn {
-		return "Wheat Field: $125"
+		units := float32(125)
+		price := g.Run.Products["Wheat"].Price
+		return fmt.Sprintf(
+			"Wheat Field: $%v (%v units at $%v each)",
+			units*price,
+			units,
+			price,
+		)
 	} else {
 		return "Wheat Field: $0"
 	}
@@ -161,7 +194,9 @@ func WheatFieldRoundSummer(g *Game, tech *Technology) {
 	tech.Redraw = true
 }
 func WheatFieldRoundAutumn(g *Game, tech *Technology) {
-	g.Run.EndRoundMoney += 125
+	//	g.Run.EndRoundMoney += 125
+
+	g.Run.Products["Wheat"].Quantity += 125
 	tech.RoundHandlerIndex += 1
 	tech.Tile.Tile.TileFrame.X += 45
 	tech.Redraw = true
