@@ -68,6 +68,7 @@ func (g *Game) PlaceTech(tech *Technology, x, y float32) {
 	g.Run.Technology = append(g.Run.Technology, tech)
 	tech.OnBuild(g, tech)
 	log.Printf("tech afte %v", len(g.Run.Technology))
+	g.DrawTechnology(tech)
 
 }
 

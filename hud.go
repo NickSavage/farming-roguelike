@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gen2brain/raylib-go/raylib"
-	"log"
+	//	"log"
 )
 
 func OnClickShopWindowButton(g *Game) {
@@ -140,7 +140,6 @@ func (g *Game) InitHUD() {
 func UpdateHUD(g *Game) {
 	scene := g.Scenes["HUD"]
 	for _, button := range scene.Buttons {
-		log.Printf("aoeoa")
 		if g.WasButtonClicked(&button) {
 			button.OnClick(g)
 		}
@@ -185,11 +184,7 @@ func DrawEndRoundWindowPage1(g *Game, window *Window) {
 	rl.DrawRectangleRec(windowRect, rl.White)
 	rl.DrawRectangleLinesEx(windowRect, 5, rl.Black)
 
-	if g.ScreenSkip {
-		if rl.IsMouseButtonUp(rl.MouseButtonLeft) {
-			g.ScreenSkip = false
-		}
-	}
+	rl.DrawText("Income", int32(windowRect.X+5), int32(windowRect.Y+5), 30, rl.Black)
 	var totalEarned float32 = 0
 
 	var x, y int32
@@ -223,12 +218,43 @@ func DrawEndRoundWindowPage2(g *Game, win *Window) {
 
 	rl.DrawText("Investments", int32(windowRect.X+5), int32(windowRect.Y+5), 30, rl.Black)
 
+	var actions float32 = float32(g.Run.RoundActions)
+
+	var x, y int32
+	for i, tech := range g.Run.Technology {
+		x = int32(windowRect.X + 10)
+		y = int32(windowRect.Y + 50 + float32(i*30))
+		nextSeason := tech.RoundHandler[tech.RoundHandlerIndex]
+
+		actions -= nextSeason.CostActions
+		text := fmt.Sprintf(
+			"%s: -%v actions -$%v money",
+			tech.Name,
+			nextSeason.CostActions,
+			nextSeason.CostMoney,
+		)
+		rl.DrawText(text, x, y, 20, rl.Red)
+
+	}
+	text := fmt.Sprintf("Actions next season: %v", actions)
+	rl.DrawText(text, x, y+30, 20, rl.Red)
+
 	button := g.Scenes["HUD"].Data["EndRoundConfirmButton"].(Button)
 	button.Rectangle.X = 500
 	button.Rectangle.Y = 500
 
 	g.DrawButton(button)
+
+	previousButton := g.Button("Previous")
+	previousButton.Rectangle.X = 300
+	previousButton.Rectangle.Y = 500
+	g.DrawButton(previousButton)
+	if g.WasButtonClicked(&previousButton) {
+		g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["EndRound1"])
+	}
+
 	if g.WasButtonClicked(&button) {
+		OnClickEndRound(g)
 		g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["NextEvent"])
 	}
 }
@@ -255,6 +281,5 @@ func DrawNextEventWindow(g *Game, win *Window) {
 }
 
 func OnClickConfirmNextEvent(g *Game) {
-	OnClickEndRound(g)
 
 }

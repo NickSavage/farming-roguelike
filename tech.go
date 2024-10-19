@@ -2,9 +2,10 @@ package main
 
 func (g *Game) InitTechnology() {
 	tech := make(map[string]Technology)
-	tech["ChickenCoop"] = g.ChickenCoop()
 
+	tech["ChickenCoop"] = g.ChickenCoop()
 	tech["WheatField"] = g.WheatField()
+
 	g.Data["Technology"] = tech
 }
 
@@ -95,21 +96,25 @@ func (g *Game) WheatField() Technology {
 				Season:        Spring,
 				OnRoundEnd:    WheatFieldRoundSpring,
 				RoundEndValue: WheatFieldRoundEndValue,
+				CostActions:   1,
 			},
 			{
 				Season:        Summer,
 				OnRoundEnd:    WheatFieldRoundSummer,
 				RoundEndValue: WheatFieldRoundEndValue,
+				CostActions:   1,
 			},
 			{
 				Season:        Autumn,
 				OnRoundEnd:    WheatFieldRoundAutumn,
 				RoundEndValue: WheatFieldRoundEndValue,
+				CostActions:   1,
 			},
 			{
 				Season:        Winter,
 				OnRoundEnd:    WheatFieldRoundWinter,
 				RoundEndValue: WheatFieldRoundEndValue,
+				CostActions:   1,
 			},
 		},
 		RoundCounterMax:   0,

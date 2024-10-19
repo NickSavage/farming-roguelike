@@ -112,9 +112,23 @@ func (g *Game) drawTiles() {
 	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
 	for i := range grid {
 		for j := range grid[i] {
+			DrawTile(
+				g.Data["GrassTile"].(Tile),
+				float32(i*TILE_HEIGHT),
+				float32(j*TILE_WIDTH),
+			)
+		}
+	}
+
+	for i := range grid {
+		for j := range grid[i] {
 			tile := grid[i][j]
 			if tile.Skip {
-				continue
+				// if these match, it is the top left of a multicell tile
+				// so we don't want to skip
+				if !(tile.Row == i && tile.Column == j) {
+					continue
+				}
 			}
 			DrawTile(
 				g.Data["GrassTile"].(Tile),
@@ -133,45 +147,36 @@ func (g *Game) drawTiles() {
 }
 
 func (g *Game) InitDrawTechnology() {
-
-	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
 	for _, tech := range g.Run.Technology {
-		tile := tech.Tile
-		for x := range tile.Width {
-			for y := range tile.Height {
-				tile.Occupied = true
-				tile.Technology = tech
-				if tile.MultiSquare {
-					tile.Skip = true
-				}
-				grid[tile.Row+x][tile.Column+y] = tile
-			}
-		}
-		grid[tile.Row][tile.Column] = tile
-
+		g.DrawTechnology(tech)
 	}
 
 }
 func (g *Game) RedrawTechnology() {
-	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
 	for _, tech := range g.Run.Technology {
 		if !tech.Redraw {
 			continue
 		}
-		tile := tech.Tile
-		for x := range tile.Width {
-			for y := range tile.Height {
-				tile.Occupied = true
-				tile.Technology = tech
-				if tile.MultiSquare {
-					tile.Skip = true
-				}
-				grid[tile.Row+x][tile.Column+y] = tile
-			}
-		}
-		grid[tile.Row][tile.Column] = tile
-
+		g.DrawTechnology(tech)
 	}
+}
+
+func (g *Game) DrawTechnology(tech *Technology) {
+	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
+
+	tile := tech.Tile
+	log.Printf("tile %v", tile)
+	for x := range tile.Width {
+		for y := range tile.Height {
+			tile.Occupied = true
+			tile.Technology = tech
+			if tile.MultiSquare {
+				tile.Skip = true
+			}
+			grid[tile.Row+x][tile.Column+y] = tile
+		}
+	}
+	grid[tile.Row][tile.Column] = tile
 
 }
 

@@ -76,6 +76,15 @@ func (g *Game) ActivateScene(sceneName string) {
 	}
 }
 
+func (g *Game) Button(text string) Button {
+	return Button{
+		Rectangle: rl.NewRectangle(0, 0, 150, 40),
+		Color:     rl.SkyBlue,
+		Text:      text,
+		TextColor: rl.Black,
+	}
+}
+
 func (g *Game) DrawButton(button Button) {
 
 	rl.DrawRectangle(button.Rectangle.ToInt32().X, button.Rectangle.ToInt32().Y, button.Rectangle.ToInt32().Width, button.Rectangle.ToInt32().Height, button.Color)
