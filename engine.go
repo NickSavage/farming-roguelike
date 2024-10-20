@@ -76,6 +76,14 @@ func (g *Game) ActivateScene(sceneName string) {
 	}
 }
 
+func (g *Game) CloseButton(x, y float32) Button {
+	closeButton := g.Button("X")
+	closeButton.Rectangle.X = 200 + 900 - 30
+	closeButton.Rectangle.Y = 60
+	closeButton.Rectangle.Width = 40
+	return closeButton
+}
+
 func (g *Game) Button(text string) Button {
 	return Button{
 		Rectangle: rl.NewRectangle(0, 0, 150, 40),

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 )
 
 func (g *Game) InitTechnology() {
@@ -11,6 +12,15 @@ func (g *Game) InitTechnology() {
 	tech["WheatField"] = g.WheatField()
 
 	g.Data["Technology"] = tech
+}
+
+func (g *Game) GetProductNames() []string {
+	results := []string{}
+	for _, product := range g.Run.Products {
+		results = append(results, product.Name)
+	}
+	sort.Strings(results)
+	return results
 }
 
 func (g *Game) CreateChickenCoopTech() *Technology {

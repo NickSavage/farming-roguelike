@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/gen2brain/raylib-go/raylib"
-	"log"
+	//	"log"
+	"math"
 )
 
 func OnClickShopWindowButton(g *Game) {
@@ -19,6 +20,11 @@ func OnClickTechWindowButton(g *Game) {
 func OnClickOpenEndRoundPage1Window(g *Game) {
 	scene := g.Scenes["HUD"]
 	g.ActivateWindow(scene.Windows, scene.Windows["EndRound1"])
+}
+
+func OnClickOpenPricesWindow(g *Game) {
+	scene := g.Scenes["HUD"]
+	g.ActivateWindow(scene.Windows, scene.Windows["Prices"])
 }
 
 func (g *Game) InitHUD() {
@@ -54,10 +60,23 @@ func (g *Game) InitHUD() {
 	scene.Buttons = append(scene.Buttons, shopButton)
 	scene.Data["DisplayShopWindow"] = false
 
-	viewEndRoundButton := Button{
+	priceButton := Button{
 		Rectangle: rl.Rectangle{
 			X:      10,
 			Y:      250,
+			Width:  150,
+			Height: 40,
+		},
+		Color:     rl.SkyBlue,
+		Text:      "Market",
+		TextColor: rl.Black,
+		OnClick:   OnClickOpenPricesWindow,
+	}
+	scene.Buttons = append(scene.Buttons, priceButton)
+	viewEndRoundButton := Button{
+		Rectangle: rl.Rectangle{
+			X:      10,
+			Y:      300,
 			Width:  150,
 			Height: 40,
 		},
@@ -133,6 +152,11 @@ func (g *Game) InitHUD() {
 		Name:       "Next Event",
 		Display:    false,
 		DrawWindow: DrawNextEventWindow,
+	}
+	scene.Windows["Prices"] = &Window{
+		Name:       "Prices",
+		Display:    false,
+		DrawWindow: DrawPricesWindow,
 	}
 
 }
@@ -271,15 +295,17 @@ func DrawNextEventWindow(g *Game, win *Window) {
 	button.Rectangle.Y = 500
 
 	event := g.Run.Events[g.Run.CurrentRound]
-	log.Printf("event %v", event)
 	g.DrawButton(button)
 	rl.DrawText(event.Name, 225, 60, 30, rl.Black)
 
 	for _, effect := range event.Effects {
 		if effect.IsPriceChange {
+			newPrice := g.Run.Products[effect.ProductImpacted].Price * float32(1+effect.PriceChange)
+			newPrice = float32(math.Round(float64(newPrice*100))) / 100
 
-			text := fmt.Sprintf("Price of %v change by %v", effect.ProductImpacted, effect.PriceChange)
-			rl.DrawText(text, 225, 95, 15, rl.Black)
+			displayChange := math.Round(float64(effect.PriceChange*100*100)) / 100
+			text := fmt.Sprintf("Price of %v is now %v (%v%%)", effect.ProductImpacted, newPrice, displayChange)
+			rl.DrawText(text, 225, 95, 20, rl.Black)
 		}
 	}
 
@@ -293,4 +319,32 @@ func DrawNextEventWindow(g *Game, win *Window) {
 
 func OnClickConfirmNextEvent(g *Game) {
 
+}
+
+func DrawPricesWindow(g *Game, win *Window) {
+	scene := g.Scenes["HUD"]
+
+	window := rl.NewRectangle(220, 50, 900, 500)
+	rl.DrawRectangleRec(window, rl.White)
+	rl.DrawRectangleLinesEx(window, 5, rl.Black)
+
+	rl.DrawText("Market Prices", 225, 60, 30, rl.Black)
+
+	var i, x, y int32
+	products := g.GetProductNames()
+	for _, productName := range products {
+		x = int32(window.X + 10)
+		y = int32(window.Y + 50 + float32(i*30))
+		rl.DrawText(productName, x, y, 20, rl.Black)
+		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[productName].Price), x+100, y, 20, rl.Black)
+
+		i += 1
+
+	}
+
+	closeButton := g.CloseButton(200+900-30, 60)
+	g.DrawButton(closeButton)
+	if g.WasButtonClicked(&closeButton) {
+		g.ActivateWindow(scene.Windows, scene.Windows["Prices"])
+	}
 }
