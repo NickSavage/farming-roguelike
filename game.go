@@ -30,7 +30,9 @@ func (g *Game) InitRun() {
 func (r *Run) sellAllProducts() float32 {
 	var result float32 = 0
 	for _, product := range r.Products {
-		result = +product.Quantity * product.Price
+		result += +product.Quantity * product.Price
+		log.Printf("selling %v %v = %v", product.Quantity, product.Name, result)
+
 	}
 	return result
 }

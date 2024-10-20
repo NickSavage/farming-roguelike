@@ -99,15 +99,19 @@ func ChickenCoopOnBuild(g *Game, tech *Technology) {
 }
 
 func ChickenCoopRoundEndText(g *Game, tech *Technology) string {
-	return "Chicken Coop: $5"
+	return fmt.Sprintf("Chicken Coop: $%v", ChickenCoopRoundEndValue(g, tech))
 }
 
 func ChickenCoopRoundEndValue(g *Game, tech *Technology) float32 {
+	return ChickenCoopProduce(g, tech) * g.Run.Products["Chicken"].Price
+}
+
+func ChickenCoopProduce(g *Game, tech *Technology) float32 {
 	return 5
 }
 
 func ChickenCoopRoundEnd(g *Game, tech *Technology) {
-	g.Run.EndRoundMoney += 5
+	g.Run.Products["Chicken"].Quantity += ChickenCoopProduce(g, tech)
 }
 
 func (g *Game) WheatField() Technology {
@@ -204,8 +208,6 @@ func WheatFieldRoundSummer(g *Game, tech *Technology) {
 	tech.Redraw = true
 }
 func WheatFieldRoundAutumn(g *Game, tech *Technology) {
-	//	g.Run.EndRoundMoney += 125
-
 	g.Run.Products["Wheat"].Quantity += 125
 	tech.RoundHandlerIndex += 1
 	tech.Tile.Tile.TileFrame.X += 45
