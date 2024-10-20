@@ -274,10 +274,18 @@ func DrawNextEventWindow(g *Game, win *Window) {
 	log.Printf("event %v", event)
 	g.DrawButton(button)
 	rl.DrawText(event.Name, 225, 60, 30, rl.Black)
-	rl.DrawText(g.Run.Events[g.Run.CurrentRound].Name, 225, 95, 15, rl.Black)
+
+	for _, effect := range event.Effects {
+		if effect.IsPriceChange {
+
+			text := fmt.Sprintf("Price of %v change by %v", effect.ProductImpacted, effect.PriceChange)
+			rl.DrawText(text, 225, 95, 15, rl.Black)
+		}
+	}
 
 	if g.WasButtonClicked(&button) {
 		button.OnClick(g)
+		g.ProcessNextEvent()
 		win.Display = false
 	}
 

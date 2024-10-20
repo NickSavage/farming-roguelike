@@ -58,10 +58,18 @@ func (g *Game) GetNextEvent() {
 	newEvent := g.NewRandomEvent()
 	newEvent.RoundIndex = g.Run.CurrentRound
 	g.Run.Events[newEvent.RoundIndex] = newEvent
+}
 
-	// display event window
-	g.ScreenSkip = true
-	g.Scenes["HUD"].Data["DisplayNextEventWindow"] = true
+func (g *Game) ProcessNextEvent() {
+	event := g.Run.Events[g.Run.CurrentRound]
+	log.Printf("process event %v", event.Name)
+	for _, effect := range event.Effects {
+		if effect.IsPriceChange {
+			log.Printf("Price of %v change by %v", effect.ProductImpacted, effect.PriceChange)
+			current := g.Run.Products[effect.ProductImpacted].Price
+			g.Run.Products[effect.ProductImpacted].Price = current * (1 + effect.PriceChange)
+		}
+	}
 }
 
 func (g *Game) PlaceTech(tech *Technology, x, y float32) {

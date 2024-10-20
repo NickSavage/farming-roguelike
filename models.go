@@ -78,6 +78,7 @@ type Event struct {
 }
 type Effect struct {
 	ProductImpacted string
+	IsPriceChange   bool
 	PriceChange     float32 // percentage
 }
 

@@ -24,6 +24,7 @@ func (g *Game) RandomPriceChange() Effect {
 
 	scaledRandom := baseRandom*0.2 - 0.1
 	return Effect{
+		IsPriceChange:   true,
 		ProductImpacted: productNames[index],
 		PriceChange:     float32(scaledRandom),
 	}
