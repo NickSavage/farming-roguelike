@@ -100,11 +100,14 @@ func ChickenCoopOnBuild(g *Game, tech *Technology) {
 }
 
 func ChickenCoopRoundEndText(g *Game, tech *Technology) string {
-	return fmt.Sprintf("Chicken Coop: $%v", ChickenCoopRoundEndValue(g, tech))
+	units := ChickenCoopProduce(g, tech)
+	price := g.Run.Products["Chicken"].Price
+	text := "$%v (%v units at $%v each)"
+	return fmt.Sprintf(text, units*price, units, price)
 }
 
 func ChickenCoopRoundEndValue(g *Game, tech *Technology) float32 {
-	return ChickenCoopProduce(g, tech) * g.Run.Products["Chicken"].Price
+	return ChickenCoopProduce(g, tech) //* g.Run.Products["Chicken"].Price
 }
 
 func ChickenCoopProduce(g *Game, tech *Technology) float32 {
@@ -184,19 +187,22 @@ func WheatFieldRoundEndValue(g *Game, tech *Technology) float32 {
 	}
 }
 func WheatFieldRoundEndText(g *Game, tech *Technology) string {
-	if g.Run.CurrentSeason == Autumn {
-		units := float32(125)
-		price := g.Run.Products["Wheat"].Price
-		return fmt.Sprintf(
-			"Wheat Field: $%v (%v units at $%v each)",
-			units*price,
-			units,
-			price,
-		)
-	} else {
-		return "Wheat Field: $0"
-	}
+	units := WheatFieldProduce(g, tech)
+	price := g.Run.Products["Wheat"].Price
+	return fmt.Sprintf(
+		"$%v (%v units at $%v each)",
+		units*price,
+		units,
+		price,
+	)
+}
 
+func WheatFieldProduce(g *Game, tech *Technology) float32 {
+	if g.Run.CurrentSeason == Autumn {
+		return float32(125)
+	} else {
+		return 0
+	}
 }
 
 func WheatFieldRoundSpring(g *Game, tech *Technology) {

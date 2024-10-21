@@ -27,22 +27,23 @@ func (g *Game) InitRun() {
 
 }
 
-func (r *Run) sellAllProducts() float32 {
-	var result float32 = 0
-	for _, product := range r.Products {
-		result += +r.SellProduct(product)
-	}
+// func (g *Game) sellAllProducts() float32 {
+// 	var result float32 = 0
+// 	for _, product := range g.Run.Products {
+// 		result += +g.SellProduct(product)
+// 	}
 
-	log.Printf("sell %v", result)
-	return result
-}
+// 	log.Printf("sell %v", result)
+// 	return result
+// }
 
-func (r *Run) SellProduct(product *Product) float32 {
+func (g *Game) SellProduct(product *Product) {
 	result := +product.Quantity * product.Price
 	log.Printf("selling %v %v = %v", product.Quantity, product.Name, result)
 	product.Quantity = 0
-	return result
+	// TODO: add to round money for reporting?
 
+	g.Run.Money += result
 }
 
 func OnClickEndRound(g *Game) {
@@ -53,7 +54,7 @@ func OnClickEndRound(g *Game) {
 		g.Run.RoundActionsRemaining -= int(tech.RoundHandler[tech.RoundHandlerIndex].CostActions)
 		g.Run.EndRoundMoney -= tech.RoundHandler[tech.RoundHandlerIndex].CostMoney
 	}
-	g.Run.EndRoundMoney += g.Run.sellAllProducts()
+	//	g.Run.EndRoundMoney += g.Run.sellAllProducts()
 	g.Run.Money += g.Run.EndRoundMoney * g.Run.Productivity
 	g.Run.Money = float32(math.Round(float64(g.Run.Money)))
 	g.Run.EndRoundMoney = 0

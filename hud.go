@@ -84,6 +84,8 @@ func (g *Game) InitHUD() {
 		DrawWindow: DrawSellWindow,
 	}
 
+	scene.Data["SellAllConfirm"] = ""
+
 }
 
 func UpdateHUD(g *Game) {
@@ -156,8 +158,9 @@ func DrawEndRoundWindowPage1(g *Game, window *Window) {
 	rl.DrawRectangleRec(windowRect, rl.White)
 	rl.DrawRectangleLinesEx(windowRect, 5, rl.Black)
 
-	rl.DrawText("Income", int32(windowRect.X+5), int32(windowRect.Y+5), 30, rl.Black)
+	rl.DrawText("Production", int32(windowRect.X+5), int32(windowRect.Y+5), 30, rl.Black)
 	var totalEarned float32 = 0
+	var columnOffset int32 = 150
 
 	var x, y int32
 	for i, tech := range g.Run.Technology {
@@ -167,11 +170,12 @@ func DrawEndRoundWindowPage1(g *Game, window *Window) {
 		value := tech.RoundHandler[index].RoundEndValue(g, tech)
 		totalEarned += value
 		text := tech.RoundHandler[index].RoundEndText(g, tech)
-		rl.DrawText(text, x, y, 20, rl.Black)
+		rl.DrawText(tech.Name, x, y, 20, rl.Black)
+		rl.DrawText(text, x+columnOffset, y, 20, rl.Black)
 	}
 
-	text := fmt.Sprintf("Total: $%v", totalEarned)
-	rl.DrawText(text, x, y+30, 20, rl.Black)
+	//	text := fmt.Sprintf("Total: $%v", totalEarned)
+	//rl.DrawText(text, x, y+30, 20, rl.Black)
 
 	button := g.Button("Next Page", 500, 500, OnClickEndRoundPageTwoButton)
 
@@ -190,21 +194,22 @@ func DrawEndRoundWindowPage2(g *Game, win *Window) {
 	rl.DrawText("Investments", int32(windowRect.X+5), int32(windowRect.Y+5), 30, rl.Black)
 
 	var actions float32 = float32(g.Run.RoundActions)
-
+	var columnOffset int32 = 150
 	var x, y int32
+
 	for i, tech := range g.Run.Technology {
 		x = int32(windowRect.X + 10)
 		y = int32(windowRect.Y + 50 + float32(i*30))
 		nextSeason := tech.RoundHandler[tech.RoundHandlerIndex]
 
 		actions -= nextSeason.CostActions
+		rl.DrawText(tech.Name, x, y, 20, rl.Black)
 		text := fmt.Sprintf(
-			"%s: -%v actions -$%v money",
-			tech.Name,
+			"-%v actions -$%v money",
 			nextSeason.CostActions,
 			nextSeason.CostMoney,
 		)
-		rl.DrawText(text, x, y, 20, rl.Red)
+		rl.DrawText(text, x+columnOffset, y, 20, rl.Red)
 
 	}
 	text := fmt.Sprintf("Actions next season: %v", actions)
@@ -279,6 +284,8 @@ func DrawMarketWindow(g *Game, win *Window) {
 
 	var i, x, y int32
 	var columnOffset int32 = 150
+	var sellAllConfirm string = scene.Data["SellAllConfirm"].(string)
+
 	products := g.GetProductNames()
 	rl.DrawText("Products", int32(window.X+10), int32(window.Y+50), 25, rl.Black)
 	rl.DrawText("Inventory", int32(window.X+10)+columnOffset, int32(window.Y+50), 25, rl.Black)
@@ -290,25 +297,44 @@ func DrawMarketWindow(g *Game, win *Window) {
 		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[productName].Quantity), x+columnOffset, y, 20, rl.Black)
 		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[productName].Price), x+columnOffset*2, y, 20, rl.Black)
 
+		if g.Run.Products[productName].Quantity == 0 {
+			i += 1
+			continue
+		}
 		edge := window.X + window.Width
-		sellButton := g.DrawSellButton(float32(edge-110), float32(y))
-		sellButton.Text = "Sell Some"
-		sellButton.Rectangle.Width = 100
-		g.DrawButton(sellButton)
+		// sellButton := g.DrawSellButton(float32(edge-110), float32(y))
+		// sellButton.Text = "Sell Some"
+		// sellButton.Rectangle.Width = 100
+		// g.DrawButton(sellButton)
 
-		sellAllButton := g.DrawSellButton(float32(edge-220), float32(y))
-		sellAllButton.Text = "Sell All"
-		sellAllButton.Rectangle.Width = 100
-		g.DrawButton(sellAllButton)
+		if sellAllConfirm == productName {
+			sellAllButton := g.DrawSellButton(float32(edge-110), float32(y))
+			sellAllButton.Color = rl.Red
+			sellAllButton.Text = "Confirm"
+			sellAllButton.Rectangle.Width = 100
+			g.DrawButton(sellAllButton)
+			if g.WasButtonClicked(&sellAllButton) {
+				scene.Data["SellAllConfirm"] = ""
+				g.ScreenSkip = true
+				g.SellProduct(g.Run.Products[productName])
+			}
 
-		if g.WasButtonClicked(&sellButton) {
-			OpenSellWindow(g, g.Run.Products[productName])
+		} else {
+			sellAllButton := g.DrawSellButton(float32(edge-110), float32(y))
+			sellAllButton.Text = "Sell All"
+			sellAllButton.Rectangle.Width = 100
+			g.DrawButton(sellAllButton)
+			if g.WasButtonClicked(&sellAllButton) {
+				scene.Data["SellAllConfirm"] = productName
+				g.ScreenSkip = true
+			}
 		}
-		if g.WasButtonClicked(&sellAllButton) {
-			OpenSellWindow(g, g.Run.Products[productName])
-		}
 
+		// if g.WasButtonClicked(&sellButton) {
+		// 	OpenSellWindow(g, g.Run.Products[productName])
+		// }
 		i += 1
+
 	}
 
 	closeButton := g.CloseButton(200+900-30, 60, OnClickOpenMarketWindow)
