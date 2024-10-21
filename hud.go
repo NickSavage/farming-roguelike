@@ -7,6 +7,8 @@ import (
 	"math"
 )
 
+func OnClickNull(g *Game) {}
+
 func OnClickShopWindowButton(g *Game) {
 	scene := g.Scenes["HUD"]
 	g.ActivateWindow(scene.Windows, scene.Windows["ShopWindow"])
@@ -22,109 +24,27 @@ func OnClickOpenEndRoundPage1Window(g *Game) {
 	g.ActivateWindow(scene.Windows, scene.Windows["EndRound1"])
 }
 
-func OnClickOpenPricesWindow(g *Game) {
+func OnClickOpenMarketWindow(g *Game) {
 	scene := g.Scenes["HUD"]
 	g.ActivateWindow(scene.Windows, scene.Windows["Prices"])
 }
 
+func OnClickEndRoundPageTwoButton(g *Game) {
+
+}
+
+func OnClickEndRoundConfirmButton(g *Game) {
+
+}
+
+func OpenSellWindow(g *Game, product *Product) {
+	scene := g.Scenes["HUD"]
+	g.ActivateWindow(scene.Windows, scene.Windows["Sell"])
+
+}
+
 func (g *Game) InitHUD() {
 	scene := g.Scenes["HUD"]
-
-	techButton := Button{
-		Rectangle: rl.Rectangle{
-			X:      10,
-			Y:      150,
-			Width:  150,
-			Height: 40,
-		},
-		Color:     rl.SkyBlue,
-		Text:      "Technology",
-		TextColor: rl.Black,
-		OnClick:   OnClickTechWindowButton,
-	}
-	scene.Buttons = append(scene.Buttons, techButton)
-	scene.Data["DisplayTechWindow"] = false
-
-	shopButton := Button{
-		Rectangle: rl.Rectangle{
-			X:      10,
-			Y:      200,
-			Width:  150,
-			Height: 40,
-		},
-		Color:     rl.SkyBlue,
-		Text:      "Shop",
-		TextColor: rl.Black,
-		OnClick:   OnClickShopWindowButton,
-	}
-	scene.Buttons = append(scene.Buttons, shopButton)
-	scene.Data["DisplayShopWindow"] = false
-
-	priceButton := Button{
-		Rectangle: rl.Rectangle{
-			X:      10,
-			Y:      250,
-			Width:  150,
-			Height: 40,
-		},
-		Color:     rl.SkyBlue,
-		Text:      "Market",
-		TextColor: rl.Black,
-		OnClick:   OnClickOpenPricesWindow,
-	}
-	scene.Buttons = append(scene.Buttons, priceButton)
-	viewEndRoundButton := Button{
-		Rectangle: rl.Rectangle{
-			X:      10,
-			Y:      300,
-			Width:  150,
-			Height: 40,
-		},
-		Color:     rl.SkyBlue,
-		Text:      "End Round",
-		TextColor: rl.Black,
-		OnClick:   OnClickOpenEndRoundPage1Window,
-	}
-	scene.Buttons = append(scene.Buttons, viewEndRoundButton)
-
-	scene.Data["EndRoundToPageTwoButton"] = Button{
-		Rectangle: rl.Rectangle{
-			X:      0,
-			Y:      0,
-			Width:  150,
-			Height: 40,
-		},
-		Color:     rl.SkyBlue,
-		Text:      "Next Page",
-		TextColor: rl.Black,
-	}
-	scene.Data["EndRoundConfirmButton"] = Button{
-		Rectangle: rl.Rectangle{
-			X:      0,
-			Y:      0,
-			Width:  150,
-			Height: 40,
-		},
-		Color:     rl.SkyBlue,
-		Text:      "End Round",
-		TextColor: rl.Black,
-		OnClick:   OnClickEndRound,
-	}
-	scene.Data["DisplayEndRoundWindow"] = false
-
-	scene.Data["NextEventConfirmButton"] = Button{
-		Rectangle: rl.Rectangle{
-			X:      0,
-			Y:      0,
-			Width:  150,
-			Height: 40,
-		},
-		Color:     rl.SkyBlue,
-		Text:      "Confirm",
-		TextColor: rl.Black,
-		OnClick:   OnClickConfirmNextEvent,
-	}
-	scene.Data["DisplayNextEventWindow"] = false
 
 	scene.Windows = make(map[string]*Window)
 	scene.Windows["ShopWindow"] = &Window{
@@ -156,7 +76,12 @@ func (g *Game) InitHUD() {
 	scene.Windows["Prices"] = &Window{
 		Name:       "Prices",
 		Display:    false,
-		DrawWindow: DrawPricesWindow,
+		DrawWindow: DrawMarketWindow,
+	}
+	scene.Windows["Sell"] = &Window{
+		Name:       "Sell",
+		Display:    false,
+		DrawWindow: DrawSellWindow,
 	}
 
 }
@@ -178,13 +103,7 @@ func DrawHUD(g *Game) {
 	rl.DrawRectangle(0, g.screenHeight-height, g.screenWidth, height, rl.Black)
 	rl.DrawRectangle(0, 0, sidebarWidth, g.screenHeight-height, rl.Black)
 
-	rl.DrawText(
-		fmt.Sprintf("Actions: %v/%v", g.Run.RoundActionsRemaining, g.Run.RoundActions),
-		30, 30, 20, rl.White,
-	)
-	rl.DrawText(fmt.Sprintf("Money: $%v", g.Run.Money), 30, 50, 20, rl.White)
-	rl.DrawText(fmt.Sprintf("Round: %v", g.Run.CurrentRound), 30, 70, 20, rl.White)
-	rl.DrawText(fmt.Sprintf("Season: %v", g.Run.CurrentSeason.String()), 30, 90, 20, rl.White)
+	DrawSidebar(g)
 	g.DrawButtons(scene.Buttons)
 
 	if g.Data["Message"].(string) != "" {
@@ -200,6 +119,35 @@ func DrawHUD(g *Game) {
 			window.DrawWindow(g, window)
 		}
 	}
+}
+
+func DrawSidebar(g *Game) {
+
+	rl.DrawText(
+		fmt.Sprintf("Actions: %v/%v", g.Run.RoundActionsRemaining, g.Run.RoundActions),
+		30, 30, 20, rl.White,
+	)
+	rl.DrawText(fmt.Sprintf("Money: $%v", g.Run.Money), 30, 50, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("Round: %v", g.Run.CurrentRound), 30, 70, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("Season: %v", g.Run.CurrentSeason.String()), 30, 90, 20, rl.White)
+
+	buttons := []*Button{}
+	techButton := g.Button("Technology", 10, 150, OnClickTechWindowButton)
+	buttons = append(buttons, &techButton)
+	shopButton := g.Button("Shop", 10, 200, OnClickShopWindowButton)
+	buttons = append(buttons, &shopButton)
+	priceButton := g.Button("Market", 10, 250, OnClickOpenMarketWindow)
+	buttons = append(buttons, &priceButton)
+	viewEndRoundButton := g.Button("End Round", 10, 300, OnClickOpenEndRoundPage1Window)
+	buttons = append(buttons, &viewEndRoundButton)
+
+	for _, button := range buttons {
+		g.DrawButton(*button)
+		if g.WasButtonClicked(button) {
+			button.OnClick(g)
+		}
+	}
+
 }
 
 func DrawEndRoundWindowPage1(g *Game, window *Window) {
@@ -225,9 +173,7 @@ func DrawEndRoundWindowPage1(g *Game, window *Window) {
 	text := fmt.Sprintf("Total: $%v", totalEarned)
 	rl.DrawText(text, x, y+30, 20, rl.Black)
 
-	button := g.Scenes["HUD"].Data["EndRoundToPageTwoButton"].(Button)
-	button.Rectangle.X = 500
-	button.Rectangle.Y = 500
+	button := g.Button("Next Page", 500, 500, OnClickEndRoundPageTwoButton)
 
 	g.DrawButton(button)
 	if g.WasButtonClicked(&button) {
@@ -263,16 +209,11 @@ func DrawEndRoundWindowPage2(g *Game, win *Window) {
 	}
 	text := fmt.Sprintf("Actions next season: %v", actions)
 	rl.DrawText(text, x, y+30, 20, rl.Red)
-
-	button := g.Scenes["HUD"].Data["EndRoundConfirmButton"].(Button)
-	button.Rectangle.X = 500
-	button.Rectangle.Y = 500
+	button := g.Button("End Round", 500, 500, OnClickEndRoundConfirmButton)
 
 	g.DrawButton(button)
 
-	previousButton := g.Button("Previous")
-	previousButton.Rectangle.X = 300
-	previousButton.Rectangle.Y = 500
+	previousButton := g.Button("Previous", 300, 500, OnClickOpenEndRoundPage1Window)
 	g.DrawButton(previousButton)
 	if g.WasButtonClicked(&previousButton) {
 		g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["EndRound1"])
@@ -290,9 +231,7 @@ func DrawNextEventWindow(g *Game, win *Window) {
 	rl.DrawRectangleRec(window, rl.White)
 	rl.DrawRectangleLinesEx(window, 5, rl.Black)
 
-	button := g.Scenes["HUD"].Data["NextEventConfirmButton"].(Button)
-	button.Rectangle.X = 500
-	button.Rectangle.Y = 500
+	button := g.Button("Confirm", 500, 500, OnClickConfirmNextEvent)
 
 	event := g.Run.Events[g.Run.CurrentRound]
 	g.DrawButton(button)
@@ -311,17 +250,25 @@ func DrawNextEventWindow(g *Game, win *Window) {
 
 	if g.WasButtonClicked(&button) {
 		button.OnClick(g)
-		g.ProcessNextEvent()
-		win.Display = false
 	}
 
 }
 
 func OnClickConfirmNextEvent(g *Game) {
+	g.ProcessNextEvent()
+	g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["NextEvent"])
 
 }
 
-func DrawPricesWindow(g *Game, win *Window) {
+func (g *Game) DrawSellButton(x, y float32) Button {
+	result := g.Button("Sell", x, y, OnClickNull)
+	result.Rectangle.Width = 50
+	result.Rectangle.Height = 25
+	result.TextSize = 20
+	return result
+}
+
+func DrawMarketWindow(g *Game, win *Window) {
 	scene := g.Scenes["HUD"]
 
 	window := rl.NewRectangle(220, 50, 900, 500)
@@ -331,20 +278,59 @@ func DrawPricesWindow(g *Game, win *Window) {
 	rl.DrawText("Market Prices", 225, 60, 30, rl.Black)
 
 	var i, x, y int32
+	var columnOffset int32 = 150
 	products := g.GetProductNames()
+	rl.DrawText("Products", int32(window.X+10), int32(window.Y+50), 25, rl.Black)
+	rl.DrawText("Inventory", int32(window.X+10)+columnOffset, int32(window.Y+50), 25, rl.Black)
+	rl.DrawText("Spot Price", int32(window.X+10)+columnOffset*2, int32(window.Y+50), 25, rl.Black)
 	for _, productName := range products {
 		x = int32(window.X + 10)
-		y = int32(window.Y + 50 + float32(i*30))
+		y = int32(window.Y + 80 + float32(i*30))
 		rl.DrawText(productName, x, y, 20, rl.Black)
-		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[productName].Price), x+100, y, 20, rl.Black)
+		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[productName].Quantity), x+columnOffset, y, 20, rl.Black)
+		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[productName].Price), x+columnOffset*2, y, 20, rl.Black)
+
+		edge := window.X + window.Width
+		sellButton := g.DrawSellButton(float32(edge-110), float32(y))
+		sellButton.Text = "Sell Some"
+		sellButton.Rectangle.Width = 100
+		g.DrawButton(sellButton)
+
+		sellAllButton := g.DrawSellButton(float32(edge-220), float32(y))
+		sellAllButton.Text = "Sell All"
+		sellAllButton.Rectangle.Width = 100
+		g.DrawButton(sellAllButton)
+
+		if g.WasButtonClicked(&sellButton) {
+			OpenSellWindow(g, g.Run.Products[productName])
+		}
+		if g.WasButtonClicked(&sellAllButton) {
+			OpenSellWindow(g, g.Run.Products[productName])
+		}
 
 		i += 1
-
 	}
 
-	closeButton := g.CloseButton(200+900-30, 60)
+	closeButton := g.CloseButton(200+900-30, 60, OnClickOpenMarketWindow)
 	g.DrawButton(closeButton)
 	if g.WasButtonClicked(&closeButton) {
+		g.ActivateWindow(scene.Windows, scene.Windows["Prices"])
+	}
+}
+
+func DrawSellWindow(g *Game, win *Window) {
+	scene := g.Scenes["HUD"]
+
+	window := rl.NewRectangle(220, 50, 500, 500)
+	rl.DrawRectangleRec(window, rl.White)
+	rl.DrawRectangleLinesEx(window, 5, rl.Black)
+
+	rl.DrawText("Sell", 225, 60, 30, rl.Black)
+
+	closeButton := g.CloseButton(200+500-30, 60, OnClickOpenMarketWindow)
+	g.DrawButton(closeButton)
+	if g.WasButtonClicked(&closeButton) {
+		g.ActivateWindow(scene.Windows, scene.Windows["Sell"])
 		g.ActivateWindow(scene.Windows, scene.Windows["Prices"])
 	}
 }

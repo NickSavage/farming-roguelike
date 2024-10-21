@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"sort"
 )
 
@@ -112,6 +113,7 @@ func ChickenCoopProduce(g *Game, tech *Technology) float32 {
 
 func ChickenCoopRoundEnd(g *Game, tech *Technology) {
 	g.Run.Products["Chicken"].Quantity += ChickenCoopProduce(g, tech)
+	log.Printf("chicken %v", g.Run.Products["Chicken"].Quantity)
 }
 
 func (g *Game) WheatField() Technology {

@@ -76,20 +76,19 @@ func (g *Game) ActivateScene(sceneName string) {
 	}
 }
 
-func (g *Game) CloseButton(x, y float32) Button {
-	closeButton := g.Button("X")
-	closeButton.Rectangle.X = 200 + 900 - 30
-	closeButton.Rectangle.Y = 60
+func (g *Game) CloseButton(x, y float32, onClick func(*Game)) Button {
+	closeButton := g.Button("X", x, y, onClick)
 	closeButton.Rectangle.Width = 40
 	return closeButton
 }
 
-func (g *Game) Button(text string) Button {
+func (g *Game) Button(text string, x, y float32, onClick func(*Game)) Button {
 	return Button{
-		Rectangle: rl.NewRectangle(0, 0, 150, 40),
+		Rectangle: rl.NewRectangle(x, y, 150, 40),
 		Color:     rl.SkyBlue,
 		Text:      text,
 		TextColor: rl.Black,
+		OnClick:   onClick,
 	}
 }
 

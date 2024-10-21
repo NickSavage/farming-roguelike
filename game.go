@@ -30,11 +30,19 @@ func (g *Game) InitRun() {
 func (r *Run) sellAllProducts() float32 {
 	var result float32 = 0
 	for _, product := range r.Products {
-		result += +product.Quantity * product.Price
-		log.Printf("selling %v %v = %v", product.Quantity, product.Name, result)
-
+		result += +r.SellProduct(product)
 	}
+
+	log.Printf("sell %v", result)
 	return result
+}
+
+func (r *Run) SellProduct(product *Product) float32 {
+	result := +product.Quantity * product.Price
+	log.Printf("selling %v %v = %v", product.Quantity, product.Name, result)
+	product.Quantity = 0
+	return result
+
 }
 
 func OnClickEndRound(g *Game) {
@@ -64,7 +72,6 @@ func (g *Game) GetNextEvent() {
 
 func (g *Game) ProcessNextEvent() {
 	event := g.Run.Events[g.Run.CurrentRound]
-	log.Printf("process event %v", event.Name)
 	for _, effect := range event.Effects {
 		if effect.IsPriceChange {
 			log.Printf("Price of %v change by %v", effect.ProductImpacted, effect.PriceChange)
