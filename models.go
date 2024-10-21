@@ -14,16 +14,19 @@ type Game struct {
 }
 
 type BoardSquare struct {
-	Tile        Tile
-	TileType    string
-	Row         int
-	Column      int
-	Width       int // in tiles
-	Height      int // in tiles
-	Skip        bool
-	Occupied    bool
-	MultiSquare bool
-	Technology  *Technology
+	Tile         Tile
+	TileType     string
+	Row          int
+	Column       int
+	Width        int // in tiles
+	Height       int // in tiles
+	Skip         bool
+	Occupied     bool
+	MultiSquare  bool
+	Technology   *Technology
+	IsTechnology bool
+	HoverActive  bool
+	IsTree       bool
 }
 
 type BoardRightClickMenu struct {

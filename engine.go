@@ -35,6 +35,8 @@ type Scene struct {
 	Data        map[string]interface{}
 	Camera      rl.Camera2D
 	Windows     map[string]*Window
+	Menu        *BoardRightClickMenu
+	RenderMenu  bool
 }
 
 type Window struct {

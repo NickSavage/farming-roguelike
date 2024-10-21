@@ -29,14 +29,15 @@ func (g *Game) CreateChickenCoopTech() *Technology {
 	tech := g.Data["Technology"].(map[string]Technology)
 	result := tech["ChickenCoop"]
 	result.Tile = BoardSquare{
-		Tile:        g.Data["ChickenCoopTile"].(Tile),
-		TileType:    "Technology",
-		Row:         10,
-		Column:      10,
-		Width:       2,
-		Height:      2,
-		Occupied:    true,
-		MultiSquare: true,
+		Tile:         g.Data["ChickenCoopTile"].(Tile),
+		TileType:     "Technology",
+		Row:          10,
+		Column:       10,
+		Width:        2,
+		Height:       2,
+		Occupied:     true,
+		MultiSquare:  true,
+		IsTechnology: true,
 	}
 	g.Run.Products["Chicken"] = &Product{
 		Name:     "Chicken",
@@ -52,13 +53,14 @@ func (g *Game) CreateWheatTech() *Technology {
 	tech := g.Data["Technology"].(map[string]Technology)
 	result := tech["WheatField"]
 	result.Tile = BoardSquare{
-		Tile:     g.Data["WheatTile"].(Tile),
-		TileType: "Technology",
-		Row:      8,
-		Column:   8,
-		Width:    5,
-		Height:   5,
-		Occupied: true,
+		Tile:         g.Data["WheatTile"].(Tile),
+		TileType:     "Technology",
+		Row:          8,
+		Column:       8,
+		Width:        5,
+		Height:       5,
+		Occupied:     true,
+		IsTechnology: true,
 	}
 	g.Run.Products["Wheat"] = &Product{
 		Name:     "Wheat",

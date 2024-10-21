@@ -41,6 +41,7 @@ func (g *Game) InitPlaceRandomTrees(numTrees int) {
 		boardSquare.Height = 2
 		boardSquare.Occupied = true
 		boardSquare.MultiSquare = true
+		boardSquare.IsTree = true
 
 		for i := range boardSquare.Width {
 			for j := range boardSquare.Height {
@@ -129,6 +130,11 @@ func (g *Game) drawTiles() {
 				if !(tile.Row == i && tile.Column == j) {
 					continue
 				}
+			}
+			if tile.HoverActive && (tile.IsTechnology || tile.IsTree) {
+				tile.Tile.Color = rl.Green
+			} else {
+				tile.Tile.Color = rl.White
 			}
 			DrawTile(
 				g.Data["GrassTile"].(Tile),
@@ -334,7 +340,7 @@ func DrawBoard(g *Game) {
 	g.HandleHover()
 	DrawHUD(g)
 	g.RedrawTechnology()
-	// g.DrawRightClickMenu()
+	g.DrawClickMenu()
 }
 
 func (g *Game) SelectTiles() {
@@ -376,16 +382,21 @@ func (g *Game) SelectTiles() {
 
 }
 
-func (g *Game) HandleRightClick() {
+func (g *Game) HandleLeftClick() {
 
 	scene := g.Scenes["Board"]
 
-	if rl.IsMouseButtonPressed(rl.MouseRightButton) {
+	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 		mousePosition := rl.GetMousePosition()
 
 		grid := scene.Data["Grid"].([][]BoardSquare)
 		x := int((mousePosition.X + scene.Camera.Target.X) / scene.Camera.Zoom / float32(TILE_WIDTH))
 		y := int((mousePosition.Y + scene.Camera.Target.Y) / scene.Camera.Zoom / float32(TILE_HEIGHT))
+		if !(grid[x][y].IsTechnology || grid[x][y].IsTree) {
+
+			scene.RenderMenu = false
+			return
+		}
 		menu := &BoardRightClickMenu{
 			Rectangle: rl.Rectangle{
 				X:      mousePosition.X,
@@ -395,16 +406,16 @@ func (g *Game) HandleRightClick() {
 			},
 			BoardSquare: &grid[x][y],
 		}
-		scene.Data["RenderRightClickMenu"] = menu
+		scene.RenderMenu = true
+		scene.Menu = menu
 		return
 	}
-	if scene.Data["RenderRightClickMenu"] != nil {
+	if scene.RenderMenu {
 		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 
 			mousePosition := rl.GetMousePosition()
-			menu := scene.Data["RenderRightClickMenu"].(*BoardRightClickMenu)
-			if !rl.CheckCollisionPointRec(mousePosition, menu.Rectangle) {
-				scene.Data["RenderRightClickMenu"] = nil
+			if !rl.CheckCollisionPointRec(mousePosition, scene.Menu.Rectangle) {
+				scene.RenderMenu = false
 			}
 
 		}
@@ -412,33 +423,80 @@ func (g *Game) HandleRightClick() {
 
 }
 
-func (g *Game) DrawRightClickMenu() {
+func (g *Game) DrawClickMenu() {
 	scene := g.Scenes["Board"]
-	if scene.Data["RenderRightClickMenu"] == nil {
+	if !scene.RenderMenu {
 		return
 	}
-	menu := scene.Data["RenderRightClickMenu"].(*BoardRightClickMenu)
 
-	rl.DrawRectangleRec(menu.Rectangle, rl.White)
+	rl.DrawRectangleRec(scene.Menu.Rectangle, rl.White)
 
+}
+
+func (g *Game) disableTechHoverHighlight(vec rl.Vector2) {
+
+	scene := g.Scenes["Board"]
+	grid := scene.Data["Grid"].([][]BoardSquare)
+	square := &grid[int(vec.X)][int(vec.Y)]
+
+	square.HoverActive = false
+	// if !square.IsTechnology || !square.MultiSquare {
+	// 	return
+	// }
+	if square.Height <= 1 || square.Width <= 1 {
+		return
+	}
+	startX := square.Row
+	startY := square.Column
+	for x := range square.Width {
+		for y := range square.Height {
+			grid[startX+x][startY+y].HoverActive = false
+		}
+	}
+}
+
+func (g *Game) enableTechHoverHighlight(vec rl.Vector2) {
+	scene := g.Scenes["Board"]
+	grid := scene.Data["Grid"].([][]BoardSquare)
+	square := &grid[int(vec.X)][int(vec.Y)]
+
+	square.HoverActive = true
+	if square.Height <= 1 || square.Width <= 1 {
+		return
+	}
+	// if !square.IsTechnology || !square.MultiSquare {
+	// 	return
+	// }
+	startX := square.Row
+	startY := square.Column
+	for x := range square.Width {
+		for y := range square.Height {
+			grid[startX+x][startY+y].HoverActive = true
+		}
+	}
 }
 
 func (g *Game) HandleHover() {
 
 	scene := g.Scenes["Board"]
+	//	grid := scene.Data["Grid"].([][]BoardSquare)
 	mousePosition := rl.GetMousePosition()
+
+	oldVec := scene.Data["HoverVector"].(rl.Vector2)
+	g.disableTechHoverHighlight(oldVec)
 
 	newVec := rl.Vector2{
 		X: (mousePosition.X + scene.Camera.Target.X) / scene.Camera.Zoom / float32(TILE_WIDTH),
 		Y: (mousePosition.Y + scene.Camera.Target.Y) / scene.Camera.Zoom / float32(TILE_HEIGHT),
 	}
-	oldVec := scene.Data["HoverVector"].(rl.Vector2)
+
 	if newVec.X < 0 || newVec.X > TILE_ROWS-1 {
 		return
 	}
 	if newVec.Y < 0 || newVec.Y > TILE_COLUMNS-1 {
 		return
 	}
+	g.enableTechHoverHighlight(newVec)
 	if oldVec.X == newVec.X && oldVec.Y == newVec.Y {
 		counter := scene.Data["HoverVectorCounter"].(int)
 		if counter == 0 {
@@ -452,13 +510,16 @@ func (g *Game) HandleHover() {
 				)
 
 			}
+
+		} else if scene.RenderMenu {
+			counter = 10
+
 		} else {
 			counter = counter - 1
 			scene.Data["HoverVectorCounter"] = counter
 		}
 
 	} else {
-
 		scene.Data["HoverVector"] = newVec
 		scene.Data["HoverVectorCounter"] = 10
 	}
@@ -500,7 +561,7 @@ func UpdateBoard(g *Game) {
 		}
 	}
 	g.SelectTiles()
-	// g.HandleRightClick()
+	g.HandleLeftClick()
 
 	// mousePosition := rl.GetMousePosition()
 }
