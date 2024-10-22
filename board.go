@@ -185,6 +185,26 @@ func (g *Game) DrawTechnology(tech *Technology) {
 
 }
 
+func (g *Game) RemoveTechnology(square *BoardSquare) {
+
+	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
+
+	tech := square.Technology
+	for x := range square.Width {
+		for y := range square.Height {
+			square.Occupied = false
+			square.Skip = false
+			square.Technology = tech
+			if square.MultiSquare {
+				square.Skip = false
+			}
+			square.Tile = g.Data["GrassTile"].(Tile)
+			square.TileType = "Grass"
+			grid[square.Row+x][square.Column+y] = *square
+		}
+	}
+}
+
 func (g *Game) drawGrid() {
 	var spacing float32
 	spacing = 45
