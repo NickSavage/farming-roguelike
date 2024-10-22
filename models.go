@@ -32,6 +32,13 @@ type BoardSquare struct {
 type BoardRightClickMenu struct {
 	Rectangle   rl.Rectangle
 	BoardSquare *BoardSquare
+	Items       []BoardMenuItem
+}
+
+type BoardMenuItem struct {
+	Rectangle rl.Rectangle
+	Text      string
+	OnClick   func(*Game)
 }
 
 type Technology struct {

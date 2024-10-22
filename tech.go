@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"sort"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func (g *Game) InitTechnology() {
@@ -228,3 +230,39 @@ func WheatFieldRoundWinter(g *Game, tech *Technology) {
 	tech.Tile.Tile.TileFrame.X += 45
 	tech.Redraw = true
 }
+
+// trees
+
+func TreeMenuItems() []BoardMenuItem {
+	results := []BoardMenuItem{}
+	results = append(results, BoardMenuItem{
+		Rectangle: rl.Rectangle{
+			X:      0,
+			Y:      0,
+			Height: 30,
+			Width:  150,
+		},
+		Text:    "Chop (1 action)",
+		OnClick: ChopTree,
+	})
+	results = append(results, BoardMenuItem{
+		Rectangle: rl.Rectangle{
+			X:      0,
+			Y:      0,
+			Height: 30,
+			Width:  150,
+		},
+		Text:    "Test (1 action)",
+		OnClick: BlankAction,
+	})
+
+	return results
+}
+
+func ChopTree(g *Game) {
+
+	scene := g.Scenes["Board"]
+	log.Printf("square %v", scene.Menu.BoardSquare)
+}
+
+func BlankAction(g *Game) {}

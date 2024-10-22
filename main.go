@@ -129,7 +129,7 @@ func main() {
 	g.InitBoard()
 	rl.SetTargetFPS(60)
 
-	g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["Prices"])
+	//	g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["Prices"])
 
 	for !rl.WindowShouldClose() {
 		g.Counter += 1

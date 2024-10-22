@@ -382,6 +382,14 @@ func (g *Game) SelectTiles() {
 
 }
 
+func DrawGenericMenu(g *Game) {
+	scene := g.Scenes["Board"]
+	//	square := scene.Menu.BoardSquare
+
+	rl.DrawRectangleRec(scene.Menu.Rectangle, rl.White)
+	rl.DrawRectangleLinesEx(scene.Menu.Rectangle, 2, rl.Black)
+}
+
 func (g *Game) HandleLeftClick() {
 
 	scene := g.Scenes["Board"]
@@ -397,6 +405,12 @@ func (g *Game) HandleLeftClick() {
 			scene.RenderMenu = false
 			return
 		}
+		if scene.RenderMenu {
+			if scene.Menu.BoardSquare.Row == grid[x][y].Row ||
+				scene.Menu.BoardSquare.Column == grid[x][y].Column {
+				return
+			}
+		}
 		menu := &BoardRightClickMenu{
 			Rectangle: rl.Rectangle{
 				X:      mousePosition.X,
@@ -405,9 +419,16 @@ func (g *Game) HandleLeftClick() {
 				Width:  100,
 			},
 			BoardSquare: &grid[x][y],
+			Items:       make([]BoardMenuItem, 0),
 		}
+
+		if grid[x][y].IsTree {
+			menu.Items = TreeMenuItems()
+		}
+		g.ScreenSkip = true
 		scene.RenderMenu = true
 		scene.Menu = menu
+
 		return
 	}
 	if scene.RenderMenu {
@@ -429,7 +450,41 @@ func (g *Game) DrawClickMenu() {
 		return
 	}
 
-	rl.DrawRectangleRec(scene.Menu.Rectangle, rl.White)
+	mousePosition := rl.GetMousePosition()
+
+	var color rl.Color
+
+	x := scene.Menu.Rectangle.X
+	y := scene.Menu.Rectangle.Y
+
+	for _, item := range scene.Menu.Items {
+		rec := item.Rectangle
+		rec.X = x
+		rec.Y = y
+		if rl.CheckCollisionPointRec(mousePosition, rec) {
+			color = rl.Gray
+		} else {
+			color = rl.White
+		}
+		rl.DrawRectangleRec(rec, color)
+		rl.DrawText(item.Text, int32(rec.X+5), int32(rec.Y+5), 15, rl.Black)
+
+		y = rec.Y + rec.Height
+
+		if g.ScreenSkip {
+			if rl.IsMouseButtonUp(rl.MouseButtonLeft) {
+				g.ScreenSkip = false
+			}
+		}
+		if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
+			mousePosition := rl.GetMousePosition()
+			if !rl.CheckCollisionPointRec(mousePosition, item.Rectangle) {
+				item.OnClick(g)
+				scene.RenderMenu = false
+			}
+
+		}
+	}
 
 }
 
