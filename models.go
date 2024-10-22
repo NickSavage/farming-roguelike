@@ -74,8 +74,8 @@ type Run struct {
 	Money                 float32
 	Productivity          float32
 	EndRoundMoney         float32
-	RoundActions          int
-	RoundActionsRemaining int
+	RoundActions          float32
+	RoundActionsRemaining float32
 	CurrentRound          int
 	CurrentSeason         Season
 	Events                []Event

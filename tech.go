@@ -263,11 +263,10 @@ func ChopTree(g *Game) {
 
 	scene := g.Scenes["Board"]
 	log.Printf("square %v", scene.Menu.BoardSquare)
-	g.RemoveTechnology(scene.Menu.BoardSquare)
-	//	grid := scene.Data["Grid"].([][]BoardSquare)
-	scene.Menu.BoardSquare.Tile = g.Data["GrassTile"].(Tile)
-	scene.Menu.BoardSquare.TileType = "Grass"
-	g.Run.RoundActionsRemaining -= 1
+	err := g.Run.SpendAction(1)
+	if err == nil {
+		g.RemoveTechnology(scene.Menu.BoardSquare)
+	}
 }
 
 func BlankAction(g *Game) {}

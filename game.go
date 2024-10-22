@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gen2brain/raylib-go/raylib"
 	"log"
@@ -51,7 +52,7 @@ func OnClickEndRound(g *Game) {
 	g.Run.RoundActionsRemaining = g.Run.RoundActions
 	for _, tech := range g.Run.Technology {
 		tech.RoundHandler[tech.RoundHandlerIndex].OnRoundEnd(g, tech)
-		g.Run.RoundActionsRemaining -= int(tech.RoundHandler[tech.RoundHandlerIndex].CostActions)
+		g.Run.RoundActionsRemaining -= tech.RoundHandler[tech.RoundHandlerIndex].CostActions
 		g.Run.EndRoundMoney -= tech.RoundHandler[tech.RoundHandlerIndex].CostMoney
 	}
 	//	g.Run.EndRoundMoney += g.Run.sellAllProducts()
@@ -162,4 +163,22 @@ func GenerateRandomEvents() []Event {
 
 	return results
 
+}
+
+// actions
+
+func (r *Run) CanSpendAction(actions float32) bool {
+	if r.RoundActionsRemaining >= actions {
+		log.Printf("actions %v %v", r.RoundActionsRemaining, actions)
+		return true
+	}
+	return false
+}
+
+func (r *Run) SpendAction(actions float32) error {
+	if r.CanSpendAction(actions) {
+		r.RoundActionsRemaining -= actions
+		return nil
+	}
+	return errors.New("cannot spend action, not enough actions only have %v left")
 }
