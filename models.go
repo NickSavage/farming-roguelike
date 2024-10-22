@@ -36,9 +36,10 @@ type BoardRightClickMenu struct {
 }
 
 type BoardMenuItem struct {
-	Rectangle rl.Rectangle
-	Text      string
-	OnClick   func(*Game)
+	Rectangle       rl.Rectangle
+	Text            string
+	OnClick         func(*Game)
+	CheckIsDisabled func(*Game, *BoardSquare) bool
 }
 
 type Technology struct {

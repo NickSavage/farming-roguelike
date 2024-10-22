@@ -242,8 +242,9 @@ func TreeMenuItems() []BoardMenuItem {
 			Height: 30,
 			Width:  150,
 		},
-		Text:    "Chop (1 action)",
-		OnClick: ChopTree,
+		Text:            "Chop (1 action)",
+		OnClick:         ChopTree,
+		CheckIsDisabled: IsChopActionDisabled,
 	})
 	results = append(results, BoardMenuItem{
 		Rectangle: rl.Rectangle{
@@ -252,11 +253,20 @@ func TreeMenuItems() []BoardMenuItem {
 			Height: 30,
 			Width:  150,
 		},
-		Text:    "Test (1 action)",
-		OnClick: BlankAction,
+		Text:            "Test",
+		OnClick:         BlankAction,
+		CheckIsDisabled: IsBlankActionDisabled,
 	})
 
 	return results
+}
+
+func IsChopActionDisabled(g *Game, square *BoardSquare) bool {
+	if !g.Run.CanSpendAction(1) {
+		return true
+	}
+	return false
+
 }
 
 func ChopTree(g *Game) {
@@ -270,3 +280,7 @@ func ChopTree(g *Game) {
 }
 
 func BlankAction(g *Game) {}
+
+func IsBlankActionDisabled(g *Game, square *BoardSquare) bool {
+	return false
+}

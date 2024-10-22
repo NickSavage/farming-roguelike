@@ -360,7 +360,7 @@ func DrawBoard(g *Game) {
 	g.HandleHover()
 	DrawHUD(g)
 	g.RedrawTechnology()
-	g.DrawClickMenu()
+	g.DrawContextMenu(g.Scenes["Board"])
 }
 
 func (g *Game) SelectTiles() {
@@ -457,50 +457,6 @@ func (g *Game) HandleLeftClick() {
 
 			mousePosition := rl.GetMousePosition()
 			if !rl.CheckCollisionPointRec(mousePosition, scene.Menu.Rectangle) {
-				scene.RenderMenu = false
-			}
-
-		}
-	}
-
-}
-
-func (g *Game) DrawClickMenu() {
-	scene := g.Scenes["Board"]
-	if !scene.RenderMenu {
-		return
-	}
-
-	mousePosition := rl.GetMousePosition()
-
-	var color rl.Color
-
-	x := scene.Menu.Rectangle.X
-	y := scene.Menu.Rectangle.Y
-
-	for _, item := range scene.Menu.Items {
-		rec := item.Rectangle
-		rec.X = x
-		rec.Y = y
-		if rl.CheckCollisionPointRec(mousePosition, rec) {
-			color = rl.Gray
-		} else {
-			color = rl.White
-		}
-		rl.DrawRectangleRec(rec, color)
-		rl.DrawText(item.Text, int32(rec.X+5), int32(rec.Y+5), 15, rl.Black)
-
-		y = rec.Y + rec.Height
-
-		if g.ScreenSkip {
-			if rl.IsMouseButtonUp(rl.MouseButtonLeft) {
-				g.ScreenSkip = false
-			}
-		}
-		if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
-			mousePosition := rl.GetMousePosition()
-			if !rl.CheckCollisionPointRec(mousePosition, item.Rectangle) {
-				item.OnClick(g)
 				scene.RenderMenu = false
 			}
 

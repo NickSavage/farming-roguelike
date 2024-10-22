@@ -194,3 +194,59 @@ func (g *Game) ActivateWindow(windows map[string]*Window, window *Window) {
 		window.Display = true
 	}
 }
+
+// menus
+
+func (g *Game) DrawContextMenu(scene *Scene) {
+	if !scene.RenderMenu {
+		return
+	}
+
+	mousePosition := rl.GetMousePosition()
+
+	var color rl.Color
+	var textColor rl.Color
+
+	x := scene.Menu.Rectangle.X
+	y := scene.Menu.Rectangle.Y
+
+	square := scene.Menu.BoardSquare
+
+	for _, item := range scene.Menu.Items {
+		rec := item.Rectangle
+		rec.X = x
+		rec.Y = y
+		if rl.CheckCollisionPointRec(mousePosition, rec) {
+			color = rl.Gray
+		} else {
+			color = rl.White
+		}
+		if !item.CheckIsDisabled(g, square) {
+			textColor = rl.Black
+		} else {
+			textColor = rl.LightGray
+
+		}
+		rl.DrawRectangleRec(rec, color)
+		rl.DrawText(item.Text, int32(rec.X+5), int32(rec.Y+5), 15, textColor)
+
+		y = rec.Y + rec.Height
+
+		if g.ScreenSkip {
+			if rl.IsMouseButtonUp(rl.MouseButtonLeft) {
+				g.ScreenSkip = false
+			}
+		}
+		if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
+			mousePosition := rl.GetMousePosition()
+			if rl.CheckCollisionPointRec(mousePosition, rec) {
+				if !item.CheckIsDisabled(g, square) {
+					item.OnClick(g)
+					scene.RenderMenu = false
+				}
+			}
+
+		}
+	}
+
+}
