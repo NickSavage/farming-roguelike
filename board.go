@@ -400,16 +400,17 @@ func (g *Game) HandleLeftClick() {
 		grid := scene.Data["Grid"].([][]BoardSquare)
 		x := int((mousePosition.X + scene.Camera.Target.X) / scene.Camera.Zoom / float32(TILE_WIDTH))
 		y := int((mousePosition.Y + scene.Camera.Target.Y) / scene.Camera.Zoom / float32(TILE_HEIGHT))
-		if !(grid[x][y].IsTechnology || grid[x][y].IsTree) {
-
-			scene.RenderMenu = false
-			return
-		}
 		if scene.RenderMenu {
+			// TODO build a rect of the menu and check if the click is within
 			if scene.Menu.BoardSquare.Row == grid[x][y].Row ||
 				scene.Menu.BoardSquare.Column == grid[x][y].Column {
 				return
 			}
+		}
+		if !(grid[x][y].IsTechnology || grid[x][y].IsTree) {
+
+			scene.RenderMenu = false
+			return
 		}
 		menu := &BoardRightClickMenu{
 			Rectangle: rl.Rectangle{
