@@ -38,15 +38,6 @@ func (g *Game) InitRun() {
 // 	return result
 // }
 
-func (g *Game) SellProduct(product *Product) {
-	result := +product.Quantity * product.Price
-	log.Printf("selling %v %v = %v", product.Quantity, product.Name, result)
-	product.Quantity = 0
-	// TODO: add to round money for reporting?
-
-	g.Run.Money += result
-}
-
 func OnClickEndRound(g *Game) {
 	g.Run.CurrentRound += 1
 	g.Run.RoundActionsRemaining = g.Run.RoundActions
@@ -83,12 +74,12 @@ func (g *Game) ProcessNextEvent() {
 	}
 }
 
-func (g *Game) PlaceTech(tech *Technology, x, y float32) {
+func (g *Game) PlaceTech(tech *Technology, x, y float32) error {
 
-	if g.Run.RoundActionsRemaining < 1 {
+	if !g.Run.CanSpendAction(1) {
 		g.Data["Message"] = "Unable to build Technology, out of actions"
 		g.Data["MessageCounter"] = g.Seconds + 5
-		return
+		return errors.New("unable to buid technology, out of actions")
 	}
 
 	row := int((x + TILE_WIDTH/2) / TILE_WIDTH)
@@ -99,10 +90,15 @@ func (g *Game) PlaceTech(tech *Technology, x, y float32) {
 	tech.Tile.Column = col
 
 	log.Printf("tech %v", len(g.Run.Technology))
+	err := tech.OnBuild(g, tech)
+	if err != nil {
+		return err
+
+	}
 	g.Run.Technology = append(g.Run.Technology, tech)
-	tech.OnBuild(g, tech)
 	log.Printf("tech afte %v", len(g.Run.Technology))
 	g.DrawTechnology(tech)
+	return nil
 
 }
 
@@ -120,7 +116,7 @@ func (g *Game) DrawTechHoverWindow(tech Technology, x, y float32) {
 
 }
 
-func (g *Game) drawRunTech(tech Technology, x, y float32) {
+func (g *Game) drawExistingTechIcon(tech Technology, x, y float32) {
 
 	rect := rl.Rectangle{
 		X:      x,
@@ -145,7 +141,7 @@ func DrawTechnologyWindow(g *Game, win *Window) {
 	rl.DrawText("Technology", 205, 55, 30, rl.Black)
 
 	for i, tech := range g.Run.Technology {
-		g.drawRunTech(*tech, float32(210+(i*offset)), 90)
+		g.drawExistingTechIcon(*tech, float32(210+(i*offset)), 90)
 
 	}
 
@@ -180,5 +176,30 @@ func (r *Run) SpendAction(actions float32) error {
 		r.RoundActionsRemaining -= actions
 		return nil
 	}
-	return errors.New("cannot spend action, not enough actions only have %v left")
+	return errors.New("cannot spend action, not enough actions")
+}
+
+func (r *Run) CanSpendMoney(money float32) bool {
+	if r.Money >= money {
+		return true
+	}
+	return false
+}
+
+func (r *Run) SpendMoney(money float32) error {
+
+	if r.CanSpendMoney(money) {
+		r.Money -= money
+		return nil
+	}
+	return errors.New("cannot spend money, not enough money")
+}
+
+func (g *Game) SellProduct(product *Product) {
+	result := +product.Quantity * product.Price
+	log.Printf("selling %v %v = %v", product.Quantity, product.Name, result)
+	product.Quantity = 0
+	// TODO: add to round money for reporting?
+
+	g.Run.Money += result
 }

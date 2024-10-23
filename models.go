@@ -48,7 +48,7 @@ type Technology struct {
 	Tile              BoardSquare
 	Cost              float32
 	CanBeBuilt        func(*Game) bool
-	OnBuild           func(*Game, *Technology)
+	OnBuild           func(*Game, *Technology) error
 	RoundHandler      []TechnologyRoundHandler
 	RoundCounterMax   int
 	RoundCounter      int

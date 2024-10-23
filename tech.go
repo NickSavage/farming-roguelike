@@ -98,10 +98,19 @@ func ChickenCoopCanBeBuilt(g *Game) bool {
 	return true
 }
 
-func ChickenCoopOnBuild(g *Game, tech *Technology) {
+func ChickenCoopOnBuild(g *Game, tech *Technology) error {
+	err := g.Run.SpendMoney(tech.Cost)
+	if err != nil {
+		log.Printf("err %v", err)
+		return err
+	}
 	g.Run.Productivity += 0.05
-	g.Run.RoundActionsRemaining -= 1
-	g.Run.Money -= tech.Cost
+	err = g.Run.SpendAction(1)
+	if err != nil {
+		log.Printf("err %v", err)
+		return err
+	}
+	return nil
 }
 
 func ChickenCoopRoundEndText(g *Game, tech *Technology) string {
@@ -174,15 +183,25 @@ func WheatFieldCanBeBuilt(g *Game) bool {
 	return true
 }
 
-func WheatFieldOnBuild(g *Game, tech *Technology) {
+func WheatFieldOnBuild(g *Game, tech *Technology) error {
+
+	err := g.Run.SpendMoney(tech.Cost)
+	if err != nil {
+		log.Printf("err %v", err)
+		return err
+	}
+	err = g.Run.SpendAction(1)
+	if err != nil {
+		log.Printf("err %v", err)
+		return err
+	}
 
 	g.Run.Products["Wheat"] = &Product{
 		Name:     "Wheat",
 		Quantity: 0,
 		Price:    1,
 	}
-	g.Run.RoundActionsRemaining -= 1
-	g.Run.Money -= tech.Cost
+	return nil
 }
 
 func WheatFieldRoundEndValue(g *Game, tech *Technology) float32 {
@@ -276,9 +295,21 @@ func (g *Game) Workstation() Technology {
 
 }
 
-func WorkstationOnBuild(g *Game, tech *Technology) {
+func WorkstationOnBuild(g *Game, tech *Technology) error {
+	err := g.Run.SpendMoney(tech.Cost)
+	if err != nil {
+		log.Printf("err %v", err)
+		return err
+	}
+	err = g.Run.SpendAction(1)
+	if err != nil {
+		log.Printf("err %v", err)
+		return err
+	}
+
 	g.Run.Productivity += 0.05
-	g.Run.Money -= tech.Cost
+
+	return nil
 
 }
 func WorkstationRoundEnd(g *Game, tech *Technology) {
