@@ -2,6 +2,11 @@ package main
 
 import rl "github.com/gen2brain/raylib-go/raylib"
 
+type BoardCoord struct {
+	Row    int
+	Column int
+}
+
 type Game struct {
 	Scenes       map[string]*Scene
 	Data         map[string]interface{}

@@ -22,14 +22,6 @@ func CheckVecVisible(vec rl.Vector2) bool {
 	return true
 }
 
-// func (g *Game) GetSquareAtPoint(vec rl.Vector2) *BoardSquare {
-
-// 	scene := g.Scenes["Board"]
-
-// 	row := int((vec.X + TILE_WIDTH/2) / TILE_WIDTH)
-// 	col := int((vec.Y + TILE_HEIGHT/2) / TILE_HEIGHT)
-// }
-
 func generateCoordinates(numPairs, maxX, maxY int) []rl.Vector2 {
 	coordinates := make([]rl.Vector2, numPairs)
 
@@ -118,7 +110,7 @@ func (g *Game) InitBoard() {
 	}
 	g.Scenes["Board"].Data["Grid"] = grid
 
-	g.Scenes["Board"].Data["HoverVector"] = rl.Vector2{}
+	g.Scenes["Board"].Data["HoverVector"] = BoardCoord{}
 	g.Scenes["Board"].Data["HoverVectorCounter"] = 0
 	g.InitPlaceRandomTrees(215)
 	g.InitPlaceTech()
@@ -534,11 +526,11 @@ func (g *Game) HandleLeftClick() {
 
 }
 
-func (g *Game) disableTechHoverHighlight(vec rl.Vector2) {
+func (g *Game) disableTechHoverHighlight(coord BoardCoord) {
 
 	scene := g.Scenes["Board"]
 	grid := scene.Data["Grid"].([][]BoardSquare)
-	square := &grid[int(vec.X)][int(vec.Y)]
+	square := &grid[int(coord.Row)][int(coord.Column)]
 
 	square.HoverActive = false
 	// if !square.IsTechnology || !square.MultiSquare {
@@ -556,10 +548,10 @@ func (g *Game) disableTechHoverHighlight(vec rl.Vector2) {
 	}
 }
 
-func (g *Game) enableTechHoverHighlight(vec rl.Vector2) {
+func (g *Game) enableTechHoverHighlight(coord BoardCoord) {
 	scene := g.Scenes["Board"]
 	grid := scene.Data["Grid"].([][]BoardSquare)
-	square := &grid[int(vec.X)][int(vec.Y)]
+	square := &grid[int(coord.Row)][int(coord.Column)]
 
 	square.HoverActive = true
 	if square.Height <= 1 || square.Width <= 1 {
@@ -580,28 +572,24 @@ func (g *Game) enableTechHoverHighlight(vec rl.Vector2) {
 func (g *Game) HandleHover() {
 
 	scene := g.Scenes["Board"]
-	//	grid := scene.Data["Grid"].([][]BoardSquare)
+	grid := scene.Data["Grid"].([][]BoardSquare)
 	mousePosition := rl.GetMousePosition()
 
-	oldVec := scene.Data["HoverVector"].(rl.Vector2)
+	oldVec := scene.Data["HoverVector"].(BoardCoord)
 	g.disableTechHoverHighlight(oldVec)
 
-	newVec := rl.Vector2{
-		X: (mousePosition.X + scene.Camera.Target.X) / scene.Camera.Zoom / float32(TILE_WIDTH),
-		Y: (mousePosition.Y + scene.Camera.Target.Y) / scene.Camera.Zoom / float32(TILE_HEIGHT),
-	}
-
-	if newVec.X < 0 || newVec.X > TILE_ROWS-1 {
+	coords := g.GetBoardCoordAtPoint(mousePosition)
+	if coords.Row < 0 || coords.Row > TILE_ROWS-1 {
 		return
 	}
-	if newVec.Y < 0 || newVec.Y > TILE_COLUMNS-1 {
+	if coords.Column < 0 || coords.Column > TILE_COLUMNS-1 {
 		return
 	}
-	g.enableTechHoverHighlight(newVec)
-	if oldVec.X == newVec.X && oldVec.Y == newVec.Y {
+	g.enableTechHoverHighlight(coords)
+	if oldVec.Row == coords.Row && oldVec.Column == coords.Column {
 		counter := scene.Data["HoverVectorCounter"].(int)
 		if counter == 0 {
-			square := scene.Data["Grid"].([][]BoardSquare)[int(newVec.X)][int(newVec.Y)]
+			square := grid[coords.Row][coords.Column]
 
 			if square.Technology != nil {
 				g.DrawTechHoverWindow(
@@ -621,7 +609,7 @@ func (g *Game) HandleHover() {
 		}
 
 	} else {
-		scene.Data["HoverVector"] = newVec
+		scene.Data["HoverVector"] = coords
 		scene.Data["HoverVectorCounter"] = 10
 	}
 

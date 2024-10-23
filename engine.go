@@ -177,6 +177,21 @@ func (g *Game) Update() {
 	}
 }
 
+// tiles
+
+func (g *Game) GetBoardCoordAtPoint(vec rl.Vector2) BoardCoord {
+
+	scene := g.Scenes["Board"]
+
+	//	mousePosition := rl.GetMousePosition()
+	X := int((vec.X + scene.Camera.Target.X) / scene.Camera.Zoom / float32(TILE_WIDTH))
+	Y := int((vec.Y + scene.Camera.Target.Y) / scene.Camera.Zoom / float32(TILE_HEIGHT))
+	return BoardCoord{
+		Row:    X,
+		Column: Y,
+	}
+}
+
 // window handling
 func (g *Game) DisableAllWindows(windows map[string]*Window) {
 	for _, window := range windows {
