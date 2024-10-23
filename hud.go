@@ -176,6 +176,9 @@ func DrawEndRoundWindowPage1(g *Game, window *Window) {
 
 	var x, y int32
 	for i, tech := range g.Run.Technology {
+		if !tech.ShowEndRound {
+			continue
+		}
 		x = int32(windowRect.X + 10)
 		y = int32(windowRect.Y + 50 + float32(i*30))
 		index := tech.RoundHandlerIndex
@@ -210,6 +213,10 @@ func DrawEndRoundWindowPage2(g *Game, win *Window) {
 	var x, y int32
 
 	for i, tech := range g.Run.Technology {
+
+		if !tech.ShowEndRound {
+			continue
+		}
 		x = int32(windowRect.X + 10)
 		y = int32(windowRect.Y + 50 + float32(i*30))
 		nextSeason := tech.RoundHandler[tech.RoundHandlerIndex]

@@ -23,6 +23,7 @@ type ShopButton struct {
 	Image           Tile
 	BackgroundColor rl.Color
 	OnClick         func(*Game)
+	Technology      *Technology
 }
 type Scene struct {
 	Name        string
@@ -115,28 +116,6 @@ func (g *Game) DrawButtons(buttons []Button) {
 		g.DrawButton(button)
 	}
 
-}
-
-func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {
-	rect := rl.Rectangle{
-		X:      x,
-		Y:      y,
-		Width:  float32(shopButton.Width),
-		Height: float32(shopButton.Height),
-	}
-	rl.DrawRectangleLinesEx(rect, 1, rl.Black)
-	rl.DrawRectangleRec(rect, shopButton.BackgroundColor)
-	DrawTile(shopButton.Image, x+5, y+2)
-	rl.DrawText(shopButton.Title, int32(x+50), int32(y+2), 20, rl.Black)
-	rl.DrawText(shopButton.Description, int32(x+50), int32(y+22), 10, rl.Black)
-
-	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-
-		mousePosition := rl.GetMousePosition()
-		if rl.CheckCollisionPointRec(mousePosition, rect) {
-			shopButton.OnClick(g)
-		}
-	}
 }
 
 func (g *Game) WasButtonClicked(button *Button) bool {

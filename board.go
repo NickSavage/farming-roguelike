@@ -22,6 +22,12 @@ func CheckVecVisible(vec rl.Vector2) bool {
 	return true
 }
 
+func (g *Game) GetSquareFromCoords(input BoardCoord) *BoardSquare {
+	scene := g.Scenes["Board"]
+	grid := scene.Data["Grid"].([][]BoardSquare)
+	return &grid[input.Row][input.Column]
+
+}
 func generateCoordinates(numPairs, maxX, maxY int) []rl.Vector2 {
 	coordinates := make([]rl.Vector2, numPairs)
 
@@ -77,6 +83,22 @@ func (g *Game) InitPlaceTech() {
 	}
 
 }
+
+func (g *Game) GetGrassSquare(x, y int) *BoardSquare {
+
+	square := &BoardSquare{
+		Tile:     g.Data["GrassTile"].(Tile),
+		TileType: "Grass",
+		Row:      x,
+		Column:   y,
+		Width:    1,
+		Height:   1,
+		Skip:     false,
+		Occupied: false,
+	}
+	return square
+}
+
 func (g *Game) InitBoard() {
 	scene := g.Scenes["Board"]
 	scene.Camera = rl.Camera2D{}
@@ -95,17 +117,7 @@ func (g *Game) InitBoard() {
 	}
 	for i := 0; i < int(rows); i++ {
 		for j := 0; j < int(cols); j++ {
-			square := BoardSquare{
-				Tile:     g.Data["GrassTile"].(Tile),
-				TileType: "Grass",
-				Row:      i,
-				Column:   j,
-				Width:    1,
-				Height:   1,
-				Skip:     false,
-				Occupied: false,
-			}
-			grid[i][j] = square
+			grid[i][j] = *g.GetGrassSquare(i, j)
 		}
 	}
 	g.Scenes["Board"].Data["Grid"] = grid
@@ -207,18 +219,11 @@ func (g *Game) RemoveTechnology(square *BoardSquare) {
 
 	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
 
-	tech := square.Technology
+	//	tech := square.Technology
 	for x := range square.Width {
 		for y := range square.Height {
-			square.Occupied = false
-			square.Skip = false
-			square.Technology = tech
-			if square.MultiSquare {
-				square.Skip = false
-			}
-			square.Tile = g.Data["GrassTile"].(Tile)
-			square.TileType = "Grass"
-			grid[square.Row+x][square.Column+y] = *square
+			new := g.GetGrassSquare(square.Row+x, square.Column+y)
+			grid[square.Row+x][square.Column+y] = *new
 		}
 	}
 }
@@ -358,8 +363,7 @@ func (g *Game) DrawPlaceTech() {
 	mousePosition := rl.GetMousePosition()
 
 	cancelButton := scene.Data["PlaceTechCancelButton"].(ShopButton)
-	g.DrawShopButton(cancelButton, 200, 50)
-
+	//	g.DrawShopButton(cancelButton, 200, 50)
 	if rl.CheckCollisionPointRec(mousePosition, rl.Rectangle{
 		X:      200,
 		Y:      50,
@@ -572,7 +576,6 @@ func (g *Game) enableTechHoverHighlight(coord BoardCoord) {
 func (g *Game) HandleHover() {
 
 	scene := g.Scenes["Board"]
-	grid := scene.Data["Grid"].([][]BoardSquare)
 	mousePosition := rl.GetMousePosition()
 
 	oldVec := scene.Data["HoverVector"].(BoardCoord)
@@ -586,10 +589,12 @@ func (g *Game) HandleHover() {
 		return
 	}
 	g.enableTechHoverHighlight(coords)
+	square := g.GetSquareFromCoords(coords)
+	log.Printf("square %v,%v - %v", coords.Row, coords.Column, square)
 	if oldVec.Row == coords.Row && oldVec.Column == coords.Column {
 		counter := scene.Data["HoverVectorCounter"].(int)
 		if counter == 0 {
-			square := grid[coords.Row][coords.Column]
+			square := g.GetSquareFromCoords(coords)
 
 			if square.Technology != nil {
 				g.DrawTechHoverWindow(

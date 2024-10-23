@@ -9,13 +9,13 @@ import (
 )
 
 func (g *Game) InitTechnology() {
-	tech := make(map[string]Technology)
+	tech := make(map[string]*Technology)
 
 	tech["ChickenCoop"] = g.ChickenCoop()
 	tech["WheatField"] = g.WheatField()
 	tech["Workstation"] = g.Workstation()
 
-	g.Data["Technology"] = tech
+	g.Technology = tech
 }
 
 func (g *Game) GetProductNames() []string {
@@ -29,8 +29,7 @@ func (g *Game) GetProductNames() []string {
 
 func (g *Game) CreateChickenCoopTech() *Technology {
 
-	tech := g.Data["Technology"].(map[string]Technology)
-	result := tech["ChickenCoop"]
+	result := g.Technology["ChickenCoop"]
 	result.Square = BoardSquare{
 		Tile:         g.Data["ChickenCoopTile"].(Tile),
 		TileType:     "Technology",
@@ -48,13 +47,12 @@ func (g *Game) CreateChickenCoopTech() *Technology {
 		Price:    5,
 	}
 
-	return &result
+	return result
 }
 
 func (g *Game) CreateWheatTech() *Technology {
 
-	tech := g.Data["Technology"].(map[string]Technology)
-	result := tech["WheatField"]
+	result := g.Technology["WheatField"]
 	result.Square = BoardSquare{
 		Tile:         g.Data["WheatTile"].(Tile),
 		TileType:     "Technology",
@@ -71,11 +69,11 @@ func (g *Game) CreateWheatTech() *Technology {
 		Price:    1,
 	}
 
-	return &result
+	return result
 }
 
-func (g *Game) ChickenCoop() Technology {
-	result := Technology{
+func (g *Game) ChickenCoop() *Technology {
+	result := &Technology{
 		Name:        "Chicken Coop",
 		Square:      BoardSquare{},
 		Description: "asdasd",
@@ -90,6 +88,7 @@ func (g *Game) ChickenCoop() Technology {
 			},
 		},
 		RoundHandlerIndex: 0,
+		ShowEndRound:      true,
 	}
 	return result
 }
@@ -133,8 +132,8 @@ func ChickenCoopRoundEnd(g *Game, tech *Technology) {
 	log.Printf("chicken %v", g.Run.Products["Chicken"].Quantity)
 }
 
-func (g *Game) WheatField() Technology {
-	return Technology{
+func (g *Game) WheatField() *Technology {
+	return &Technology{
 		Name:        "Wheat",
 		Square:      BoardSquare{},
 		Cost:        50,
@@ -174,6 +173,7 @@ func (g *Game) WheatField() Technology {
 		RoundCounterMax:   0,
 		RoundCounter:      0,
 		RoundHandlerIndex: 0,
+		ShowEndRound:      true,
 	}
 
 }
@@ -255,8 +255,7 @@ func WheatFieldRoundWinter(g *Game, tech *Technology) {
 
 func (g *Game) CreateWorkstationTech() *Technology {
 
-	tech := g.Data["Technology"].(map[string]Technology)
-	result := tech["Workstation"]
+	result := g.Technology["Workstation"]
 	result.Square = BoardSquare{
 		Tile:         g.Data["WorkstationTile"].(Tile),
 		TileType:     "Technology",
@@ -268,11 +267,11 @@ func (g *Game) CreateWorkstationTech() *Technology {
 		IsTechnology: true,
 	}
 
-	return &result
+	return result
 }
 
-func (g *Game) Workstation() Technology {
-	return Technology{
+func (g *Game) Workstation() *Technology {
+	return &Technology{
 		Name:        "Workstation",
 		Square:      BoardSquare{},
 		Cost:        25,
@@ -290,6 +289,7 @@ func (g *Game) Workstation() Technology {
 		RoundCounterMax:   0,
 		RoundCounter:      0,
 		RoundHandlerIndex: 0,
+		ShowEndRound:      false,
 	}
 
 }

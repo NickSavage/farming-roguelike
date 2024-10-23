@@ -17,6 +17,7 @@ type Game struct {
 	Seconds      int32
 	ScreenSkip   bool
 	WindowOpen   bool
+	Technology   map[string]*Technology
 }
 
 type BoardSquare struct {
@@ -60,6 +61,7 @@ type Technology struct {
 	RoundCounter      int
 	RoundHandlerIndex int
 	Redraw            bool
+	ShowEndRound      bool
 }
 
 type TechnologyRoundHandler struct {
