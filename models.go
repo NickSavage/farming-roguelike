@@ -46,7 +46,7 @@ type BoardMenuItem struct {
 type Technology struct {
 	Name              string
 	Description       string
-	Tile              BoardSquare
+	Square            BoardSquare
 	Cost              float32
 	CanBeBuilt        func(*Game) bool
 	OnBuild           func(*Game, *Technology) error

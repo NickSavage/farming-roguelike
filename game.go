@@ -76,18 +76,22 @@ func (g *Game) ProcessNextEvent() {
 
 func (g *Game) PlaceTech(tech *Technology, x, y float32) error {
 
+	log.Printf("?")
 	if !g.Run.CanSpendAction(1) {
 		g.Data["Message"] = "Unable to build Technology, out of actions"
 		g.Data["MessageCounter"] = g.Seconds + 5
-		return errors.New("unable to buid technology, out of actions")
+		return errors.New("unable to build technology, out of actions")
 	}
 
 	row := int((x + TILE_WIDTH/2) / TILE_WIDTH)
 	col := int((y + TILE_HEIGHT/2) / TILE_HEIGHT)
 
+	if g.CheckSquareOccupied(row, col) {
+		return errors.New("unable to place tech")
+	}
 	// Store calculated row and column in tech
-	tech.Tile.Row = row
-	tech.Tile.Column = col
+	tech.Square.Row = row
+	tech.Square.Column = col
 
 	log.Printf("tech %v", len(g.Run.Technology))
 	err := tech.OnBuild(g, tech)
@@ -121,10 +125,10 @@ func (g *Game) drawExistingTechIcon(tech Technology, x, y float32) {
 	rect := rl.Rectangle{
 		X:      x,
 		Y:      y,
-		Width:  tech.Tile.Tile.TileFrame.Width,
-		Height: tech.Tile.Tile.TileFrame.Height,
+		Width:  tech.Square.Tile.TileFrame.Width,
+		Height: tech.Square.Tile.TileFrame.Height,
 	}
-	DrawTile(tech.Tile.Tile, x, y)
+	DrawTile(tech.Square.Tile, x, y)
 
 	mousePosition := rl.GetMousePosition()
 	if rl.CheckCollisionPointRec(mousePosition, rect) {

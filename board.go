@@ -1,9 +1,11 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	"fmt"
 	"log"
 	"math/rand"
+
+	"github.com/gen2brain/raylib-go/raylib"
 )
 
 const TILE_HEIGHT = 45
@@ -19,6 +21,14 @@ func CheckVecVisible(vec rl.Vector2) bool {
 	}
 	return true
 }
+
+// func (g *Game) GetSquareAtPoint(vec rl.Vector2) *BoardSquare {
+
+// 	scene := g.Scenes["Board"]
+
+// 	row := int((vec.X + TILE_WIDTH/2) / TILE_WIDTH)
+// 	col := int((vec.Y + TILE_HEIGHT/2) / TILE_HEIGHT)
+// }
 
 func generateCoordinates(numPairs, maxX, maxY int) []rl.Vector2 {
 	coordinates := make([]rl.Vector2, numPairs)
@@ -155,6 +165,13 @@ func (g *Game) drawTiles() {
 				float32(i*TILE_HEIGHT),
 				float32(j*TILE_WIDTH),
 			)
+			rl.DrawText(
+				fmt.Sprintf("%v,%v", i, j),
+				int32(i*TILE_HEIGHT)+5,
+				int32(j*TILE_WIDTH)+5,
+				10,
+				rl.Black,
+			)
 		}
 	}
 
@@ -179,7 +196,7 @@ func (g *Game) RedrawTechnology() {
 func (g *Game) DrawTechnology(tech *Technology) {
 	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
 
-	tile := tech.Tile
+	tile := tech.Square
 	for x := range tile.Width {
 		for y := range tile.Height {
 			tile.Occupied = true
@@ -268,28 +285,56 @@ func (g *Game) drawGrid() {
 
 }
 
+func (g *Game) CheckSquareOccupied(row, col int) bool {
+
+	scene := g.Scenes["Board"]
+
+	log.Printf("check %v,%v", row, col)
+	if scene.Data["Grid"].([][]BoardSquare)[row][col].Occupied {
+		return true
+	}
+	return false
+}
+
 func (g *Game) CheckTilesOccupied(newBoardSquare BoardSquare, mouseX, mouseY float32) bool {
 	scene := g.Scenes["Board"]
 
 	row := int((mouseX + TILE_WIDTH/2) / TILE_WIDTH)
 	col := int((mouseY + TILE_HEIGHT/2) / TILE_HEIGHT)
 
+	if row < 0 {
+		row = 0
+	}
+	if row >= TILE_COLUMNS {
+		row = TILE_COLUMNS - 1
+
+	}
+	if col < 0 {
+		col = 0
+	}
+	if col >= TILE_ROWS {
+		col = TILE_ROWS - 1
+	}
+	if newBoardSquare.Width == 1 && newBoardSquare.Height == 1 {
+
+		//		log.Printf("check %v,%v", row, col)
+		if scene.Data["Grid"].([][]BoardSquare)[row][col].Occupied {
+			return true
+		}
+		return false
+	}
+
 	for x := range newBoardSquare.Width {
 		for y := range newBoardSquare.Height {
 			testX := row + x - 1
-			if testX < 0 {
-				testX = 0
-			}
 			if testX >= TILE_COLUMNS {
 				testX = TILE_COLUMNS - 1
 			}
 			testY := col + y - 1
-			if testY < 0 {
-				testY = 0
-			}
 			if testY >= TILE_ROWS {
 				testY = TILE_ROWS - 1
 			}
+			//			log.Printf("check %v,%v", testX, testY)
 			if scene.Data["Grid"].([][]BoardSquare)[testX][testY].Occupied {
 				return true
 			}
@@ -332,27 +377,29 @@ func (g *Game) DrawPlaceTech() {
 		// don't display placement if you're over the cancel button
 		return
 	}
-	if g.CheckTilesOccupied(chosenTech.Tile, mousePosition.X, mousePosition.Y) {
-		occupiedTile := chosenTech.Tile.Tile
+	if g.CheckTilesOccupied(chosenTech.Square, mousePosition.X, mousePosition.Y) {
+		occupiedTile := chosenTech.Square.Tile
 		occupiedTile.Color = rl.Red
 		DrawTile(
 			occupiedTile,
-			float32(mousePosition.X)-(chosenTech.Tile.Tile.TileFrame.Width/2),
-			float32(mousePosition.Y)-(chosenTech.Tile.Tile.TileFrame.Height/2),
+			float32(mousePosition.X)-(chosenTech.Square.Tile.TileFrame.Width/2),
+			float32(mousePosition.Y)-(chosenTech.Square.Tile.TileFrame.Height/2),
 		)
 
 	} else {
 		DrawTile(
-			chosenTech.Tile.Tile,
-			float32(mousePosition.X)-(chosenTech.Tile.Tile.TileFrame.Width/2),
-			float32(mousePosition.Y)-(chosenTech.Tile.Tile.TileFrame.Height/2),
+			chosenTech.Square.Tile,
+			float32(mousePosition.X)-(chosenTech.Square.Tile.TileFrame.Width/2),
+			float32(mousePosition.Y)-(chosenTech.Square.Tile.TileFrame.Height/2),
 		)
 		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+
+			log.Printf("draw place tech")
 			scene.Data["PlaceTech"] = false
 			g.PlaceTech(
 				chosenTech,
-				float32(mousePosition.X)-(chosenTech.Tile.Tile.TileFrame.Width/2),
-				float32(mousePosition.Y)-(chosenTech.Tile.Tile.TileFrame.Height/2),
+				float32(mousePosition.X)-(chosenTech.Square.Tile.TileFrame.Width/2),
+				float32(mousePosition.Y)-(chosenTech.Square.Tile.TileFrame.Height/2),
 			)
 		}
 
