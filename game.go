@@ -23,8 +23,8 @@ func (g *Game) InitRun() {
 		Events:                GenerateRandomEvents(),
 		Products:              make(map[string]*Product),
 	}
-	g.Run.Technology = append(g.Run.Technology, g.CreateChickenCoopTech())
-	g.Run.Technology = append(g.Run.Technology, g.CreateWheatTech())
+	// g.Run.Technology = append(g.Run.Technology, g.CreateChickenCoopTech())
+	// g.Run.Technology = append(g.Run.Technology, g.CreateWheatTech())
 
 }
 
@@ -56,7 +56,7 @@ func OnClickEndRound(g *Game) {
 		g.Run.EndRoundMoney -= tech.RoundHandler[tech.RoundHandlerIndex].CostMoney
 	}
 	//	g.Run.EndRoundMoney += g.Run.sellAllProducts()
-	g.Run.Money += g.Run.EndRoundMoney * g.Run.Productivity
+	g.Run.Money += g.Run.EndRoundMoney
 	g.Run.Money = float32(math.Round(float64(g.Run.Money)))
 	g.Run.EndRoundMoney = 0
 

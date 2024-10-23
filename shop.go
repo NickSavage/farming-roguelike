@@ -18,6 +18,13 @@ func ShopClickWheatField(g *Game) {
 	g.Scenes["Board"].Data["PlaceChosenTech"] = g.CreateWheatTech()
 
 }
+func ShopClickWorkstation(g *Game) {
+	g.Scenes["HUD"].Windows["ShopWindow"].Display = false
+	g.Scenes["Board"].Data["PlaceTech"] = true
+	g.ScreenSkip = true
+	g.Scenes["Board"].Data["PlaceChosenTech"] = g.CreateWorkstationTech()
+
+}
 
 func (g *Game) InitShopWindow() {
 	scene := g.Scenes["Board"]
@@ -38,6 +45,14 @@ func (g *Game) InitShopWindow() {
 			Image:       g.Data["WheatTile"].(Tile),
 			OnClick:     ShopClickWheatField,
 		},
+		ShopButton{
+			Width:       400,
+			Height:      50,
+			Title:       "Workstation",
+			Description: "sdasda",
+			Image:       g.Data["WorkstationTile"].(Tile),
+			OnClick:     ShopClickWorkstation,
+		},
 	}
 	scene.Data["ShopButtons"] = buttons
 }
@@ -51,6 +66,7 @@ func DrawShopWindow(g *Game, window *Window) {
 	buttons := scene.Data["ShopButtons"].([]ShopButton)
 	g.DrawShopButton(buttons[0], 205, 90)
 	g.DrawShopButton(buttons[1], 205, 145)
+	g.DrawShopButton(buttons[2], 205, 200)
 	// for _, button := range buttons {
 	// 	g.DrawShopButton(button, 205, 90)
 

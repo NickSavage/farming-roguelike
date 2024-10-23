@@ -102,8 +102,8 @@ func DrawHUD(g *Game) {
 	scene := g.Scenes["HUD"]
 	height := int32(150)
 	sidebarWidth := int32(200)
-	rl.DrawRectangle(0, g.screenHeight-height, g.screenWidth, height, rl.Black)
-	rl.DrawRectangle(0, 0, sidebarWidth, g.screenHeight-height, rl.Black)
+	//	rl.DrawRectangle(0, g.screenHeight-height, g.screenWidth, height, rl.Black)
+	rl.DrawRectangle(0, 0, sidebarWidth, g.screenHeight, rl.Black)
 
 	DrawSidebar(g)
 	g.DrawButtons(scene.Buttons)
@@ -131,16 +131,17 @@ func DrawSidebar(g *Game) {
 	)
 	rl.DrawText(fmt.Sprintf("Money: $%v", g.Run.Money), 30, 50, 20, rl.White)
 	rl.DrawText(fmt.Sprintf("Round: %v", g.Run.CurrentRound), 30, 70, 20, rl.White)
-	rl.DrawText(fmt.Sprintf("Season: %v", g.Run.CurrentSeason.String()), 30, 90, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("Productivity: %v", g.Run.Productivity), 30, 90, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("Season: %v", g.Run.CurrentSeason.String()), 30, 110, 20, rl.White)
 
 	buttons := []*Button{}
-	techButton := g.Button("Technology", 10, 150, OnClickTechWindowButton)
+	techButton := g.Button("Technology", 10, 170, OnClickTechWindowButton)
 	buttons = append(buttons, &techButton)
-	shopButton := g.Button("Shop", 10, 200, OnClickShopWindowButton)
+	shopButton := g.Button("Shop", 10, 220, OnClickShopWindowButton)
 	buttons = append(buttons, &shopButton)
-	priceButton := g.Button("Market", 10, 250, OnClickOpenMarketWindow)
+	priceButton := g.Button("Market", 10, 270, OnClickOpenMarketWindow)
 	buttons = append(buttons, &priceButton)
-	viewEndRoundButton := g.Button("End Round", 10, 300, OnClickOpenEndRoundPage1Window)
+	viewEndRoundButton := g.Button("End Round", 10, 320, OnClickOpenEndRoundPage1Window)
 	buttons = append(buttons, &viewEndRoundButton)
 
 	for _, button := range buttons {

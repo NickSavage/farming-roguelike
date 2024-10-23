@@ -13,6 +13,7 @@ func (g *Game) InitTechnology() {
 
 	tech["ChickenCoop"] = g.ChickenCoop()
 	tech["WheatField"] = g.WheatField()
+	tech["Workstation"] = g.Workstation()
 
 	g.Data["Technology"] = tech
 }
@@ -115,7 +116,8 @@ func ChickenCoopRoundEndValue(g *Game, tech *Technology) float32 {
 }
 
 func ChickenCoopProduce(g *Game, tech *Technology) float32 {
-	return 5
+	return 5 * g.Run.Productivity
+
 }
 
 func ChickenCoopRoundEnd(g *Game, tech *Technology) {
@@ -203,7 +205,7 @@ func WheatFieldRoundEndText(g *Game, tech *Technology) string {
 
 func WheatFieldProduce(g *Game, tech *Technology) float32 {
 	if g.Run.CurrentSeason == Autumn {
-		return float32(125)
+		return float32(125) * g.Run.Productivity
 	} else {
 		return 0
 	}
@@ -229,6 +231,66 @@ func WheatFieldRoundWinter(g *Game, tech *Technology) {
 	tech.RoundHandlerIndex += 0
 	tech.Tile.Tile.TileFrame.X += 45
 	tech.Redraw = true
+}
+
+// workstation
+
+func (g *Game) CreateWorkstationTech() *Technology {
+
+	tech := g.Data["Technology"].(map[string]Technology)
+	result := tech["Workstation"]
+	result.Tile = BoardSquare{
+		Tile:         g.Data["WorkstationTile"].(Tile),
+		TileType:     "Technology",
+		Row:          1,
+		Column:       1,
+		Width:        1,
+		Height:       1,
+		Occupied:     true,
+		IsTechnology: true,
+	}
+
+	return &result
+}
+
+func (g *Game) Workstation() Technology {
+	return Technology{
+		Name:        "Workstation",
+		Tile:        BoardSquare{},
+		Cost:        25,
+		Description: "asdasd",
+		OnBuild:     WorkstationOnBuild,
+		Redraw:      false,
+		RoundHandler: []TechnologyRoundHandler{
+			{
+				OnRoundEnd:    WorkstationRoundEnd,
+				RoundEndValue: WorkstationRoundEndValue,
+				RoundEndText:  WorkstationRoundEndText,
+				CostActions:   0,
+			},
+		},
+		RoundCounterMax:   0,
+		RoundCounter:      0,
+		RoundHandlerIndex: 0,
+	}
+
+}
+
+func WorkstationOnBuild(g *Game, tech *Technology) {
+	g.Run.Productivity += 0.05
+	g.Run.Money -= tech.Cost
+
+}
+func WorkstationRoundEnd(g *Game, tech *Technology) {
+
+}
+func WorkstationRoundEndValue(g *Game, tech *Technology) float32 {
+	return 0
+
+}
+func WorkstationRoundEndText(g *Game, tech *Technology) string {
+	return ""
+
 }
 
 // trees
@@ -278,6 +340,8 @@ func ChopTree(g *Game) {
 		g.RemoveTechnology(scene.Menu.BoardSquare)
 	}
 }
+
+// generic actions
 
 func BlankAction(g *Game) {}
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gen2brain/raylib-go/raylib"
-	//	"log"
+	"log"
 	"math/rand"
 )
 
@@ -11,6 +11,14 @@ const TILE_WIDTH = 45
 
 const TILE_ROWS = 30
 const TILE_COLUMNS = 30
+
+func CheckVecVisible(vec rl.Vector2) bool {
+	// todo this is the sidebar, how can I do this better
+	if vec.X < 200 {
+		return false
+	}
+	return true
+}
 
 func generateCoordinates(numPairs, maxX, maxY int) []rl.Vector2 {
 	coordinates := make([]rl.Vector2, numPairs)
@@ -102,7 +110,7 @@ func (g *Game) InitBoard() {
 
 	g.Scenes["Board"].Data["HoverVector"] = rl.Vector2{}
 	g.Scenes["Board"].Data["HoverVectorCounter"] = 0
-	g.InitPlaceRandomTrees(40)
+	g.InitPlaceRandomTrees(215)
 	g.InitPlaceTech()
 	g.InitDrawTechnology()
 
@@ -153,6 +161,7 @@ func (g *Game) drawTiles() {
 }
 
 func (g *Game) InitDrawTechnology() {
+	log.Printf("init")
 	for _, tech := range g.Run.Technology {
 		g.DrawTechnology(tech)
 	}
@@ -290,11 +299,14 @@ func (g *Game) CheckTilesOccupied(newBoardSquare BoardSquare, mouseX, mouseY flo
 
 }
 
+// placing tech
+
 func OnClickCancelTechPlacement(g *Game) {
 	scene := g.Scenes["Board"]
 	scene.Data["PlaceTech"] = false
 
 }
+
 func (g *Game) DrawPlaceTech() {
 	scene := g.Scenes["Board"]
 	if scene.Data["PlaceTech"] == nil || !scene.Data["PlaceTech"].(bool) {
@@ -347,6 +359,8 @@ func (g *Game) DrawPlaceTech() {
 	}
 
 }
+
+// main draw function
 
 func DrawBoard(g *Game) {
 
@@ -411,11 +425,16 @@ func DrawGenericMenu(g *Game) {
 }
 
 func (g *Game) HandleLeftClick() {
+	// todo: shouldn't work if a window is open
 
 	scene := g.Scenes["Board"]
 
 	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 		mousePosition := rl.GetMousePosition()
+
+		if !CheckVecVisible(mousePosition) {
+			return
+		}
 
 		grid := scene.Data["Grid"].([][]BoardSquare)
 		x := int((mousePosition.X + scene.Camera.Target.X) / scene.Camera.Zoom / float32(TILE_WIDTH))
