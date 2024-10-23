@@ -429,6 +429,9 @@ func (g *Game) HandleLeftClick() {
 
 	scene := g.Scenes["Board"]
 
+	if g.WindowOpen {
+		return
+	}
 	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 		mousePosition := rl.GetMousePosition()
 

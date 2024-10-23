@@ -203,3 +203,13 @@ func (g *Game) SellProduct(product *Product) {
 
 	g.Run.Money += result
 }
+
+func (r *Run) CalculateNetWorth() float32 {
+	var result float32 = 0
+	for _, product := range r.Products {
+		value := product.Price * product.Quantity
+		result += value
+	}
+	result += r.Money
+	return result
+}

@@ -11,6 +11,7 @@ type Game struct {
 	Counter      int32
 	Seconds      int32
 	ScreenSkip   bool
+	WindowOpen   bool
 }
 
 type BoardSquare struct {
