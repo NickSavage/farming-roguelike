@@ -21,6 +21,7 @@ func OnClickTechWindowButton(g *Game) {
 
 func OnClickOpenEndRoundPage1Window(g *Game) {
 	scene := g.Scenes["HUD"]
+	PreEndRound(g)
 	g.ActivateWindow(scene.Windows, scene.Windows["EndRound1"])
 }
 
@@ -129,13 +130,13 @@ func DrawHUD(g *Game) {
 
 func DrawSidebar(g *Game) {
 
-	rl.DrawText(
-		fmt.Sprintf("Net Worth: %v", g.Run.CalculateNetWorth()),
-		30,
-		30,
-		20,
-		rl.White,
-	)
+	// rl.DrawText(
+	// 	fmt.Sprintf("Net Worth: %v", g.Run.CalculateNetWorth()),
+	// 	30,
+	// 	30,
+	// 	20,
+	// 	rl.White,
+	// )
 
 	// rl.DrawText(
 	// 	fmt.Sprintf("Actions: %v/%v", g.Run.RoundActionsRemaining, g.Run.RoundActions),
@@ -172,7 +173,7 @@ func DrawEndRoundWindowPage1(g *Game, window *Window) {
 	rl.DrawRectangleLinesEx(windowRect, 5, rl.Black)
 
 	rl.DrawText("Production", int32(windowRect.X+5), int32(windowRect.Y+5), 30, rl.Black)
-	var totalEarned float32 = 0
+	var subtotal float32 = 0
 	var columnOffset int32 = 150
 
 	var x, y int32
@@ -184,20 +185,30 @@ func DrawEndRoundWindowPage1(g *Game, window *Window) {
 		y = int32(windowRect.Y + 50 + float32(i*30))
 		index := tech.RoundHandlerIndex
 		value := g.RoundEndValue(tech, &tech.RoundHandler[index])
-		totalEarned += value
+		subtotal += value
 		text := g.RoundEndText(tech, &tech.RoundHandler[index])
 		rl.DrawText(tech.Name, x, y, 20, rl.Black)
 		rl.DrawText(text, x+columnOffset, y, 20, rl.Black)
 	}
 
-	//	text := fmt.Sprintf("Total: $%v", totalEarned)
-	//rl.DrawText(text, x, y+30, 20, rl.Black)
+	total := (subtotal * g.Run.Yield)
+	yield := total - subtotal
+	text := fmt.Sprintf("Subtotal: $%v", subtotal)
+	rl.DrawText(text, x, y+30, 20, rl.Black)
+	text = fmt.Sprintf("Yield: %v (%%%v)", yield, g.Run.Yield)
+	rl.DrawText(text, x, y+50, 20, rl.Black)
+	text = fmt.Sprintf("Total: %v", total)
+	rl.DrawText(text, x, y+70, 20, rl.Black)
 
 	button := g.Button("Next Page", 500, 500, OnClickEndRoundPageTwoButton)
 
 	g.DrawButton(button)
+	// if g.WasButtonClicked(&button) {
+	// 	g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["EndRound2"])
+	// }
 	if g.WasButtonClicked(&button) {
-		g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["EndRound2"])
+		OnClickEndRound(g)
+		g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["NextEvent"])
 	}
 }
 
@@ -238,11 +249,11 @@ func DrawEndRoundWindowPage2(g *Game, win *Window) {
 	if g.WasButtonClicked(&previousButton) {
 		g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["EndRound1"])
 	}
-
 	if g.WasButtonClicked(&button) {
 		OnClickEndRound(g)
 		g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["NextEvent"])
 	}
+
 }
 
 func DrawNextEventWindow(g *Game, win *Window) {
@@ -303,17 +314,17 @@ func DrawMarketWindow(g *Game, win *Window) {
 
 	products := g.GetProductNames()
 	rl.DrawText("Products", int32(window.X+10), int32(window.Y+50), 25, rl.Black)
-	rl.DrawText("Inventory", int32(window.X+10)+columnOffset, int32(window.Y+50), 25, rl.Black)
+	//	rl.DrawText("Inventory", int32(window.X+10)+columnOffset, int32(window.Y+50), 25, rl.Black)
 	rl.DrawText("Spot Price", int32(window.X+10)+columnOffset*2, int32(window.Y+50), 25, rl.Black)
-	rl.DrawText("Value", int32(window.X+10)+columnOffset*3, int32(window.Y+50), 25, rl.Black)
+	//	rl.DrawText("Value", int32(window.X+10)+columnOffset*3, int32(window.Y+50), 25, rl.Black)
 	for _, productName := range products {
 		x = int32(window.X + 10)
 		y = int32(window.Y + 80 + float32(i*30))
 		rl.DrawText(productName, x, y, 20, rl.Black)
-		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[productName].Quantity), x+columnOffset, y, 20, rl.Black)
+		//		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[productName].Quantity), x+columnOffset, y, 20, rl.Black)
 		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[productName].Price), x+columnOffset*2, y, 20, rl.Black)
-		value := g.Run.Products[productName].Price * g.Run.Products[productName].Quantity
-		rl.DrawText(fmt.Sprintf("%v", value), x+columnOffset*3, y, 20, rl.Black)
+		//		value := g.Run.Products[productName].Price * g.Run.Products[productName].Quantity
+		//		rl.DrawText(fmt.Sprintf("%v", value), x+columnOffset*3, y, 20, rl.Black)
 
 		if g.Run.Products[productName].Quantity == 0 {
 			i += 1

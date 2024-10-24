@@ -1,6 +1,6 @@
 package main
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+// import rl "github.com/gen2brain/raylib-go/raylib"
 
 type BoardCoord struct {
 	Row    int
@@ -37,17 +37,14 @@ type BoardSquare struct {
 	IsTree       bool
 }
 
-type BoardRightClickMenu struct {
-	Rectangle   rl.Rectangle
-	BoardSquare *BoardSquare
-	Items       []BoardMenuItem
-}
-
-type BoardMenuItem struct {
-	Rectangle       rl.Rectangle
-	Text            string
-	OnClick         func(*Game)
-	CheckIsDisabled func(*Game, *BoardSquare) bool
+type TechnologySpace struct {
+	Technology     *Technology
+	TechnologyType TechnologyType
+	Row            int
+	Column         int
+	Width          int // in tiles
+	Height         int // in tiles
+	IsFilled       bool
 }
 
 type Technology struct {
@@ -65,6 +62,13 @@ type Technology struct {
 	ShowEndRound      bool
 }
 
+type TechnologyType int
+
+const (
+	PlantSpace TechnologyType = iota
+	BuildingSpace
+)
+
 type TechnologyRoundHandler struct {
 	Season          Season
 	CostMoney       float32
@@ -76,15 +80,17 @@ type Person struct {
 }
 
 type Run struct {
-	Technology    []*Technology
-	People        []Person
-	Products      map[string]*Product
-	Money         float32
-	Productivity  float32
-	EndRoundMoney float32
-	CurrentRound  int
-	CurrentSeason Season
-	Events        []Event
+	Technology       []*Technology
+	People           []Person
+	Products         map[string]*Product
+	Money            float32
+	Yield            float32
+	Productivity     float32
+	EndRoundMoney    float32
+	CurrentRound     int
+	CurrentSeason    Season
+	Events           []Event
+	TechnologySpaces []*TechnologySpace
 }
 
 type Event struct {

@@ -52,6 +52,19 @@ type Tile struct {
 	Color     rl.Color
 }
 
+type BoardRightClickMenu struct {
+	Rectangle   rl.Rectangle
+	BoardSquare *BoardSquare
+	Items       []BoardMenuItem
+}
+
+type BoardMenuItem struct {
+	Rectangle       rl.Rectangle
+	Text            string
+	OnClick         func(*Game)
+	CheckIsDisabled func(*Game, *BoardSquare) bool
+}
+
 func DrawTile(t Tile, x, y float32) {
 
 	rl.DrawTextureRec(

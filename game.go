@@ -6,6 +6,7 @@ import (
 	"github.com/gen2brain/raylib-go/raylib"
 	"log"
 	"math"
+	"math/rand"
 )
 
 const YEARS int = 8
@@ -21,32 +22,43 @@ func (g *Game) InitRun() {
 		Events:       GenerateRandomEvents(),
 		Products:     make(map[string]*Product),
 	}
+	g.InitTechSpaces()
 	//	g.Run.Technology = append(g.Run.Technology, g.CreateChickenCoopTech())
 	// g.Run.Technology = append(g.Run.Technology, g.CreateWheatTech())
 
 }
 
-// func (g *Game) sellAllProducts() float32 {
-// 	var result float32 = 0
-// 	for _, product := range g.Run.Products {
-// 		result += +g.SellProduct(product)
-// 	}
+func (g *Game) InitTechSpaces() {
+	spaces := []*TechnologySpace{
+		{
+			TechnologyType: PlantSpace,
+			Row:            2,
+			Column:         3,
+			Width:          5,
+			Height:         5,
+			IsFilled:       false,
+		},
+	}
+	g.Run.TechnologySpaces = spaces
 
-// 	log.Printf("sell %v", result)
-// 	return result
-// }
+}
+
+func PreEndRound(g *Game) {
+	g.Run.Yield = g.Run.GenerateYield()
+}
 
 func OnClickEndRound(g *Game) {
-	g.Run.CurrentRound += 1
+
 	for _, tech := range g.Run.Technology {
 		tech.RoundHandler[tech.RoundHandlerIndex].OnRoundEnd(g, tech)
 		g.Run.EndRoundMoney -= tech.RoundHandler[tech.RoundHandlerIndex].CostMoney
 	}
-	//	g.Run.EndRoundMoney += g.Run.sellAllProducts()
-	g.Run.Money += g.Run.EndRoundMoney
+	g.Run.EndRoundMoney += g.sellAllProducts()
+	g.Run.Money += g.Run.EndRoundMoney * g.Run.Yield
 	g.Run.Money = float32(math.Round(float64(g.Run.Money)))
 	g.Run.EndRoundMoney = 0
 
+	g.Run.CurrentRound += 1
 	g.Run.CurrentSeason.Next()
 	g.GetNextEvent()
 
@@ -145,13 +157,23 @@ func (r *Run) SpendMoney(money float32) error {
 	return errors.New("cannot spend money, not enough money")
 }
 
-func (g *Game) SellProduct(product *Product) {
+func (g *Game) sellAllProducts() float32 {
+	var result float32 = 0
+	for _, product := range g.Run.Products {
+		result += +g.SellProduct(product)
+	}
+
+	log.Printf("sell %v", result)
+	return result
+}
+
+func (g *Game) SellProduct(product *Product) float32 {
 	result := +product.Quantity * product.Price
 	log.Printf("selling %v %v = %v", product.Quantity, product.Name, result)
 	product.Quantity = 0
 	// TODO: add to round money for reporting?
 
-	g.Run.Money += result
+	return result
 }
 
 func (r *Run) CalculateNetWorth() float32 {
@@ -162,4 +184,13 @@ func (r *Run) CalculateNetWorth() float32 {
 	}
 	result += r.Money
 	return result
+}
+
+// yield
+
+func (r *Run) GenerateYield() float32 {
+	f := rand.Float64()
+	scaledF := float32(f*1.2 + 0.8)
+	return scaledF
+
 }

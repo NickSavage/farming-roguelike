@@ -224,6 +224,16 @@ func (g *Game) DrawTechnology(tech *Technology) {
 
 }
 
+func (g *Game) DrawTechnologySpaces() {
+	for _, space := range g.Run.TechnologySpaces {
+		x := int32(space.Row * TILE_WIDTH)
+		y := int32(space.Column * TILE_HEIGHT)
+		width := int32(space.Width * TILE_WIDTH)
+		height := int32(space.Height * TILE_HEIGHT)
+		rl.DrawRectangle(x, y, width, height, rl.Blue)
+	}
+}
+
 func (g *Game) RemoveTechnology(square *BoardSquare) {
 
 	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
@@ -359,6 +369,7 @@ func DrawBoard(g *Game) {
 	rl.BeginMode2D(g.Scenes["Board"].Camera)
 	g.drawTiles()
 	//	g.DrawPlaceTech()
+	g.DrawTechnologySpaces()
 	g.drawGrid()
 	rl.EndMode2D()
 
