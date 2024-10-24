@@ -83,6 +83,16 @@ func (g *Game) LoadAssets() {
 		},
 		Color: rl.White,
 	}
+	g.Data["PotatoTile"] = Tile{
+		Texture: rl.LoadTextureFromImage(image),
+		TileFrame: rl.Rectangle{
+			X:      0,
+			Y:      92,
+			Width:  45,
+			Height: 45,
+		},
+		Color: rl.White,
+	}
 
 	image = rl.LoadImage("assets/tech/workstation.png")
 	rl.ImageResize(image, 45, 45)

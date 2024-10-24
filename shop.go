@@ -29,6 +29,19 @@ func ShopClickWheatField(g *Game) {
 	g.Scenes["Board"].Data["PlaceChosenTech"] = g.CreateWheatTech()
 
 }
+func ShopClickPotatoField(g *Game) {
+
+	tech := g.Technology["PotatoField"]
+	if !g.Run.CanSpendMoney(tech.CostMoney) {
+		return
+	}
+	g.Scenes["HUD"].Windows["ShopWindow"].Display = false
+	g.Scenes["Board"].Data["PlaceTech"] = true
+	g.ScreenSkip = true
+	g.Scenes["Board"].Data["PlaceChosenTech"] = g.CreatePotatoTech()
+
+}
+
 func ShopClickWorkstation(g *Game) {
 	tech := g.Technology["Workstation"]
 	if !g.Run.CanSpendMoney(tech.CostMoney) {
@@ -91,6 +104,13 @@ func (g *Game) InitShopWindow() {
 		ShopButton{
 			Width:      400,
 			Height:     50,
+			Image:      g.Data["PotatoTile"].(Tile),
+			OnClick:    ShopClickPotatoField,
+			Technology: tech["PotatoField"],
+		},
+		ShopButton{
+			Width:      400,
+			Height:     50,
 			Image:      g.Data["WorkstationTile"].(Tile),
 			OnClick:    ShopClickWorkstation,
 			Technology: tech["Workstation"],
@@ -109,6 +129,7 @@ func DrawShopWindow(g *Game, window *Window) {
 	g.DrawShopButton(buttons[0], 205, 90)
 	g.DrawShopButton(buttons[1], 205, 145)
 	g.DrawShopButton(buttons[2], 205, 200)
+	g.DrawShopButton(buttons[3], 205, 255)
 	// for _, button := range buttons {
 	// 	g.DrawShopButton(button, 205, 90)
 

@@ -296,6 +296,7 @@ func (g *Game) CheckSquareOccupied(row, col int) bool {
 func (g *Game) CheckTilesOccupied(newBoardSquare BoardSquare, mouseX, mouseY float32) bool {
 	scene := g.Scenes["Board"]
 
+	// todo convert to using coords
 	row := int((mouseX + TILE_WIDTH/2) / TILE_WIDTH)
 	col := int((mouseY + TILE_HEIGHT/2) / TILE_HEIGHT)
 
@@ -373,20 +374,36 @@ func (g *Game) DrawPlaceTech() {
 		// don't display placement if you're over the cancel button
 		return
 	}
+	mouseTileX := float32(mousePosition.X) - (chosenTech.Square.Tile.TileFrame.Width / 2)
+	mouseTileY := float32(mousePosition.Y) - (chosenTech.Square.Tile.TileFrame.Height / 2)
 	if g.CheckTilesOccupied(chosenTech.Square, mousePosition.X, mousePosition.Y) {
 		occupiedTile := chosenTech.Square.Tile
 		occupiedTile.Color = rl.Red
+		rl.DrawRectangle(
+			int32(mouseTileX),
+			int32(mouseTileY),
+			int32(chosenTech.Square.Width*TILE_WIDTH),
+			int32(chosenTech.Square.Height*TILE_HEIGHT),
+			rl.Red,
+		)
 		DrawTile(
 			occupiedTile,
-			float32(mousePosition.X)-(chosenTech.Square.Tile.TileFrame.Width/2),
-			float32(mousePosition.Y)-(chosenTech.Square.Tile.TileFrame.Height/2),
+			mouseTileX,
+			mouseTileY,
 		)
 
 	} else {
+		rl.DrawRectangle(
+			int32(mouseTileX),
+			int32(mouseTileY),
+			int32(chosenTech.Square.Width*TILE_WIDTH),
+			int32(chosenTech.Square.Height*TILE_HEIGHT),
+			rl.Green,
+		)
 		DrawTile(
 			chosenTech.Square.Tile,
-			float32(mousePosition.X)-(chosenTech.Square.Tile.TileFrame.Width/2),
-			float32(mousePosition.Y)-(chosenTech.Square.Tile.TileFrame.Height/2),
+			mouseTileX,
+			mouseTileY,
 		)
 		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 
@@ -394,8 +411,8 @@ func (g *Game) DrawPlaceTech() {
 			scene.Data["PlaceTech"] = false
 			g.PlaceTech(
 				chosenTech,
-				float32(mousePosition.X)-(chosenTech.Square.Tile.TileFrame.Width/2),
-				float32(mousePosition.Y)-(chosenTech.Square.Tile.TileFrame.Height/2),
+				mouseTileX,
+				mouseTileY,
 			)
 		}
 

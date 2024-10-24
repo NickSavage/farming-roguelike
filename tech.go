@@ -13,6 +13,8 @@ func (g *Game) InitTechnology() {
 
 	tech["ChickenCoop"] = g.ChickenCoop()
 	tech["WheatField"] = g.WheatField()
+	tech["PotatoField"] = g.PotatoField()
+
 	tech["Workstation"] = g.Workstation()
 
 	g.Technology = tech
@@ -215,12 +217,111 @@ func WheatFieldRoundSummer(g *Game, tech *Technology) {
 	tech.Redraw = true
 }
 func WheatFieldRoundAutumn(g *Game, tech *Technology) {
-	g.Run.Products["Wheat"].Quantity += 125
+	g.Run.Products["Wheat"].Quantity += WheatFieldProduce(g, tech)
 	tech.RoundHandlerIndex += 1
 	tech.Square.Tile.TileFrame.X += 45
 	tech.Redraw = true
 }
 func WheatFieldRoundWinter(g *Game, tech *Technology) {
+	tech.RoundHandlerIndex += 0
+	tech.Square.Tile.TileFrame.X += 45
+	tech.Redraw = true
+}
+
+// potato
+
+func (g *Game) CreatePotatoTech() *Technology {
+
+	result := g.Technology["PotatoField"]
+	result.Square = BoardSquare{
+		Tile:         g.Data["PotatoTile"].(Tile),
+		TileType:     "Technology",
+		Row:          8,
+		Column:       8,
+		Width:        4,
+		Height:       4,
+		Occupied:     true,
+		IsTechnology: true,
+	}
+
+	g.InitProduct(result, 5)
+	return result
+}
+
+func (g *Game) PotatoField() *Technology {
+	return &Technology{
+		Name:        "Potato",
+		ProductName: "Potato",
+		Square:      BoardSquare{},
+		CostMoney:   50,
+		CostActions: 1,
+		Description: "asdasd",
+		OnBuild:     PotatoFieldOnBuild,
+		Redraw:      false,
+		RoundHandler: []TechnologyRoundHandler{
+			{
+				Season:          Spring,
+				OnRoundEnd:      PotatoFieldRoundSpring,
+				RoundEndProduce: PotatoFieldProduce,
+				CostActions:     1,
+			},
+			{
+				Season:          Summer,
+				OnRoundEnd:      PotatoFieldRoundSummer,
+				RoundEndProduce: PotatoFieldProduce,
+				CostActions:     1,
+			},
+			{
+				Season:          Autumn,
+				OnRoundEnd:      PotatoFieldRoundAutumn,
+				RoundEndProduce: PotatoFieldProduce,
+				CostActions:     1,
+			},
+			{
+				Season:          Winter,
+				OnRoundEnd:      PotatoFieldRoundWinter,
+				RoundEndProduce: PotatoFieldProduce,
+				CostActions:     1,
+			},
+		},
+		RoundCounterMax:   0,
+		RoundCounter:      0,
+		RoundHandlerIndex: 0,
+		ShowEndRound:      true,
+	}
+
+}
+
+func PotatoFieldOnBuild(g *Game, tech *Technology) error {
+	g.InitProduct(tech, 1)
+	return nil
+}
+
+func PotatoFieldProduce(g *Game, tech *Technology) float32 {
+	if g.Run.CurrentSeason == Autumn {
+		return float32(125) * g.Run.Productivity
+	} else {
+		return 0
+	}
+}
+
+func PotatoFieldRoundSpring(g *Game, tech *Technology) {
+	tech.RoundHandlerIndex += 1
+	tech.Square.Tile.TileFrame.X += 45
+	tech.Redraw = true
+}
+func PotatoFieldRoundSummer(g *Game, tech *Technology) {
+	tech.RoundHandlerIndex += 1
+	tech.Square.Tile.TileFrame.X += 45
+	tech.Redraw = true
+}
+func PotatoFieldRoundAutumn(g *Game, tech *Technology) {
+	g.Run.Products["Potato"].Quantity += PotatoFieldProduce(g, tech)
+	tech.RoundHandlerIndex += 1
+	tech.Square.Tile.TileFrame.X += 45
+	tech.Redraw = true
+}
+func PotatoFieldRoundWinter(g *Game, tech *Technology) {
 	tech.RoundHandlerIndex += 0
 	tech.Square.Tile.TileFrame.X += 45
 	tech.Redraw = true
