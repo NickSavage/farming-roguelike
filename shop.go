@@ -5,53 +5,37 @@ import (
 	"log"
 )
 
-func ShopClickChickenCoop(g *Game) {
+func (g *Game) ShopChooseTech(tech *Technology) {
 
-	tech := g.Technology["ChickenCoop"]
 	if !g.Run.CanSpendMoney(tech.CostMoney) {
 		return
 	}
 	g.Scenes["HUD"].Windows["ShopWindow"].Display = false
-	g.Scenes["Board"].Data["PlaceTech"] = true
-	g.ScreenSkip = true
-	g.Scenes["Board"].Data["PlaceChosenTech"] = g.CreateChickenCoopTech()
+	coords := g.GetOpenCoords()
+	g.PlaceTech(tech, coords)
+}
+
+func ShopClickChickenCoop(g *Game) {
+
+	tech := g.CreateChickenCoopTech()
+	g.ShopChooseTech(tech)
 }
 
 func ShopClickWheatField(g *Game) {
 
-	tech := g.Technology["WheatField"]
-	if !g.Run.CanSpendMoney(tech.CostMoney) {
-		return
-	}
-	g.Scenes["HUD"].Windows["ShopWindow"].Display = false
-	g.Scenes["Board"].Data["PlaceTech"] = true
-	g.ScreenSkip = true
-	g.Scenes["Board"].Data["PlaceChosenTech"] = g.CreateWheatTech()
-
+	tech := g.CreateWheatTech()
+	g.ShopChooseTech(tech)
 }
 func ShopClickPotatoField(g *Game) {
 
-	tech := g.Technology["PotatoField"]
-	if !g.Run.CanSpendMoney(tech.CostMoney) {
-		return
-	}
-	g.Scenes["HUD"].Windows["ShopWindow"].Display = false
-	g.Scenes["Board"].Data["PlaceTech"] = true
-	g.ScreenSkip = true
-	g.Scenes["Board"].Data["PlaceChosenTech"] = g.CreatePotatoTech()
-
+	tech := g.CreatePotatoTech()
+	g.ShopChooseTech(tech)
 }
 
 func ShopClickWorkstation(g *Game) {
-	tech := g.Technology["Workstation"]
-	if !g.Run.CanSpendMoney(tech.CostMoney) {
-		return
-	}
-	g.Scenes["HUD"].Windows["ShopWindow"].Display = false
-	g.Scenes["Board"].Data["PlaceTech"] = true
-	g.ScreenSkip = true
-	g.Scenes["Board"].Data["PlaceChosenTech"] = g.CreateWorkstationTech()
 
+	tech := g.CreateWorkstationTech()
+	g.ShopChooseTech(tech)
 }
 
 func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {

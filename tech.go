@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"log"
 	"sort"
-
-	rl "github.com/gen2brain/raylib-go/raylib"
+	// rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func (g *Game) InitTechnology() {
@@ -55,6 +54,31 @@ func (g *Game) RoundEndText(tech *Technology, handler *TechnologyRoundHandler) s
 	return fmt.Sprintf(text, units*price, units, price)
 }
 
+func (g *Game) PlaceTech(tech *Technology, coords BoardCoord) error {
+
+	log.Printf("?")
+
+	// if g.CheckSquareOccupied(row, col) {
+	// 	return errors.New("unable to place tech")
+	// }
+	// Store calculated row and column in tech
+	tech.Square.Row = coords.Row
+	tech.Square.Column = coords.Column
+
+	log.Printf("tech %v", len(g.Run.Technology))
+
+	if g.CanBuild(tech) {
+		err := tech.OnBuild(g, tech)
+		if err == nil {
+			g.Run.Technology = append(g.Run.Technology, tech)
+			log.Printf("tech afte %v", len(g.Run.Technology))
+			g.DrawTechnology(tech)
+		}
+	}
+	return nil
+
+}
+
 // chicken
 
 func (g *Game) CreateChickenCoopTech() *Technology {
@@ -82,7 +106,6 @@ func (g *Game) ChickenCoop() *Technology {
 		Square:      BoardSquare{},
 		Description: "asdasd",
 		CostMoney:   50,
-		CostActions: 1,
 		OnBuild:     ChickenCoopOnBuild,
 		Redraw:      false,
 		RoundHandler: []TechnologyRoundHandler{
@@ -99,11 +122,6 @@ func (g *Game) ChickenCoop() *Technology {
 
 func (g *Game) CanBuild(tech *Technology) bool {
 	err := g.Run.SpendMoney(tech.CostMoney)
-	if err != nil {
-		log.Printf("err %v", err)
-		return false
-	}
-	err = g.Run.SpendAction(tech.CostActions)
 	if err != nil {
 		log.Printf("err %v", err)
 		return false
@@ -155,7 +173,6 @@ func (g *Game) WheatField() *Technology {
 		ProductName: "Wheat",
 		Square:      BoardSquare{},
 		CostMoney:   50,
-		CostActions: 1,
 		Description: "asdasd",
 		OnBuild:     WheatFieldOnBuild,
 		Redraw:      false,
@@ -164,25 +181,21 @@ func (g *Game) WheatField() *Technology {
 				Season:          Spring,
 				OnRoundEnd:      WheatFieldRoundSpring,
 				RoundEndProduce: WheatFieldProduce,
-				CostActions:     1,
 			},
 			{
 				Season:          Summer,
 				OnRoundEnd:      WheatFieldRoundSummer,
 				RoundEndProduce: WheatFieldProduce,
-				CostActions:     1,
 			},
 			{
 				Season:          Autumn,
 				OnRoundEnd:      WheatFieldRoundAutumn,
 				RoundEndProduce: WheatFieldProduce,
-				CostActions:     1,
 			},
 			{
 				Season:          Winter,
 				OnRoundEnd:      WheatFieldRoundWinter,
 				RoundEndProduce: WheatFieldProduce,
-				CostActions:     1,
 			},
 		},
 		RoundCounterMax:   0,
@@ -254,7 +267,6 @@ func (g *Game) PotatoField() *Technology {
 		ProductName: "Potato",
 		Square:      BoardSquare{},
 		CostMoney:   50,
-		CostActions: 1,
 		Description: "asdasd",
 		OnBuild:     PotatoFieldOnBuild,
 		Redraw:      false,
@@ -263,25 +275,21 @@ func (g *Game) PotatoField() *Technology {
 				Season:          Spring,
 				OnRoundEnd:      PotatoFieldRoundSpring,
 				RoundEndProduce: PotatoFieldProduce,
-				CostActions:     1,
 			},
 			{
 				Season:          Summer,
 				OnRoundEnd:      PotatoFieldRoundSummer,
 				RoundEndProduce: PotatoFieldProduce,
-				CostActions:     1,
 			},
 			{
 				Season:          Autumn,
 				OnRoundEnd:      PotatoFieldRoundAutumn,
 				RoundEndProduce: PotatoFieldProduce,
-				CostActions:     1,
 			},
 			{
 				Season:          Winter,
 				OnRoundEnd:      PotatoFieldRoundWinter,
 				RoundEndProduce: PotatoFieldProduce,
-				CostActions:     1,
 			},
 		},
 		RoundCounterMax:   0,
@@ -352,14 +360,12 @@ func (g *Game) Workstation() *Technology {
 		ProductName: "",
 		Square:      BoardSquare{},
 		CostMoney:   25,
-		CostActions: 1,
 		Description: "asdasd",
 		OnBuild:     WorkstationOnBuild,
 		Redraw:      false,
 		RoundHandler: []TechnologyRoundHandler{
 			{
-				OnRoundEnd:  WorkstationRoundEnd,
-				CostActions: 0,
+				OnRoundEnd: WorkstationRoundEnd,
 			},
 		},
 		RoundCounterMax:   0,
@@ -382,56 +388,56 @@ func WorkstationRoundEnd(g *Game, tech *Technology) {
 
 // trees
 
-func TreeMenuItems() []BoardMenuItem {
-	results := []BoardMenuItem{}
-	results = append(results, BoardMenuItem{
-		Rectangle: rl.Rectangle{
-			X:      0,
-			Y:      0,
-			Height: 30,
-			Width:  150,
-		},
-		Text:            "Chop (1 action)",
-		OnClick:         ChopTree,
-		CheckIsDisabled: IsChopActionDisabled,
-	})
-	results = append(results, BoardMenuItem{
-		Rectangle: rl.Rectangle{
-			X:      0,
-			Y:      0,
-			Height: 30,
-			Width:  150,
-		},
-		Text:            "Test",
-		OnClick:         BlankAction,
-		CheckIsDisabled: IsBlankActionDisabled,
-	})
+// func TreeMenuItems() []BoardMenuItem {
+// 	results := []BoardMenuItem{}
+// 	results = append(results, BoardMenuItem{
+// 		Rectangle: rl.Rectangle{
+// 			X:      0,
+// 			Y:      0,
+// 			Height: 30,
+// 			Width:  150,
+// 		},
+// 		Text:            "Chop (1 action)",
+// 		OnClick:         ChopTree,
+// 		CheckIsDisabled: IsChopActionDisabled,
+// 	})
+// 	results = append(results, BoardMenuItem{
+// 		Rectangle: rl.Rectangle{
+// 			X:      0,
+// 			Y:      0,
+// 			Height: 30,
+// 			Width:  150,
+// 		},
+// 		Text:            "Test",
+// 		OnClick:         BlankAction,
+// 		CheckIsDisabled: IsBlankActionDisabled,
+// 	})
 
-	return results
-}
+// 	return results
+// }
 
-func IsChopActionDisabled(g *Game, square *BoardSquare) bool {
-	if !g.Run.CanSpendAction(1) {
-		return true
-	}
-	return false
+// func IsChopActionDisabled(g *Game, square *BoardSquare) bool {
+// 	if !g.Run.CanSpendAction(1) {
+// 		return true
+// 	}
+// 	return false
 
-}
+// }
 
-func ChopTree(g *Game) {
+// func ChopTree(g *Game) {
 
-	scene := g.Scenes["Board"]
-	log.Printf("square %v", scene.Menu.BoardSquare)
-	err := g.Run.SpendAction(1)
-	if err == nil {
-		g.RemoveTechnology(scene.Menu.BoardSquare)
-	}
-}
+// 	scene := g.Scenes["Board"]
+// 	log.Printf("square %v", scene.Menu.BoardSquare)
+// 	err := g.Run.SpendAction(1)
+// 	if err == nil {
+// 		g.RemoveTechnology(scene.Menu.BoardSquare)
+// 	}
+// }
 
-// generic actions
+// // generic actions
 
-func BlankAction(g *Game) {}
+// func BlankAction(g *Game) {}
 
-func IsBlankActionDisabled(g *Game, square *BoardSquare) bool {
-	return false
-}
+// func IsBlankActionDisabled(g *Game, square *BoardSquare) bool {
+// 	return false
+// }

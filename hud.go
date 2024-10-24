@@ -46,6 +46,8 @@ func OpenSellWindow(g *Game, product *Product) {
 func (g *Game) InitHUD() {
 	scene := g.Scenes["HUD"]
 
+	g.SidebarWidth = int32(200)
+
 	scene.Windows = make(map[string]*Window)
 	scene.Windows["ShopWindow"] = &Window{
 		Name:       "Shop Window",
@@ -101,9 +103,8 @@ func UpdateHUD(g *Game) {
 func DrawHUD(g *Game) {
 	scene := g.Scenes["HUD"]
 	height := int32(150)
-	sidebarWidth := int32(200)
 	//	rl.DrawRectangle(0, g.screenHeight-height, g.screenWidth, height, rl.Black)
-	rl.DrawRectangle(0, 0, sidebarWidth, g.screenHeight, rl.Black)
+	rl.DrawRectangle(0, 0, g.SidebarWidth, g.screenHeight, rl.Black)
 
 	DrawSidebar(g)
 	g.DrawButtons(scene.Buttons)
@@ -136,14 +137,14 @@ func DrawSidebar(g *Game) {
 		rl.White,
 	)
 
-	rl.DrawText(
-		fmt.Sprintf("Actions: %v/%v", g.Run.RoundActionsRemaining, g.Run.RoundActions),
-		30, 50, 20, rl.White,
-	)
+	// rl.DrawText(
+	// 	fmt.Sprintf("Actions: %v/%v", g.Run.RoundActionsRemaining, g.Run.RoundActions),
+	// 	30, 50, 20, rl.White,
+	// )
+	rl.DrawText(fmt.Sprintf("Round: %v", g.Run.CurrentRound), 30, 50, 20, rl.White)
 	rl.DrawText(fmt.Sprintf("Money: $%v", g.Run.Money), 30, 70, 20, rl.White)
-	rl.DrawText(fmt.Sprintf("Round: %v", g.Run.CurrentRound), 30, 90, 20, rl.White)
-	rl.DrawText(fmt.Sprintf("Productivity: %v", g.Run.Productivity), 30, 110, 20, rl.White)
-	rl.DrawText(fmt.Sprintf("Season: %v", g.Run.CurrentSeason.String()), 30, 130, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("Productivity: %v", g.Run.Productivity), 30, 90, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("Season: %v", g.Run.CurrentSeason.String()), 30, 110, 20, rl.White)
 
 	buttons := []*Button{}
 	techButton := g.Button("Technology", 10, 190, OnClickTechWindowButton)
@@ -208,7 +209,6 @@ func DrawEndRoundWindowPage2(g *Game, win *Window) {
 
 	rl.DrawText("Investments", int32(windowRect.X+5), int32(windowRect.Y+5), 30, rl.Black)
 
-	var actions float32 = float32(g.Run.RoundActions)
 	var columnOffset int32 = 150
 	var x, y int32
 
@@ -221,18 +221,14 @@ func DrawEndRoundWindowPage2(g *Game, win *Window) {
 		y = int32(windowRect.Y + 50 + float32(i*30))
 		nextSeason := tech.RoundHandler[tech.RoundHandlerIndex]
 
-		actions -= nextSeason.CostActions
 		rl.DrawText(tech.Name, x, y, 20, rl.Black)
 		text := fmt.Sprintf(
-			"-%v actions -$%v money",
-			nextSeason.CostActions,
+			"-$%v money",
 			nextSeason.CostMoney,
 		)
 		rl.DrawText(text, x+columnOffset, y, 20, rl.Red)
 
 	}
-	text := fmt.Sprintf("Actions next season: %v", actions)
-	rl.DrawText(text, x, y+30, 20, rl.Red)
 	button := g.Button("End Round", 500, 500, OnClickEndRoundConfirmButton)
 
 	g.DrawButton(button)

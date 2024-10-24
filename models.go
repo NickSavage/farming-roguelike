@@ -12,6 +12,7 @@ type Game struct {
 	Data         map[string]interface{}
 	screenWidth  int32
 	screenHeight int32
+	SidebarWidth int32
 	Run          *Run
 	Counter      int32
 	Seconds      int32
@@ -55,7 +56,6 @@ type Technology struct {
 	Description       string
 	Square            BoardSquare
 	CostMoney         float32
-	CostActions       float32
 	OnBuild           func(*Game, *Technology) error
 	RoundHandler      []TechnologyRoundHandler
 	RoundCounterMax   int
@@ -67,7 +67,6 @@ type Technology struct {
 
 type TechnologyRoundHandler struct {
 	Season          Season
-	CostActions     float32
 	CostMoney       float32
 	OnRoundEnd      func(*Game, *Technology)
 	RoundEndProduce func(*Game, *Technology) float32
@@ -77,17 +76,15 @@ type Person struct {
 }
 
 type Run struct {
-	Technology            []*Technology
-	People                []Person
-	Products              map[string]*Product
-	Money                 float32
-	Productivity          float32
-	EndRoundMoney         float32
-	RoundActions          float32
-	RoundActionsRemaining float32
-	CurrentRound          int
-	CurrentSeason         Season
-	Events                []Event
+	Technology    []*Technology
+	People        []Person
+	Products      map[string]*Product
+	Money         float32
+	Productivity  float32
+	EndRoundMoney float32
+	CurrentRound  int
+	CurrentSeason Season
+	Events        []Event
 }
 
 type Event struct {

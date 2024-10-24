@@ -11,8 +11,8 @@ import (
 const TILE_HEIGHT = 45
 const TILE_WIDTH = 45
 
-const TILE_ROWS = 30
-const TILE_COLUMNS = 30
+const TILE_ROWS = 25
+const TILE_COLUMNS = 25
 
 func CheckVecVisible(vec rl.Vector2) bool {
 	// todo this is the sidebar, how can I do this better
@@ -28,6 +28,28 @@ func (g *Game) GetSquareFromCoords(input BoardCoord) *BoardSquare {
 	return &grid[input.Row][input.Column]
 
 }
+
+func (g *Game) GetOpenCoords() BoardCoord {
+
+	scene := g.Scenes["Board"]
+	grid := scene.Data["Grid"].([][]BoardSquare)
+	for x := range TILE_ROWS - 1 {
+		for y := range TILE_COLUMNS - 1 {
+			if !grid[x][y].Occupied {
+				log.Printf("found %v,%v", x, y)
+				return BoardCoord{
+					Row:    x,
+					Column: y,
+				}
+			}
+		}
+	}
+	return BoardCoord{
+		Row:    0,
+		Column: 0,
+	}
+}
+
 func generateCoordinates(numPairs, maxX, maxY int) []rl.Vector2 {
 	coordinates := make([]rl.Vector2, numPairs)
 
@@ -71,19 +93,6 @@ func (g *Game) InitPlaceRandomTrees(numTrees int) {
 
 }
 
-func (g *Game) InitPlaceTech() {
-
-	scene := g.Scenes["Board"]
-	scene.Data["PlaceTechCancelButton"] = ShopButton{
-		Width:           200,
-		Height:          40,
-		Title:           "Cancel Placement",
-		OnClick:         OnClickCancelTechPlacement,
-		BackgroundColor: rl.SkyBlue,
-	}
-
-}
-
 func (g *Game) GetGrassSquare(x, y int) *BoardSquare {
 
 	square := &BoardSquare{
@@ -102,11 +111,11 @@ func (g *Game) GetGrassSquare(x, y int) *BoardSquare {
 func (g *Game) InitBoard() {
 	scene := g.Scenes["Board"]
 	scene.Camera = rl.Camera2D{}
-	scene.Camera.Zoom = 1.0
-	scene.Camera.Target = rl.Vector2{X: 0, Y: 0}
+	scene.Camera.Zoom = 1
+	scene.Camera.Target = rl.Vector2{X: -float32(g.SidebarWidth), Y: 0}
 
-	rows := 30
-	cols := 30
+	rows := TILE_ROWS
+	cols := TILE_COLUMNS
 
 	scene.Data["Rows"] = rows
 	scene.Data["Columns"] = cols
@@ -124,8 +133,8 @@ func (g *Game) InitBoard() {
 
 	g.Scenes["Board"].Data["HoverVector"] = BoardCoord{}
 	g.Scenes["Board"].Data["HoverVectorCounter"] = 0
-	g.InitPlaceRandomTrees(215)
-	g.InitPlaceTech()
+	//	g.InitPlaceRandomTrees(215)
+	//	g.InitPlaceTech()
 	g.InitDrawTechnology()
 
 }
@@ -342,84 +351,6 @@ func (g *Game) CheckTilesOccupied(newBoardSquare BoardSquare, mouseX, mouseY flo
 
 }
 
-// placing tech
-
-func OnClickCancelTechPlacement(g *Game) {
-	scene := g.Scenes["Board"]
-	scene.Data["PlaceTech"] = false
-
-}
-
-func (g *Game) DrawPlaceTech() {
-	scene := g.Scenes["Board"]
-	if scene.Data["PlaceTech"] == nil || !scene.Data["PlaceTech"].(bool) {
-		return
-	}
-
-	if g.ScreenSkip {
-		g.ScreenSkip = false
-		return
-	}
-	chosenTech := scene.Data["PlaceChosenTech"].(*Technology)
-	mousePosition := rl.GetMousePosition()
-
-	cancelButton := scene.Data["PlaceTechCancelButton"].(ShopButton)
-	//	g.DrawShopButton(cancelButton, 200, 50)
-	if rl.CheckCollisionPointRec(mousePosition, rl.Rectangle{
-		X:      200,
-		Y:      50,
-		Width:  float32(cancelButton.Width),
-		Height: float32(cancelButton.Height),
-	}) {
-		// don't display placement if you're over the cancel button
-		return
-	}
-	mouseTileX := float32(mousePosition.X) - (chosenTech.Square.Tile.TileFrame.Width / 2)
-	mouseTileY := float32(mousePosition.Y) - (chosenTech.Square.Tile.TileFrame.Height / 2)
-	if g.CheckTilesOccupied(chosenTech.Square, mousePosition.X, mousePosition.Y) {
-		occupiedTile := chosenTech.Square.Tile
-		occupiedTile.Color = rl.Red
-		rl.DrawRectangle(
-			int32(mouseTileX),
-			int32(mouseTileY),
-			int32(chosenTech.Square.Width*TILE_WIDTH),
-			int32(chosenTech.Square.Height*TILE_HEIGHT),
-			rl.Red,
-		)
-		DrawTile(
-			occupiedTile,
-			mouseTileX,
-			mouseTileY,
-		)
-
-	} else {
-		rl.DrawRectangle(
-			int32(mouseTileX),
-			int32(mouseTileY),
-			int32(chosenTech.Square.Width*TILE_WIDTH),
-			int32(chosenTech.Square.Height*TILE_HEIGHT),
-			rl.Green,
-		)
-		DrawTile(
-			chosenTech.Square.Tile,
-			mouseTileX,
-			mouseTileY,
-		)
-		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-
-			log.Printf("draw place tech")
-			scene.Data["PlaceTech"] = false
-			g.PlaceTech(
-				chosenTech,
-				mouseTileX,
-				mouseTileY,
-			)
-		}
-
-	}
-
-}
-
 // main draw function
 
 func DrawBoard(g *Game) {
@@ -427,124 +358,14 @@ func DrawBoard(g *Game) {
 	//	scene := g.Scenes["Board"]
 	rl.BeginMode2D(g.Scenes["Board"].Camera)
 	g.drawTiles()
-	g.DrawPlaceTech()
+	//	g.DrawPlaceTech()
 	g.drawGrid()
 	rl.EndMode2D()
 
 	g.HandleHover()
 	DrawHUD(g)
 	g.RedrawTechnology()
-	g.DrawContextMenu(g.Scenes["Board"])
-}
-
-func (g *Game) SelectTiles() {
-
-	scene := g.Scenes["Board"]
-
-	currentGesture := rl.GetGestureDetected()
-	if currentGesture == rl.GestureNone {
-		if scene.Data["DragSelectionStart"] == nil {
-			return
-		}
-		if scene.Data["DragSelectionStop"] == nil {
-			return
-		}
-		start := scene.Data["DragSelectionStart"].(rl.Vector2)
-		end := scene.Data["DragSelectionStop"].(rl.Vector2)
-		xTiles := int((end.X-start.X)/TILE_WIDTH) + 1
-		yTiles := int((end.Y-start.Y)/TILE_HEIGHT) + 1
-		startX := int((start.X + scene.Camera.Target.X) / scene.Camera.Zoom / float32(TILE_WIDTH))
-		startY := int((start.Y + scene.Camera.Target.Y) / scene.Camera.Zoom / float32(TILE_HEIGHT))
-
-		for xOffset := range xTiles {
-			for yOffset := range yTiles {
-				grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
-				tile := &grid[startX+xOffset][startY+yOffset]
-				if tile.TileType == "Grass" {
-					tile.Tile = g.Data["DirtTile"].(Tile)
-					tile.TileType = "Dirt"
-				} else if tile.TileType == "Dirt" {
-					tile.Tile = g.Data["GrassTile"].(Tile)
-					tile.TileType = "Grass"
-
-				}
-
-			}
-		}
-
-	}
-
-}
-
-func DrawGenericMenu(g *Game) {
-	scene := g.Scenes["Board"]
-	//	square := scene.Menu.BoardSquare
-
-	rl.DrawRectangleRec(scene.Menu.Rectangle, rl.White)
-	rl.DrawRectangleLinesEx(scene.Menu.Rectangle, 2, rl.Black)
-}
-
-func (g *Game) HandleLeftClick() {
-	// todo: shouldn't work if a window is open
-
-	scene := g.Scenes["Board"]
-
-	if g.WindowOpen {
-		return
-	}
-	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-		mousePosition := rl.GetMousePosition()
-
-		if !CheckVecVisible(mousePosition) {
-			return
-		}
-
-		grid := scene.Data["Grid"].([][]BoardSquare)
-		x := int((mousePosition.X + scene.Camera.Target.X) / scene.Camera.Zoom / float32(TILE_WIDTH))
-		y := int((mousePosition.Y + scene.Camera.Target.Y) / scene.Camera.Zoom / float32(TILE_HEIGHT))
-		if scene.RenderMenu {
-			// TODO build a rect of the menu and check if the click is within
-			if scene.Menu.BoardSquare.Row == grid[x][y].Row ||
-				scene.Menu.BoardSquare.Column == grid[x][y].Column {
-				return
-			}
-		}
-		if !(grid[x][y].IsTechnology || grid[x][y].IsTree) {
-
-			scene.RenderMenu = false
-			return
-		}
-		menu := &BoardRightClickMenu{
-			Rectangle: rl.Rectangle{
-				X:      mousePosition.X,
-				Y:      mousePosition.Y,
-				Height: 100,
-				Width:  100,
-			},
-			BoardSquare: &grid[x][y],
-			Items:       make([]BoardMenuItem, 0),
-		}
-
-		if grid[x][y].IsTree {
-			menu.Items = TreeMenuItems()
-		}
-		g.ScreenSkip = true
-		scene.RenderMenu = true
-		scene.Menu = menu
-
-		return
-	}
-	if scene.RenderMenu {
-		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-
-			mousePosition := rl.GetMousePosition()
-			if !rl.CheckCollisionPointRec(mousePosition, scene.Menu.Rectangle) {
-				scene.RenderMenu = false
-			}
-
-		}
-	}
-
+	// g.DrawContextMenu(g.Scenes["Board"])
 }
 
 func (g *Game) disableTechHoverHighlight(coord BoardCoord) {
@@ -578,9 +399,9 @@ func (g *Game) enableTechHoverHighlight(coord BoardCoord) {
 	if square.Height <= 1 || square.Width <= 1 {
 		return
 	}
-	// if !square.IsTechnology || !square.MultiSquare {
-	// 	return
-	// }
+	if !square.IsTechnology || !square.MultiSquare {
+		return
+	}
 	startX := square.Row
 	startY := square.Column
 	for x := range square.Width {
@@ -606,8 +427,8 @@ func (g *Game) HandleHover() {
 		return
 	}
 	g.enableTechHoverHighlight(coords)
-	square := g.GetSquareFromCoords(coords)
-	log.Printf("square %v,%v - %v", coords.Row, coords.Column, square)
+	//	square := g.GetSquareFromCoords(coords)
+	//	log.Printf("square %v,%v - %v", coords.Row, coords.Column, square)
 	if oldVec.Row == coords.Row && oldVec.Column == coords.Column {
 		counter := scene.Data["HoverVectorCounter"].(int)
 		if counter == 0 {
@@ -638,41 +459,41 @@ func (g *Game) HandleHover() {
 }
 
 func UpdateBoard(g *Game) {
-	scene := g.Scenes["Board"]
+	//	scene := g.Scenes["Board"]
 
 	//	Camera zoom controls
-	scene.Camera.Zoom += float32(rl.GetMouseWheelMove()) * 0.05
-	if scene.Camera.Zoom > 1.2 {
-		scene.Camera.Zoom = 1.2
-	} else if scene.Camera.Zoom < 0.8 {
-		scene.Camera.Zoom = 0.8
-	}
-	if rl.IsKeyDown(rl.KeyRight) {
-		scene.Camera.Target.X += 5
-		if scene.Camera.Target.X > TILE_COLUMNS*TILE_WIDTH-float32(g.screenWidth-50) {
-			scene.Camera.Target.X = TILE_COLUMNS*TILE_WIDTH - float32(g.screenWidth-50)
-		}
-	}
-	if rl.IsKeyDown(rl.KeyLeft) {
-		scene.Camera.Target.X -= 5
-		if scene.Camera.Target.X < -200 {
-			scene.Camera.Target.X = -200
-		}
-	}
-	if rl.IsKeyDown(rl.KeyDown) {
-		scene.Camera.Target.Y += 5
-		if scene.Camera.Target.Y > TILE_ROWS*TILE_HEIGHT-float32(g.screenHeight-200) {
-			scene.Camera.Target.Y = TILE_ROWS*TILE_HEIGHT - float32(g.screenHeight-200)
-		}
-	}
-	if rl.IsKeyDown(rl.KeyUp) {
-		scene.Camera.Target.Y -= 5
-		if scene.Camera.Target.Y < -300 {
-			scene.Camera.Target.Y = -300
-		}
-	}
-	g.SelectTiles()
-	g.HandleLeftClick()
+	// scene.Camera.Zoom += float32(rl.GetMouseWheelMove()) * 0.05
+	// if scene.Camera.Zoom > 1.2 {
+	// 	scene.Camera.Zoom = 1.2
+	// } else if scene.Camera.Zoom < 0.8 {
+	// 	scene.Camera.Zoom = 0.8
+	// }
+	// if rl.IsKeyDown(rl.KeyRight) {
+	// 	scene.Camera.Target.X += 5
+	// 	if scene.Camera.Target.X > TILE_COLUMNS*TILE_WIDTH-float32(g.screenWidth-50) {
+	// 		scene.Camera.Target.X = TILE_COLUMNS*TILE_WIDTH - float32(g.screenWidth-50)
+	// 	}
+	// }
+	// if rl.IsKeyDown(rl.KeyLeft) {
+	// 	scene.Camera.Target.X -= 5
+	// 	if scene.Camera.Target.X < -200 {
+	// 		scene.Camera.Target.X = -200
+	// 	}
+	// }
+	// if rl.IsKeyDown(rl.KeyDown) {
+	// 	scene.Camera.Target.Y += 5
+	// 	if scene.Camera.Target.Y > TILE_ROWS*TILE_HEIGHT-float32(g.screenHeight-200) {
+	// 		scene.Camera.Target.Y = TILE_ROWS*TILE_HEIGHT - float32(g.screenHeight-200)
+	// 	}
+	// }
+	// if rl.IsKeyDown(rl.KeyUp) {
+	// 	scene.Camera.Target.Y -= 5
+	// 	if scene.Camera.Target.Y < -300 {
+	// 		scene.Camera.Target.Y = -300
+	// 	}
+	// }
+	//g.SelectTiles()
+	//	g.HandleLeftClick()
 
 	// mousePosition := rl.GetMousePosition()
 }

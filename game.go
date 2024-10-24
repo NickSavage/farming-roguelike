@@ -13,17 +13,15 @@ const YEARS int = 8
 func (g *Game) InitRun() {
 
 	g.Run = &Run{
-		Money:                 100,
-		Productivity:          1.0,
-		CurrentRound:          1,
-		RoundActions:          5,
-		RoundActionsRemaining: 5,
-		Technology:            make([]*Technology, 0),
-		People:                make([]Person, 1),
-		Events:                GenerateRandomEvents(),
-		Products:              make(map[string]*Product),
+		Money:        100,
+		Productivity: 1.0,
+		CurrentRound: 1,
+		Technology:   make([]*Technology, 0),
+		People:       make([]Person, 1),
+		Events:       GenerateRandomEvents(),
+		Products:     make(map[string]*Product),
 	}
-	// g.Run.Technology = append(g.Run.Technology, g.CreateChickenCoopTech())
+	//	g.Run.Technology = append(g.Run.Technology, g.CreateChickenCoopTech())
 	// g.Run.Technology = append(g.Run.Technology, g.CreateWheatTech())
 
 }
@@ -40,10 +38,8 @@ func (g *Game) InitRun() {
 
 func OnClickEndRound(g *Game) {
 	g.Run.CurrentRound += 1
-	g.Run.RoundActionsRemaining = g.Run.RoundActions
 	for _, tech := range g.Run.Technology {
 		tech.RoundHandler[tech.RoundHandlerIndex].OnRoundEnd(g, tech)
-		g.Run.RoundActionsRemaining -= tech.RoundHandler[tech.RoundHandlerIndex].CostActions
 		g.Run.EndRoundMoney -= tech.RoundHandler[tech.RoundHandlerIndex].CostMoney
 	}
 	//	g.Run.EndRoundMoney += g.Run.sellAllProducts()
@@ -72,39 +68,6 @@ func (g *Game) ProcessNextEvent() {
 			g.Run.Products[effect.ProductImpacted].Price = current * (1 + effect.PriceChange)
 		}
 	}
-}
-
-func (g *Game) PlaceTech(tech *Technology, x, y float32) error {
-
-	log.Printf("?")
-	if !g.Run.CanSpendAction(1) {
-		g.Data["Message"] = "Unable to build Technology, out of actions"
-		g.Data["MessageCounter"] = g.Seconds + 5
-		return errors.New("unable to build technology, out of actions")
-	}
-
-	row := int((x + TILE_WIDTH/2) / TILE_WIDTH)
-	col := int((y + TILE_HEIGHT/2) / TILE_HEIGHT)
-
-	if g.CheckSquareOccupied(row, col) {
-		return errors.New("unable to place tech")
-	}
-	// Store calculated row and column in tech
-	tech.Square.Row = row
-	tech.Square.Column = col
-
-	log.Printf("tech %v", len(g.Run.Technology))
-
-	if g.CanBuild(tech) {
-		err := tech.OnBuild(g, tech)
-		if err == nil {
-			g.Run.Technology = append(g.Run.Technology, tech)
-			log.Printf("tech afte %v", len(g.Run.Technology))
-			g.DrawTechnology(tech)
-		}
-	}
-	return nil
-
 }
 
 func (g *Game) DrawTechHoverWindow(tech Technology, x, y float32) {
@@ -164,24 +127,6 @@ func GenerateRandomEvents() []Event {
 
 	return results
 
-}
-
-// actions
-
-func (r *Run) CanSpendAction(actions float32) bool {
-	if r.RoundActionsRemaining >= actions {
-		log.Printf("actions %v %v", r.RoundActionsRemaining, actions)
-		return true
-	}
-	return false
-}
-
-func (r *Run) SpendAction(actions float32) error {
-	if r.CanSpendAction(actions) {
-		r.RoundActionsRemaining -= actions
-		return nil
-	}
-	return errors.New("cannot spend action, not enough actions")
 }
 
 func (r *Run) CanSpendMoney(money float32) bool {
