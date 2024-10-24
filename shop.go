@@ -8,7 +8,7 @@ import (
 func ShopClickChickenCoop(g *Game) {
 
 	tech := g.Technology["ChickenCoop"]
-	if !g.Run.CanSpendMoney(tech.Cost) {
+	if !g.Run.CanSpendMoney(tech.CostMoney) {
 		return
 	}
 	g.Scenes["HUD"].Windows["ShopWindow"].Display = false
@@ -20,7 +20,7 @@ func ShopClickChickenCoop(g *Game) {
 func ShopClickWheatField(g *Game) {
 
 	tech := g.Technology["WheatField"]
-	if !g.Run.CanSpendMoney(tech.Cost) {
+	if !g.Run.CanSpendMoney(tech.CostMoney) {
 		return
 	}
 	g.Scenes["HUD"].Windows["ShopWindow"].Display = false
@@ -31,7 +31,7 @@ func ShopClickWheatField(g *Game) {
 }
 func ShopClickWorkstation(g *Game) {
 	tech := g.Technology["Workstation"]
-	if !g.Run.CanSpendMoney(tech.Cost) {
+	if !g.Run.CanSpendMoney(tech.CostMoney) {
 		return
 	}
 	g.Scenes["HUD"].Windows["ShopWindow"].Display = false
@@ -44,7 +44,7 @@ func ShopClickWorkstation(g *Game) {
 func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {
 	textColor := rl.Black
 	log.Printf("shop %v", shopButton.Technology)
-	if !g.Run.CanSpendMoney(shopButton.Technology.Cost) {
+	if !g.Run.CanSpendMoney(shopButton.Technology.CostMoney) {
 		textColor = rl.LightGray
 
 	}

@@ -51,10 +51,11 @@ type BoardMenuItem struct {
 
 type Technology struct {
 	Name              string
+	ProductName       string
 	Description       string
 	Square            BoardSquare
-	Cost              float32
-	CanBeBuilt        func(*Game) bool
+	CostMoney         float32
+	CostActions       float32
 	OnBuild           func(*Game, *Technology) error
 	RoundHandler      []TechnologyRoundHandler
 	RoundCounterMax   int
@@ -65,12 +66,11 @@ type Technology struct {
 }
 
 type TechnologyRoundHandler struct {
-	Season        Season
-	CostActions   float32
-	CostMoney     float32
-	OnRoundEnd    func(*Game, *Technology)
-	RoundEndText  func(*Game, *Technology) string
-	RoundEndValue func(*Game, *Technology) float32
+	Season          Season
+	CostActions     float32
+	CostMoney       float32
+	OnRoundEnd      func(*Game, *Technology)
+	RoundEndProduce func(*Game, *Technology) float32
 }
 
 type Person struct {

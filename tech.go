@@ -18,6 +18,17 @@ func (g *Game) InitTechnology() {
 	g.Technology = tech
 }
 
+func (g *Game) InitProduct(tech *Technology, price float32) {
+
+	if _, exists := g.Run.Products[tech.ProductName]; !exists {
+		g.Run.Products[tech.ProductName] = &Product{
+			Name:     tech.ProductName,
+			Quantity: 0,
+			Price:    price,
+		}
+	}
+}
+
 func (g *Game) GetProductNames() []string {
 	results := []string{}
 	for _, product := range g.Run.Products {
@@ -26,6 +37,23 @@ func (g *Game) GetProductNames() []string {
 	sort.Strings(results)
 	return results
 }
+
+func (g *Game) RoundEndValue(tech *Technology, handler *TechnologyRoundHandler) float32 {
+	units := handler.RoundEndProduce(g, tech)
+	price := g.Run.Products[tech.ProductName].Price
+	return units * price
+
+}
+
+func (g *Game) RoundEndText(tech *Technology, handler *TechnologyRoundHandler) string {
+
+	units := handler.RoundEndProduce(g, tech)
+	price := g.Run.Products[tech.ProductName].Price
+	text := "$%v (%v units at $%v each)"
+	return fmt.Sprintf(text, units*price, units, price)
+}
+
+// chicken
 
 func (g *Game) CreateChickenCoopTech() *Technology {
 
@@ -41,14 +69,61 @@ func (g *Game) CreateChickenCoopTech() *Technology {
 		MultiSquare:  true,
 		IsTechnology: true,
 	}
-	g.Run.Products["Chicken"] = &Product{
-		Name:     "Chicken",
-		Quantity: 0,
-		Price:    5,
-	}
 
 	return result
 }
+
+func (g *Game) ChickenCoop() *Technology {
+	result := &Technology{
+		Name:        "Chicken Coop",
+		ProductName: "Chicken",
+		Square:      BoardSquare{},
+		Description: "asdasd",
+		CostMoney:   50,
+		CostActions: 1,
+		OnBuild:     ChickenCoopOnBuild,
+		Redraw:      false,
+		RoundHandler: []TechnologyRoundHandler{
+			{
+				OnRoundEnd:      ChickenCoopRoundEnd,
+				RoundEndProduce: ChickenCoopProduce,
+			},
+		},
+		RoundHandlerIndex: 0,
+		ShowEndRound:      true,
+	}
+	return result
+}
+
+func (g *Game) CanBuild(tech *Technology) bool {
+	err := g.Run.SpendMoney(tech.CostMoney)
+	if err != nil {
+		log.Printf("err %v", err)
+		return false
+	}
+	err = g.Run.SpendAction(tech.CostActions)
+	if err != nil {
+		log.Printf("err %v", err)
+		return false
+	}
+	return true
+}
+
+func ChickenCoopOnBuild(g *Game, tech *Technology) error {
+	g.InitProduct(tech, 5)
+	return nil
+}
+
+func ChickenCoopProduce(g *Game, tech *Technology) float32 {
+	return 5 * g.Run.Productivity
+}
+
+func ChickenCoopRoundEnd(g *Game, tech *Technology) {
+	g.Run.Products["Chicken"].Quantity += ChickenCoopProduce(g, tech)
+	log.Printf("chicken %v", g.Run.Products["Chicken"].Quantity)
+}
+
+// wheat
 
 func (g *Game) CreateWheatTech() *Technology {
 
@@ -72,102 +147,40 @@ func (g *Game) CreateWheatTech() *Technology {
 	return result
 }
 
-func (g *Game) ChickenCoop() *Technology {
-	result := &Technology{
-		Name:        "Chicken Coop",
-		Square:      BoardSquare{},
-		Description: "asdasd",
-		Cost:        50,
-		OnBuild:     ChickenCoopOnBuild,
-		Redraw:      false,
-		RoundHandler: []TechnologyRoundHandler{
-			{
-				OnRoundEnd:    ChickenCoopRoundEnd,
-				RoundEndValue: ChickenCoopRoundEndValue,
-				RoundEndText:  ChickenCoopRoundEndText,
-			},
-		},
-		RoundHandlerIndex: 0,
-		ShowEndRound:      true,
-	}
-	return result
-}
-
-func ChickenCoopCanBeBuilt(g *Game) bool {
-	return true
-}
-
-func ChickenCoopOnBuild(g *Game, tech *Technology) error {
-	err := g.Run.SpendMoney(tech.Cost)
-	if err != nil {
-		log.Printf("err %v", err)
-		return err
-	}
-	err = g.Run.SpendAction(1)
-	if err != nil {
-		log.Printf("err %v", err)
-		return err
-	}
-	return nil
-}
-
-func ChickenCoopRoundEndText(g *Game, tech *Technology) string {
-	units := ChickenCoopProduce(g, tech)
-	price := g.Run.Products["Chicken"].Price
-	text := "$%v (%v units at $%v each)"
-	return fmt.Sprintf(text, units*price, units, price)
-}
-
-func ChickenCoopRoundEndValue(g *Game, tech *Technology) float32 {
-	return ChickenCoopProduce(g, tech) //* g.Run.Products["Chicken"].Price
-}
-
-func ChickenCoopProduce(g *Game, tech *Technology) float32 {
-	return 5 * g.Run.Productivity
-
-}
-
-func ChickenCoopRoundEnd(g *Game, tech *Technology) {
-	g.Run.Products["Chicken"].Quantity += ChickenCoopProduce(g, tech)
-	log.Printf("chicken %v", g.Run.Products["Chicken"].Quantity)
-}
-
 func (g *Game) WheatField() *Technology {
 	return &Technology{
 		Name:        "Wheat",
+		ProductName: "Wheat",
 		Square:      BoardSquare{},
-		Cost:        50,
+		CostMoney:   50,
+		CostActions: 1,
 		Description: "asdasd",
 		OnBuild:     WheatFieldOnBuild,
 		Redraw:      false,
 		RoundHandler: []TechnologyRoundHandler{
 			{
-				Season:        Spring,
-				OnRoundEnd:    WheatFieldRoundSpring,
-				RoundEndValue: WheatFieldRoundEndValue,
-				RoundEndText:  WheatFieldRoundEndText,
-				CostActions:   1,
+				Season:          Spring,
+				OnRoundEnd:      WheatFieldRoundSpring,
+				RoundEndProduce: WheatFieldProduce,
+				CostActions:     1,
 			},
 			{
-				Season:        Summer,
-				OnRoundEnd:    WheatFieldRoundSummer,
-				RoundEndValue: WheatFieldRoundEndValue,
-				RoundEndText:  WheatFieldRoundEndText,
-				CostActions:   1,
+				Season:          Summer,
+				OnRoundEnd:      WheatFieldRoundSummer,
+				RoundEndProduce: WheatFieldProduce,
+				CostActions:     1,
 			},
 			{
-				Season:        Autumn,
-				OnRoundEnd:    WheatFieldRoundAutumn,
-				RoundEndValue: WheatFieldRoundEndValue,
-				RoundEndText:  WheatFieldRoundEndText,
-				CostActions:   1,
+				Season:          Autumn,
+				OnRoundEnd:      WheatFieldRoundAutumn,
+				RoundEndProduce: WheatFieldProduce,
+				CostActions:     1,
 			},
 			{
-				Season:        Winter,
-				OnRoundEnd:    WheatFieldRoundWinter,
-				RoundEndValue: WheatFieldRoundEndValue,
-				RoundEndText:  WheatFieldRoundEndText,
-				CostActions:   1,
+				Season:          Winter,
+				OnRoundEnd:      WheatFieldRoundWinter,
+				RoundEndProduce: WheatFieldProduce,
+				CostActions:     1,
 			},
 		},
 		RoundCounterMax:   0,
@@ -178,47 +191,9 @@ func (g *Game) WheatField() *Technology {
 
 }
 
-func WheatFieldCanBeBuilt(g *Game) bool {
-	return true
-}
-
 func WheatFieldOnBuild(g *Game, tech *Technology) error {
-
-	err := g.Run.SpendMoney(tech.Cost)
-	if err != nil {
-		log.Printf("err %v", err)
-		return err
-	}
-	err = g.Run.SpendAction(1)
-	if err != nil {
-		log.Printf("err %v", err)
-		return err
-	}
-
-	g.Run.Products["Wheat"] = &Product{
-		Name:     "Wheat",
-		Quantity: 0,
-		Price:    1,
-	}
+	g.InitProduct(tech, 1)
 	return nil
-}
-
-func WheatFieldRoundEndValue(g *Game, tech *Technology) float32 {
-	if g.Run.CurrentSeason == Autumn {
-		return 125
-	} else {
-		return 0
-	}
-}
-func WheatFieldRoundEndText(g *Game, tech *Technology) string {
-	units := WheatFieldProduce(g, tech)
-	price := g.Run.Products["Wheat"].Price
-	return fmt.Sprintf(
-		"$%v (%v units at $%v each)",
-		units*price,
-		units,
-		price,
-	)
 }
 
 func WheatFieldProduce(g *Game, tech *Technology) float32 {
@@ -273,17 +248,17 @@ func (g *Game) CreateWorkstationTech() *Technology {
 func (g *Game) Workstation() *Technology {
 	return &Technology{
 		Name:        "Workstation",
+		ProductName: "",
 		Square:      BoardSquare{},
-		Cost:        25,
+		CostMoney:   25,
+		CostActions: 1,
 		Description: "asdasd",
 		OnBuild:     WorkstationOnBuild,
 		Redraw:      false,
 		RoundHandler: []TechnologyRoundHandler{
 			{
-				OnRoundEnd:    WorkstationRoundEnd,
-				RoundEndValue: WorkstationRoundEndValue,
-				RoundEndText:  WorkstationRoundEndText,
-				CostActions:   0,
+				OnRoundEnd:  WorkstationRoundEnd,
+				CostActions: 0,
 			},
 		},
 		RoundCounterMax:   0,
@@ -295,31 +270,12 @@ func (g *Game) Workstation() *Technology {
 }
 
 func WorkstationOnBuild(g *Game, tech *Technology) error {
-	err := g.Run.SpendMoney(tech.Cost)
-	if err != nil {
-		log.Printf("err %v", err)
-		return err
-	}
-	err = g.Run.SpendAction(1)
-	if err != nil {
-		log.Printf("err %v", err)
-		return err
-	}
-
 	g.Run.Productivity += 0.05
 
 	return nil
 
 }
 func WorkstationRoundEnd(g *Game, tech *Technology) {
-
-}
-func WorkstationRoundEndValue(g *Game, tech *Technology) float32 {
-	return 0
-
-}
-func WorkstationRoundEndText(g *Game, tech *Technology) string {
-	return ""
 
 }
 

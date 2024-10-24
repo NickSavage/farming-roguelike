@@ -94,14 +94,15 @@ func (g *Game) PlaceTech(tech *Technology, x, y float32) error {
 	tech.Square.Column = col
 
 	log.Printf("tech %v", len(g.Run.Technology))
-	err := tech.OnBuild(g, tech)
-	if err != nil {
-		return err
 
+	if g.CanBuild(tech) {
+		err := tech.OnBuild(g, tech)
+		if err == nil {
+			g.Run.Technology = append(g.Run.Technology, tech)
+			log.Printf("tech afte %v", len(g.Run.Technology))
+			g.DrawTechnology(tech)
+		}
 	}
-	g.Run.Technology = append(g.Run.Technology, tech)
-	log.Printf("tech afte %v", len(g.Run.Technology))
-	g.DrawTechnology(tech)
 	return nil
 
 }
