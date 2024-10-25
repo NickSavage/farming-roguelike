@@ -8,6 +8,7 @@ import (
 )
 
 func (g *Game) InitTechnology() {
+	log.Printf("init tech")
 	tech := make(map[string]*Technology)
 
 	tech["ChickenCoop"] = g.ChickenCoop()
@@ -54,25 +55,14 @@ func (g *Game) RoundEndText(tech *Technology, handler *TechnologyRoundHandler) s
 	return fmt.Sprintf(text, units*price, units, price)
 }
 
-func (g *Game) PlaceTech(tech *Technology, coords BoardCoord) error {
-
-	log.Printf("?")
-
-	// if g.CheckSquareOccupied(row, col) {
-	// 	return errors.New("unable to place tech")
-	// }
-	// Store calculated row and column in tech
-	tech.Square.Row = coords.Row
-	tech.Square.Column = coords.Column
-
-	log.Printf("tech %v", len(g.Run.Technology))
+func (g *Game) PlaceTech(tech *Technology, space *TechnologySpace) error {
+	space.IsFilled = true
+	space.Technology = tech
 
 	if g.CanBuild(tech) {
 		err := tech.OnBuild(g, tech)
 		if err == nil {
 			g.Run.Technology = append(g.Run.Technology, tech)
-			log.Printf("tech afte %v", len(g.Run.Technology))
-			g.DrawTechnology(tech)
 		}
 	}
 	return nil
@@ -85,15 +75,14 @@ func (g *Game) CreateChickenCoopTech() *Technology {
 
 	result := g.Technology["ChickenCoop"]
 	result.Square = BoardSquare{
-		Tile:         g.Data["ChickenCoopTile"].(Tile),
-		TileType:     "Technology",
-		Row:          10,
-		Column:       10,
-		Width:        2,
-		Height:       2,
-		Occupied:     true,
-		MultiSquare:  true,
-		IsTechnology: true,
+		//		Tile:         g.Data["ChickenCoopTile"].(Tile),
+		TileType:    "Technology",
+		Row:         10,
+		Column:      10,
+		Width:       2,
+		Height:      2,
+		Occupied:    true,
+		MultiSquare: true,
 	}
 
 	return result
@@ -101,13 +90,18 @@ func (g *Game) CreateChickenCoopTech() *Technology {
 
 func (g *Game) ChickenCoop() *Technology {
 	result := &Technology{
-		Name:        "Chicken Coop",
-		ProductName: "Chicken",
-		Square:      BoardSquare{},
-		Description: "asdasd",
-		CostMoney:   50,
-		OnBuild:     ChickenCoopOnBuild,
-		Redraw:      false,
+		Name:           "Chicken Coop",
+		ProductName:    "Chicken",
+		TechnologyType: BuildingSpace,
+		Tile:           g.Data["ChickenCoopTile"].(Tile),
+		TileWidth:      1,
+		TileHeight:     1,
+		TileFillSpace:  false,
+		Square:         BoardSquare{},
+		Description:    "asdasd",
+		CostMoney:      50,
+		OnBuild:        ChickenCoopOnBuild,
+		Redraw:         false,
 		RoundHandler: []TechnologyRoundHandler{
 			{
 				OnRoundEnd:      ChickenCoopRoundEnd,
@@ -149,14 +143,13 @@ func (g *Game) CreateWheatTech() *Technology {
 
 	result := g.Technology["WheatField"]
 	result.Square = BoardSquare{
-		Tile:         g.Data["WheatTile"].(Tile),
-		TileType:     "Technology",
-		Row:          8,
-		Column:       8,
-		Width:        5,
-		Height:       5,
-		Occupied:     true,
-		IsTechnology: true,
+		//		Tile:         g.Data["WheatTile"].(Tile),
+		TileType: "Technology",
+		Row:      8,
+		Column:   8,
+		Width:    5,
+		Height:   5,
+		Occupied: true,
 	}
 	g.Run.Products["Wheat"] = &Product{
 		Name:     "Wheat",
@@ -169,13 +162,18 @@ func (g *Game) CreateWheatTech() *Technology {
 
 func (g *Game) WheatField() *Technology {
 	return &Technology{
-		Name:        "Wheat",
-		ProductName: "Wheat",
-		Square:      BoardSquare{},
-		CostMoney:   50,
-		Description: "asdasd",
-		OnBuild:     WheatFieldOnBuild,
-		Redraw:      false,
+		Name:           "Wheat",
+		ProductName:    "Wheat",
+		TechnologyType: PlantSpace,
+		Tile:           g.Data["WheatTile"].(Tile),
+		TileWidth:      1,
+		TileHeight:     1,
+		TileFillSpace:  true,
+		Square:         BoardSquare{},
+		CostMoney:      50,
+		Description:    "asdasd",
+		OnBuild:        WheatFieldOnBuild,
+		Redraw:         false,
 		RoundHandler: []TechnologyRoundHandler{
 			{
 				Season:          Spring,
@@ -221,23 +219,23 @@ func WheatFieldProduce(g *Game, tech *Technology) float32 {
 
 func WheatFieldRoundSpring(g *Game, tech *Technology) {
 	tech.RoundHandlerIndex += 1
-	tech.Square.Tile.TileFrame.X += 45
+	tech.Tile.TileFrame.X += 45
 	tech.Redraw = true
 }
 func WheatFieldRoundSummer(g *Game, tech *Technology) {
 	tech.RoundHandlerIndex += 1
-	tech.Square.Tile.TileFrame.X += 45
+	tech.Tile.TileFrame.X += 45
 	tech.Redraw = true
 }
 func WheatFieldRoundAutumn(g *Game, tech *Technology) {
 	g.Run.Products["Wheat"].Quantity += WheatFieldProduce(g, tech)
 	tech.RoundHandlerIndex += 1
-	tech.Square.Tile.TileFrame.X += 45
+	tech.Tile.TileFrame.X += 45
 	tech.Redraw = true
 }
 func WheatFieldRoundWinter(g *Game, tech *Technology) {
 	tech.RoundHandlerIndex += 0
-	tech.Square.Tile.TileFrame.X += 45
+	tech.Tile.TileFrame.X += 45
 	tech.Redraw = true
 }
 
@@ -247,14 +245,13 @@ func (g *Game) CreatePotatoTech() *Technology {
 
 	result := g.Technology["PotatoField"]
 	result.Square = BoardSquare{
-		Tile:         g.Data["PotatoTile"].(Tile),
-		TileType:     "Technology",
-		Row:          8,
-		Column:       8,
-		Width:        4,
-		Height:       4,
-		Occupied:     true,
-		IsTechnology: true,
+		//	Tile:         g.Data["PotatoTile"].(Tile),
+		TileType: "Technology",
+		Row:      8,
+		Column:   8,
+		Width:    4,
+		Height:   4,
+		Occupied: true,
 	}
 
 	g.InitProduct(result, 5)
@@ -263,13 +260,18 @@ func (g *Game) CreatePotatoTech() *Technology {
 
 func (g *Game) PotatoField() *Technology {
 	return &Technology{
-		Name:        "Potato",
-		ProductName: "Potato",
-		Square:      BoardSquare{},
-		CostMoney:   50,
-		Description: "asdasd",
-		OnBuild:     PotatoFieldOnBuild,
-		Redraw:      false,
+		Name:           "Potato",
+		ProductName:    "Potato",
+		TechnologyType: PlantSpace,
+		Tile:           g.Data["PotatoTile"].(Tile),
+		TileWidth:      1,
+		TileHeight:     1,
+		TileFillSpace:  true,
+		Square:         BoardSquare{},
+		CostMoney:      50,
+		Description:    "asdasd",
+		OnBuild:        PotatoFieldOnBuild,
+		Redraw:         false,
 		RoundHandler: []TechnologyRoundHandler{
 			{
 				Season:          Spring,
@@ -315,23 +317,23 @@ func PotatoFieldProduce(g *Game, tech *Technology) float32 {
 
 func PotatoFieldRoundSpring(g *Game, tech *Technology) {
 	tech.RoundHandlerIndex += 1
-	tech.Square.Tile.TileFrame.X += 45
+	tech.Tile.TileFrame.X += 45
 	tech.Redraw = true
 }
 func PotatoFieldRoundSummer(g *Game, tech *Technology) {
 	tech.RoundHandlerIndex += 1
-	tech.Square.Tile.TileFrame.X += 45
+	tech.Tile.TileFrame.X += 45
 	tech.Redraw = true
 }
 func PotatoFieldRoundAutumn(g *Game, tech *Technology) {
 	g.Run.Products["Potato"].Quantity += PotatoFieldProduce(g, tech)
 	tech.RoundHandlerIndex += 1
-	tech.Square.Tile.TileFrame.X += 45
+	tech.Tile.TileFrame.X += 45
 	tech.Redraw = true
 }
 func PotatoFieldRoundWinter(g *Game, tech *Technology) {
 	tech.RoundHandlerIndex += 0
-	tech.Square.Tile.TileFrame.X += 45
+	tech.Tile.TileFrame.X += 45
 	tech.Redraw = true
 }
 
@@ -341,14 +343,13 @@ func (g *Game) CreateWorkstationTech() *Technology {
 
 	result := g.Technology["Workstation"]
 	result.Square = BoardSquare{
-		Tile:         g.Data["WorkstationTile"].(Tile),
-		TileType:     "Technology",
-		Row:          1,
-		Column:       1,
-		Width:        1,
-		Height:       1,
-		Occupied:     true,
-		IsTechnology: true,
+		//	Tile:         g.Data["WorkstationTile"].(Tile),
+		TileType: "Technology",
+		Row:      1,
+		Column:   1,
+		Width:    1,
+		Height:   1,
+		Occupied: true,
 	}
 
 	return result
@@ -356,13 +357,18 @@ func (g *Game) CreateWorkstationTech() *Technology {
 
 func (g *Game) Workstation() *Technology {
 	return &Technology{
-		Name:        "Workstation",
-		ProductName: "",
-		Square:      BoardSquare{},
-		CostMoney:   25,
-		Description: "asdasd",
-		OnBuild:     WorkstationOnBuild,
-		Redraw:      false,
+		Name:           "Workstation",
+		ProductName:    "",
+		TechnologyType: BuildingSpace,
+		Tile:           g.Data["WorkstationTile"].(Tile),
+		TileWidth:      1,
+		TileHeight:     1,
+		TileFillSpace:  false,
+		Square:         BoardSquare{},
+		CostMoney:      25,
+		Description:    "asdasd",
+		OnBuild:        WorkstationOnBuild,
+		Redraw:         false,
 		RoundHandler: []TechnologyRoundHandler{
 			{
 				OnRoundEnd: WorkstationRoundEnd,
@@ -385,59 +391,3 @@ func WorkstationOnBuild(g *Game, tech *Technology) error {
 func WorkstationRoundEnd(g *Game, tech *Technology) {
 
 }
-
-// trees
-
-// func TreeMenuItems() []BoardMenuItem {
-// 	results := []BoardMenuItem{}
-// 	results = append(results, BoardMenuItem{
-// 		Rectangle: rl.Rectangle{
-// 			X:      0,
-// 			Y:      0,
-// 			Height: 30,
-// 			Width:  150,
-// 		},
-// 		Text:            "Chop (1 action)",
-// 		OnClick:         ChopTree,
-// 		CheckIsDisabled: IsChopActionDisabled,
-// 	})
-// 	results = append(results, BoardMenuItem{
-// 		Rectangle: rl.Rectangle{
-// 			X:      0,
-// 			Y:      0,
-// 			Height: 30,
-// 			Width:  150,
-// 		},
-// 		Text:            "Test",
-// 		OnClick:         BlankAction,
-// 		CheckIsDisabled: IsBlankActionDisabled,
-// 	})
-
-// 	return results
-// }
-
-// func IsChopActionDisabled(g *Game, square *BoardSquare) bool {
-// 	if !g.Run.CanSpendAction(1) {
-// 		return true
-// 	}
-// 	return false
-
-// }
-
-// func ChopTree(g *Game) {
-
-// 	scene := g.Scenes["Board"]
-// 	log.Printf("square %v", scene.Menu.BoardSquare)
-// 	err := g.Run.SpendAction(1)
-// 	if err == nil {
-// 		g.RemoveTechnology(scene.Menu.BoardSquare)
-// 	}
-// }
-
-// // generic actions
-
-// func BlankAction(g *Game) {}
-
-// func IsBlankActionDisabled(g *Game, square *BoardSquare) bool {
-// 	return false
-// }

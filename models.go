@@ -22,19 +22,19 @@ type Game struct {
 }
 
 type BoardSquare struct {
-	Tile         Tile
-	TileType     string
-	Row          int
-	Column       int
-	Width        int // in tiles
-	Height       int // in tiles
-	Skip         bool
-	Occupied     bool
-	MultiSquare  bool
-	Technology   *Technology
-	IsTechnology bool
-	HoverActive  bool
-	IsTree       bool
+	Tile              Tile
+	TileType          string
+	Row               int
+	Column            int
+	Width             int // in tiles
+	Height            int // in tiles
+	Skip              bool
+	Occupied          bool
+	MultiSquare       bool
+	IsTechnologySpace bool
+	TechnologySpace   *TechnologySpace
+	HoverActive       bool
+	IsTree            bool
 }
 
 type TechnologySpace struct {
@@ -50,6 +50,11 @@ type TechnologySpace struct {
 type Technology struct {
 	Name              string
 	ProductName       string
+	TechnologyType    TechnologyType
+	Tile              Tile
+	TileWidth         int
+	TileHeight        int
+	TileFillSpace     bool
 	Description       string
 	Square            BoardSquare
 	CostMoney         float32

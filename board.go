@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"errors"
+	//	"fmt"
 	"log"
 	"math/rand"
 
@@ -29,27 +30,19 @@ func (g *Game) GetSquareFromCoords(input BoardCoord) *BoardSquare {
 
 }
 
-func (g *Game) GetOpenCoords() BoardCoord {
+func (g *Game) GetOpenSpace(tech *Technology) (*TechnologySpace, error) {
 
-	scene := g.Scenes["Board"]
-	grid := scene.Data["Grid"].([][]BoardSquare)
-	for x := range TILE_ROWS - 1 {
-		for y := range TILE_COLUMNS - 1 {
-			if !grid[x][y].Occupied {
-				log.Printf("found %v,%v", x, y)
-				return BoardCoord{
-					Row:    x,
-					Column: y,
-				}
-			}
+	for _, space := range g.Run.TechnologySpaces {
+		if space.IsFilled {
+			continue
 		}
+		if space.TechnologyType != tech.TechnologyType {
+			continue
+		}
+		return space, nil
 	}
-	return BoardCoord{
-		Row:    0,
-		Column: 0,
-	}
+	return &TechnologySpace{}, errors.New("no empty space")
 }
-
 func generateCoordinates(numPairs, maxX, maxY int) []rl.Vector2 {
 	coordinates := make([]rl.Vector2, numPairs)
 
@@ -109,6 +102,8 @@ func (g *Game) GetGrassSquare(x, y int) *BoardSquare {
 }
 
 func (g *Game) InitBoard() {
+
+	log.Printf("init")
 	scene := g.Scenes["Board"]
 	scene.Camera = rl.Camera2D{}
 	scene.Camera.Zoom = 1
@@ -135,7 +130,6 @@ func (g *Game) InitBoard() {
 	g.Scenes["Board"].Data["HoverVectorCounter"] = 0
 	//	g.InitPlaceRandomTrees(215)
 	//	g.InitPlaceTech()
-	g.InitDrawTechnology()
 
 }
 
@@ -151,79 +145,7 @@ func (g *Game) drawTiles() {
 			)
 		}
 	}
-
-	for i := range grid {
-		for j := range grid[i] {
-			tile := grid[i][j]
-			if tile.Skip {
-				// if these match, it is the top left of a multicell tile
-				// so we don't want to skip
-				if !(tile.Row == i && tile.Column == j) {
-					continue
-				}
-			}
-			if tile.HoverActive && (tile.IsTechnology || tile.IsTree) {
-				tile.Tile.Color = rl.Green
-			} else {
-				tile.Tile.Color = rl.White
-			}
-			DrawTile(
-				g.Data["GrassTile"].(Tile),
-				float32(i*TILE_HEIGHT),
-				float32(j*TILE_WIDTH),
-			)
-
-			DrawTile(
-				tile.Tile,
-				float32(i*TILE_HEIGHT),
-				float32(j*TILE_WIDTH),
-			)
-			rl.DrawText(
-				fmt.Sprintf("%v,%v", i, j),
-				int32(i*TILE_HEIGHT)+5,
-				int32(j*TILE_WIDTH)+5,
-				10,
-				rl.Black,
-			)
-		}
-	}
-
 }
-
-func (g *Game) InitDrawTechnology() {
-	log.Printf("init")
-	for _, tech := range g.Run.Technology {
-		g.DrawTechnology(tech)
-	}
-
-}
-func (g *Game) RedrawTechnology() {
-	for _, tech := range g.Run.Technology {
-		if !tech.Redraw {
-			continue
-		}
-		g.DrawTechnology(tech)
-	}
-}
-
-func (g *Game) DrawTechnology(tech *Technology) {
-	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
-
-	tile := tech.Square
-	for x := range tile.Width {
-		for y := range tile.Height {
-			tile.Occupied = true
-			tile.Technology = tech
-			if tile.MultiSquare {
-				tile.Skip = true
-			}
-			grid[tile.Row+x][tile.Column+y] = tile
-		}
-	}
-	grid[tile.Row][tile.Column] = tile
-
-}
-
 func (g *Game) DrawTechnologySpaces() {
 	for _, space := range g.Run.TechnologySpaces {
 		x := int32(space.Row * TILE_WIDTH)
@@ -231,18 +153,25 @@ func (g *Game) DrawTechnologySpaces() {
 		width := int32(space.Width * TILE_WIDTH)
 		height := int32(space.Height * TILE_HEIGHT)
 		rl.DrawRectangle(x, y, width, height, rl.Blue)
-	}
-}
+		if !space.IsFilled {
+			continue
+		}
+		if space.Technology.TileFillSpace {
+			for i := range space.Width {
+				for j := range space.Height {
 
-func (g *Game) RemoveTechnology(square *BoardSquare) {
+					DrawTile(
+						space.Technology.Tile,
+						float32(float32(x)+float32(i*TILE_WIDTH)),
+						float32(float32(y)+float32(j*TILE_WIDTH)),
+					)
 
-	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
+				}
+			}
 
-	//	tech := square.Technology
-	for x := range square.Width {
-		for y := range square.Height {
-			new := g.GetGrassSquare(square.Row+x, square.Column+y)
-			grid[square.Row+x][square.Column+y] = *new
+		} else {
+			DrawTile(space.Technology.Tile, float32(x), float32(y))
+
 		}
 	}
 }
@@ -301,66 +230,6 @@ func (g *Game) drawGrid() {
 
 }
 
-func (g *Game) CheckSquareOccupied(row, col int) bool {
-
-	scene := g.Scenes["Board"]
-
-	log.Printf("check %v,%v", row, col)
-	if scene.Data["Grid"].([][]BoardSquare)[row][col].Occupied {
-		return true
-	}
-	return false
-}
-
-func (g *Game) CheckTilesOccupied(newBoardSquare BoardSquare, mouseX, mouseY float32) bool {
-	scene := g.Scenes["Board"]
-
-	// todo convert to using coords
-	row := int((mouseX + TILE_WIDTH/2) / TILE_WIDTH)
-	col := int((mouseY + TILE_HEIGHT/2) / TILE_HEIGHT)
-
-	if row < 0 {
-		row = 0
-	}
-	if row >= TILE_COLUMNS {
-		row = TILE_COLUMNS - 1
-
-	}
-	if col < 0 {
-		col = 0
-	}
-	if col >= TILE_ROWS {
-		col = TILE_ROWS - 1
-	}
-	if newBoardSquare.Width == 1 && newBoardSquare.Height == 1 {
-
-		//		log.Printf("check %v,%v", row, col)
-		if scene.Data["Grid"].([][]BoardSquare)[row][col].Occupied {
-			return true
-		}
-		return false
-	}
-
-	for x := range newBoardSquare.Width {
-		for y := range newBoardSquare.Height {
-			testX := row + x - 1
-			if testX >= TILE_COLUMNS {
-				testX = TILE_COLUMNS - 1
-			}
-			testY := col + y - 1
-			if testY >= TILE_ROWS {
-				testY = TILE_ROWS - 1
-			}
-			//			log.Printf("check %v,%v", testX, testY)
-			if scene.Data["Grid"].([][]BoardSquare)[testX][testY].Occupied {
-				return true
-			}
-		}
-	}
-	return false
-
-}
-
 // main draw function
 
 func DrawBoard(g *Game) {
@@ -368,58 +237,13 @@ func DrawBoard(g *Game) {
 	//	scene := g.Scenes["Board"]
 	rl.BeginMode2D(g.Scenes["Board"].Camera)
 	g.drawTiles()
-	//	g.DrawPlaceTech()
 	g.DrawTechnologySpaces()
 	g.drawGrid()
 	rl.EndMode2D()
 
 	g.HandleHover()
 	DrawHUD(g)
-	g.RedrawTechnology()
 	// g.DrawContextMenu(g.Scenes["Board"])
-}
-
-func (g *Game) disableTechHoverHighlight(coord BoardCoord) {
-
-	scene := g.Scenes["Board"]
-	grid := scene.Data["Grid"].([][]BoardSquare)
-	square := &grid[int(coord.Row)][int(coord.Column)]
-
-	square.HoverActive = false
-	// if !square.IsTechnology || !square.MultiSquare {
-	// 	return
-	// }
-	if square.Height <= 1 || square.Width <= 1 {
-		return
-	}
-	startX := square.Row
-	startY := square.Column
-	for x := range square.Width {
-		for y := range square.Height {
-			grid[startX+x][startY+y].HoverActive = false
-		}
-	}
-}
-
-func (g *Game) enableTechHoverHighlight(coord BoardCoord) {
-	scene := g.Scenes["Board"]
-	grid := scene.Data["Grid"].([][]BoardSquare)
-	square := &grid[int(coord.Row)][int(coord.Column)]
-
-	square.HoverActive = true
-	if square.Height <= 1 || square.Width <= 1 {
-		return
-	}
-	if !square.IsTechnology || !square.MultiSquare {
-		return
-	}
-	startX := square.Row
-	startY := square.Column
-	for x := range square.Width {
-		for y := range square.Height {
-			grid[startX+x][startY+y].HoverActive = true
-		}
-	}
 }
 
 func (g *Game) HandleHover() {
@@ -428,8 +252,6 @@ func (g *Game) HandleHover() {
 	mousePosition := rl.GetMousePosition()
 
 	oldVec := scene.Data["HoverVector"].(BoardCoord)
-	g.disableTechHoverHighlight(oldVec)
-
 	coords := g.GetBoardCoordAtPoint(mousePosition)
 	if coords.Row < 0 || coords.Row > TILE_ROWS-1 {
 		return
@@ -437,17 +259,24 @@ func (g *Game) HandleHover() {
 	if coords.Column < 0 || coords.Column > TILE_COLUMNS-1 {
 		return
 	}
-	g.enableTechHoverHighlight(coords)
 	//	square := g.GetSquareFromCoords(coords)
 	//	log.Printf("square %v,%v - %v", coords.Row, coords.Column, square)
 	if oldVec.Row == coords.Row && oldVec.Column == coords.Column {
 		counter := scene.Data["HoverVectorCounter"].(int)
 		if counter == 0 {
-			square := g.GetSquareFromCoords(coords)
 
-			if square.Technology != nil {
+			square := g.GetSquareFromCoords(coords)
+			if !square.IsTechnologySpace {
+				return
+			}
+
+			space := square.TechnologySpace
+			if !space.IsFilled {
+				return
+			}
+			if space.Technology != nil {
 				g.DrawTechHoverWindow(
-					*square.Technology,
+					*space.Technology,
 					mousePosition.X,
 					mousePosition.Y,
 				)
@@ -470,41 +299,4 @@ func (g *Game) HandleHover() {
 }
 
 func UpdateBoard(g *Game) {
-	//	scene := g.Scenes["Board"]
-
-	//	Camera zoom controls
-	// scene.Camera.Zoom += float32(rl.GetMouseWheelMove()) * 0.05
-	// if scene.Camera.Zoom > 1.2 {
-	// 	scene.Camera.Zoom = 1.2
-	// } else if scene.Camera.Zoom < 0.8 {
-	// 	scene.Camera.Zoom = 0.8
-	// }
-	// if rl.IsKeyDown(rl.KeyRight) {
-	// 	scene.Camera.Target.X += 5
-	// 	if scene.Camera.Target.X > TILE_COLUMNS*TILE_WIDTH-float32(g.screenWidth-50) {
-	// 		scene.Camera.Target.X = TILE_COLUMNS*TILE_WIDTH - float32(g.screenWidth-50)
-	// 	}
-	// }
-	// if rl.IsKeyDown(rl.KeyLeft) {
-	// 	scene.Camera.Target.X -= 5
-	// 	if scene.Camera.Target.X < -200 {
-	// 		scene.Camera.Target.X = -200
-	// 	}
-	// }
-	// if rl.IsKeyDown(rl.KeyDown) {
-	// 	scene.Camera.Target.Y += 5
-	// 	if scene.Camera.Target.Y > TILE_ROWS*TILE_HEIGHT-float32(g.screenHeight-200) {
-	// 		scene.Camera.Target.Y = TILE_ROWS*TILE_HEIGHT - float32(g.screenHeight-200)
-	// 	}
-	// }
-	// if rl.IsKeyDown(rl.KeyUp) {
-	// 	scene.Camera.Target.Y -= 5
-	// 	if scene.Camera.Target.Y < -300 {
-	// 		scene.Camera.Target.Y = -300
-	// 	}
-	// }
-	//g.SelectTiles()
-	//	g.HandleLeftClick()
-
-	// mousePosition := rl.GetMousePosition()
 }

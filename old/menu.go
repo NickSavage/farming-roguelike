@@ -62,3 +62,42 @@ package main
 // 	}
 
 // }
+
+// some camera stuff too
+//	scene := g.Scenes["Board"]
+
+//	Camera zoom controls
+// scene.Camera.Zoom += float32(rl.GetMouseWheelMove()) * 0.05
+// if scene.Camera.Zoom > 1.2 {
+// 	scene.Camera.Zoom = 1.2
+// } else if scene.Camera.Zoom < 0.8 {
+// 	scene.Camera.Zoom = 0.8
+// }
+// if rl.IsKeyDown(rl.KeyRight) {
+// 	scene.Camera.Target.X += 5
+// 	if scene.Camera.Target.X > TILE_COLUMNS*TILE_WIDTH-float32(g.screenWidth-50) {
+// 		scene.Camera.Target.X = TILE_COLUMNS*TILE_WIDTH - float32(g.screenWidth-50)
+// 	}
+// }
+// if rl.IsKeyDown(rl.KeyLeft) {
+// 	scene.Camera.Target.X -= 5
+// 	if scene.Camera.Target.X < -200 {
+// 		scene.Camera.Target.X = -200
+// 	}
+// }
+// if rl.IsKeyDown(rl.KeyDown) {
+// 	scene.Camera.Target.Y += 5
+// 	if scene.Camera.Target.Y > TILE_ROWS*TILE_HEIGHT-float32(g.screenHeight-200) {
+// 		scene.Camera.Target.Y = TILE_ROWS*TILE_HEIGHT - float32(g.screenHeight-200)
+// 	}
+// }
+// if rl.IsKeyDown(rl.KeyUp) {
+// 	scene.Camera.Target.Y -= 5
+// 	if scene.Camera.Target.Y < -300 {
+// 		scene.Camera.Target.Y = -300
+// 	}
+// }
+//g.SelectTiles()
+//	g.HandleLeftClick()
+
+// mousePosition := rl.GetMousePosition()

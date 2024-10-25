@@ -33,13 +33,65 @@ func (g *Game) InitTechSpaces() {
 		{
 			TechnologyType: PlantSpace,
 			Row:            2,
-			Column:         3,
+			Column:         1,
 			Width:          5,
 			Height:         5,
 			IsFilled:       false,
 		},
+		{
+			TechnologyType: PlantSpace,
+			Row:            2,
+			Column:         7,
+			Width:          5,
+			Height:         5,
+			IsFilled:       false,
+		},
+		{
+			TechnologyType: PlantSpace,
+			Row:            2,
+			Column:         13,
+			Width:          5,
+			Height:         5,
+			IsFilled:       false,
+		},
+		{
+			TechnologyType: BuildingSpace,
+			Row:            9,
+			Column:         1,
+			Width:          2,
+			Height:         2,
+			IsFilled:       false,
+		},
+		{
+			TechnologyType: BuildingSpace,
+			Row:            9,
+			Column:         4,
+			Width:          2,
+			Height:         2,
+			IsFilled:       false,
+		},
+		{
+			TechnologyType: BuildingSpace,
+			Row:            9,
+			Column:         7,
+			Width:          2,
+			Height:         2,
+			IsFilled:       false,
+		},
 	}
 	g.Run.TechnologySpaces = spaces
+
+	scene := g.Scenes["Board"]
+	grid := scene.Data["Grid"].([][]BoardSquare)
+	for _, space := range g.Run.TechnologySpaces {
+		for x := range space.Width {
+			for y := range space.Height {
+				grid[space.Row+x][space.Column+y].IsTechnologySpace = true
+				grid[space.Row+x][space.Column+y].TechnologySpace = space
+			}
+		}
+
+	}
 
 }
 
@@ -101,8 +153,8 @@ func (g *Game) drawExistingTechIcon(tech Technology, x, y float32) {
 	rect := rl.Rectangle{
 		X:      x,
 		Y:      y,
-		Width:  tech.Square.Tile.TileFrame.Width,
-		Height: tech.Square.Tile.TileFrame.Height,
+		Width:  tech.Tile.TileFrame.Width,
+		Height: tech.Tile.TileFrame.Height,
 	}
 	DrawTile(tech.Square.Tile, x, y)
 

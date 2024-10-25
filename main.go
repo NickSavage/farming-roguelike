@@ -146,10 +146,10 @@ func main() {
 	g.LoadScenes()
 
 	g.InitTechnology()
+	g.InitBoard()
 	g.InitRun()
 	g.InitShopWindow()
 
-	g.InitBoard()
 	rl.SetTargetFPS(60)
 
 	//	g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["Prices"])

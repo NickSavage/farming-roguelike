@@ -11,8 +11,10 @@ func (g *Game) ShopChooseTech(tech *Technology) {
 		return
 	}
 	g.Scenes["HUD"].Windows["ShopWindow"].Display = false
-	coords := g.GetOpenCoords()
-	g.PlaceTech(tech, coords)
+	space, err := g.GetOpenSpace(tech)
+	if err == nil {
+		g.PlaceTech(tech, space)
+	}
 }
 
 func ShopClickChickenCoop(g *Game) {
