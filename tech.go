@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	"sort"
+	//	"sort"
+	//
 	// rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -16,33 +17,36 @@ func (g *Game) InitTechnology() {
 	tech["PotatoField"] = g.PotatoField()
 
 	tech["Workstation"] = g.Workstation()
+	tech["ChickenEggWarmer"] = g.ChickenEggWarmer()
 
 	g.Technology = tech
 }
 
-func (g *Game) InitProduct(tech *Technology, price float32) {
+func (g *Game) InitProduct(productType ProductType, price float32) {
 
-	if _, exists := g.Run.Products[tech.ProductName]; !exists {
-		g.Run.Products[tech.ProductName] = &Product{
-			Name:     tech.ProductName,
+	if _, exists := g.Run.Products[productType]; !exists {
+		g.Run.Products[productType] = &Product{
+			Type:     productType,
 			Quantity: 0,
 			Price:    price,
+			Yield:    1,
 		}
 	}
 }
 
-func (g *Game) GetProductNames() []string {
-	results := []string{}
+func (g *Game) GetProductNames() []ProductType {
+	results := []ProductType{}
 	for _, product := range g.Run.Products {
-		results = append(results, product.Name)
+		results = append(results, product.Type)
 	}
-	sort.Strings(results)
+	// todo sort
+	//sort.Strings(results)
 	return results
 }
 
 func (g *Game) RoundEndValue(tech *Technology, handler *TechnologyRoundHandler) float32 {
 	units := handler.RoundEndProduce(g, tech)
-	price := g.Run.Products[tech.ProductName].Price
+	price := g.Run.Products[tech.ProductType].Price
 	return units * price
 
 }
@@ -50,7 +54,7 @@ func (g *Game) RoundEndValue(tech *Technology, handler *TechnologyRoundHandler) 
 func (g *Game) RoundEndText(tech *Technology, handler *TechnologyRoundHandler) string {
 
 	units := handler.RoundEndProduce(g, tech)
-	price := g.Run.Products[tech.ProductName].Price
+	price := g.Run.Products[tech.ProductType].Price
 	text := "$%v (%v units at $%v each)"
 	return fmt.Sprintf(text, units*price, units, price)
 }
@@ -58,6 +62,7 @@ func (g *Game) RoundEndText(tech *Technology, handler *TechnologyRoundHandler) s
 func (g *Game) PlaceTech(tech *Technology, space *TechnologySpace) error {
 	space.IsFilled = true
 	space.Technology = tech
+	tech.Space = space
 
 	if g.CanBuild(tech) {
 		err := tech.OnBuild(g, tech)
@@ -66,7 +71,22 @@ func (g *Game) PlaceTech(tech *Technology, space *TechnologySpace) error {
 		}
 	}
 	return nil
+}
 
+func (g *Game) RemoveTech(tech *Technology) {
+
+	tech.ToBeDeleted = true
+	space := tech.Space
+	space.IsFilled = false
+	space.Technology = &Technology{}
+
+	var results []*Technology
+	for _, tech := range g.Run.Technology {
+		if !tech.ToBeDeleted {
+			results = append(results, tech)
+		}
+	}
+	g.Run.Technology = results
 }
 
 // chicken
@@ -91,7 +111,7 @@ func (g *Game) CreateChickenCoopTech() *Technology {
 func (g *Game) ChickenCoop() *Technology {
 	result := &Technology{
 		Name:           "Chicken Coop",
-		ProductName:    "Chicken",
+		ProductType:    Chicken,
 		TechnologyType: BuildingSpace,
 		Tile:           g.Data["ChickenCoopTile"].(Tile),
 		TileWidth:      1,
@@ -124,12 +144,12 @@ func (g *Game) CanBuild(tech *Technology) bool {
 }
 
 func ChickenCoopOnBuild(g *Game, tech *Technology) error {
-	g.InitProduct(tech, 5)
+	g.InitProduct(tech.ProductType, 5)
 	return nil
 }
 
 func ChickenCoopProduce(g *Game, tech *Technology) float32 {
-	return 5 * g.Run.Productivity
+	return 5 * g.Run.Productivity * g.Run.Products["Chicken"].Yield
 }
 
 func ChickenCoopRoundEnd(g *Game, tech *Technology) {
@@ -152,7 +172,7 @@ func (g *Game) CreateWheatTech() *Technology {
 		Occupied: true,
 	}
 	g.Run.Products["Wheat"] = &Product{
-		Name:     "Wheat",
+		Type:     Wheat,
 		Quantity: 0,
 		Price:    1,
 	}
@@ -163,7 +183,7 @@ func (g *Game) CreateWheatTech() *Technology {
 func (g *Game) WheatField() *Technology {
 	return &Technology{
 		Name:           "Wheat",
-		ProductName:    "Wheat",
+		ProductType:    Wheat,
 		TechnologyType: PlantSpace,
 		Tile:           g.Data["WheatTile"].(Tile),
 		TileWidth:      1,
@@ -205,13 +225,13 @@ func (g *Game) WheatField() *Technology {
 }
 
 func WheatFieldOnBuild(g *Game, tech *Technology) error {
-	g.InitProduct(tech, 1)
+	g.InitProduct(tech.ProductType, 1)
 	return nil
 }
 
 func WheatFieldProduce(g *Game, tech *Technology) float32 {
 	if g.Run.CurrentSeason == Autumn {
-		return float32(125) * g.Run.Productivity
+		return float32(125) * g.Run.Productivity * g.Run.Products["Wheat"].Yield
 	} else {
 		return 0
 	}
@@ -232,6 +252,7 @@ func WheatFieldRoundAutumn(g *Game, tech *Technology) {
 	tech.RoundHandlerIndex += 1
 	tech.Tile.TileFrame.X += 45
 	tech.Redraw = true
+	g.RemoveTech(tech)
 }
 func WheatFieldRoundWinter(g *Game, tech *Technology) {
 	tech.RoundHandlerIndex += 0
@@ -254,14 +275,14 @@ func (g *Game) CreatePotatoTech() *Technology {
 		Occupied: true,
 	}
 
-	g.InitProduct(result, 5)
+	g.InitProduct(result.ProductType, 5)
 	return result
 }
 
 func (g *Game) PotatoField() *Technology {
 	return &Technology{
 		Name:           "Potato",
-		ProductName:    "Potato",
+		ProductType:    Potato,
 		TechnologyType: PlantSpace,
 		Tile:           g.Data["PotatoTile"].(Tile),
 		TileWidth:      1,
@@ -303,13 +324,13 @@ func (g *Game) PotatoField() *Technology {
 }
 
 func PotatoFieldOnBuild(g *Game, tech *Technology) error {
-	g.InitProduct(tech, 1)
+	g.InitProduct(tech.ProductType, 1)
 	return nil
 }
 
 func PotatoFieldProduce(g *Game, tech *Technology) float32 {
 	if g.Run.CurrentSeason == Autumn {
-		return float32(125) * g.Run.Productivity
+		return float32(125) * g.Run.Productivity * g.Run.Products["Potato"].Yield
 	} else {
 		return 0
 	}
@@ -358,7 +379,6 @@ func (g *Game) CreateWorkstationTech() *Technology {
 func (g *Game) Workstation() *Technology {
 	return &Technology{
 		Name:           "Workstation",
-		ProductName:    "",
 		TechnologyType: BuildingSpace,
 		Tile:           g.Data["WorkstationTile"].(Tile),
 		TileWidth:      1,
@@ -389,5 +409,59 @@ func WorkstationOnBuild(g *Game, tech *Technology) error {
 
 }
 func WorkstationRoundEnd(g *Game, tech *Technology) {
+
+}
+
+func (g *Game) CreateChickenEggWarmer() *Technology {
+
+	result := g.Technology["ChickenEggWarmer"]
+	result.Square = BoardSquare{
+		//	Tile:         g.Data["WorkstationTile"].(Tile),
+		TileType: "Technology",
+		Row:      1,
+		Column:   1,
+		Width:    1,
+		Height:   1,
+		Occupied: true,
+	}
+
+	return result
+}
+
+func (g *Game) ChickenEggWarmer() *Technology {
+	return &Technology{
+		Name:           "ChickenEggWarmer",
+		ProductType:    Chicken,
+		TechnologyType: BuildingSpace,
+		Tile:           g.Data["ChickenEggWarmerTile"].(Tile),
+		TileWidth:      1,
+		TileHeight:     1,
+		TileFillSpace:  false,
+		Square:         BoardSquare{},
+		CostMoney:      25,
+		Description:    "asdasd",
+		OnBuild:        ChickenEggWarmerOnBuild,
+		Redraw:         false,
+		RoundHandler: []TechnologyRoundHandler{
+			{
+				OnRoundEnd: WorkstationRoundEnd,
+			},
+		},
+		RoundCounterMax:   0,
+		RoundCounter:      0,
+		RoundHandlerIndex: 0,
+		ShowEndRound:      false,
+	}
+
+}
+
+func ChickenEggWarmerOnBuild(g *Game, tech *Technology) error {
+	g.InitProduct("Chicken", 5)
+	g.Run.Products["Chicken"].Yield += 0.05
+
+	return nil
+
+}
+func ChickenEggWarmerRoundEnd(g *Game, tech *Technology) {
 
 }

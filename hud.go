@@ -146,6 +146,7 @@ func DrawSidebar(g *Game) {
 	rl.DrawText(fmt.Sprintf("Money: $%v", g.Run.Money), 30, 70, 20, rl.White)
 	rl.DrawText(fmt.Sprintf("Productivity: %v", g.Run.Productivity), 30, 90, 20, rl.White)
 	rl.DrawText(fmt.Sprintf("Season: %v", g.Run.CurrentSeason.String()), 30, 110, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("Yield: %v", g.Run.Yield), 30, 130, 20, rl.White)
 
 	buttons := []*Button{}
 	techButton := g.Button("Technology", 10, 190, OnClickTechWindowButton)
@@ -314,19 +315,20 @@ func DrawMarketWindow(g *Game, win *Window) {
 
 	products := g.GetProductNames()
 	rl.DrawText("Products", int32(window.X+10), int32(window.Y+50), 25, rl.Black)
-	//	rl.DrawText("Inventory", int32(window.X+10)+columnOffset, int32(window.Y+50), 25, rl.Black)
+	rl.DrawText("Yield", int32(window.X+10)+columnOffset, int32(window.Y+50), 25, rl.Black)
 	rl.DrawText("Spot Price", int32(window.X+10)+columnOffset*2, int32(window.Y+50), 25, rl.Black)
-	//	rl.DrawText("Value", int32(window.X+10)+columnOffset*3, int32(window.Y+50), 25, rl.Black)
-	for _, productName := range products {
+	rl.DrawText("Total Earned", int32(window.X+10)+columnOffset*3, int32(window.Y+50), 25, rl.Black)
+	for _, product := range products {
+		productName := string(product)
 		x = int32(window.X + 10)
 		y = int32(window.Y + 80 + float32(i*30))
 		rl.DrawText(productName, x, y, 20, rl.Black)
-		//		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[productName].Quantity), x+columnOffset, y, 20, rl.Black)
-		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[productName].Price), x+columnOffset*2, y, 20, rl.Black)
-		//		value := g.Run.Products[productName].Price * g.Run.Products[productName].Quantity
-		//		rl.DrawText(fmt.Sprintf("%v", value), x+columnOffset*3, y, 20, rl.Black)
+		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[product].Yield), x+columnOffset, y, 20, rl.Black)
+		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[product].Price), x+columnOffset*2, y, 20, rl.Black)
+		value := g.Run.Products[product].TotalEarned
+		rl.DrawText(fmt.Sprintf("%v", value), x+columnOffset*3, y, 20, rl.Black)
 
-		if g.Run.Products[productName].Quantity == 0 {
+		if g.Run.Products[product].Quantity == 0 {
 			i += 1
 			continue
 		}
@@ -345,7 +347,7 @@ func DrawMarketWindow(g *Game, win *Window) {
 			if g.WasButtonClicked(&sellAllButton) {
 				scene.Data["SellAllConfirm"] = ""
 				g.ScreenSkip = true
-				g.SellProduct(g.Run.Products[productName])
+				g.SellProduct(g.Run.Products[product])
 			}
 
 		} else {

@@ -49,7 +49,7 @@ type TechnologySpace struct {
 
 type Technology struct {
 	Name              string
-	ProductName       string
+	ProductType       ProductType
 	TechnologyType    TechnologyType
 	Tile              Tile
 	TileWidth         int
@@ -65,6 +65,8 @@ type Technology struct {
 	RoundHandlerIndex int
 	Redraw            bool
 	ShowEndRound      bool
+	ToBeDeleted       bool
+	Space             *TechnologySpace
 }
 
 type TechnologyType int
@@ -87,7 +89,7 @@ type Person struct {
 type Run struct {
 	Technology       []*Technology
 	People           []Person
-	Products         map[string]*Product
+	Products         map[ProductType]*Product
 	Money            float32
 	Yield            float32
 	Productivity     float32
@@ -104,16 +106,26 @@ type Event struct {
 	Effects    []Effect
 }
 type Effect struct {
-	ProductImpacted string
+	ProductImpacted ProductType
 	IsPriceChange   bool
 	PriceChange     float32 // percentage
 }
 
 type Product struct {
-	Name     string
-	Quantity float32
-	Price    float32
+	Type        ProductType
+	Quantity    float32
+	Price       float32
+	Yield       float32
+	TotalEarned float32
 }
+
+type ProductType string
+
+const (
+	Chicken ProductType = "Chicken"
+	Wheat   ProductType = "Wheat"
+	Potato  ProductType = "Potato"
+)
 
 // Define the type for the enum
 type Season int

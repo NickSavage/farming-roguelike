@@ -20,7 +20,7 @@ func (g *Game) InitRun() {
 		Technology:   make([]*Technology, 0),
 		People:       make([]Person, 1),
 		Events:       GenerateRandomEvents(),
-		Products:     make(map[string]*Product),
+		Products:     make(map[ProductType]*Product),
 	}
 	g.InitTechSpaces()
 	//	g.Run.Technology = append(g.Run.Technology, g.CreateChickenCoopTech())
@@ -221,9 +221,10 @@ func (g *Game) sellAllProducts() float32 {
 
 func (g *Game) SellProduct(product *Product) float32 {
 	result := +product.Quantity * product.Price
-	log.Printf("selling %v %v = %v", product.Quantity, product.Name, result)
+	log.Printf("selling %v %v = %v", product.Quantity, string(product.Type), result)
 	product.Quantity = 0
 	// TODO: add to round money for reporting?
+	product.TotalEarned += result
 
 	return result
 }
@@ -242,7 +243,7 @@ func (r *Run) CalculateNetWorth() float32 {
 
 func (r *Run) GenerateYield() float32 {
 	f := rand.Float64()
-	scaledF := float32(f*1.2 + 0.8)
+	scaledF := float32(f*1.2 + 0.8*(1-f))
 	return scaledF
 
 }

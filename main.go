@@ -106,6 +106,12 @@ func (g *Game) LoadAssets() {
 		},
 		Color: rl.White,
 	}
+	image = rl.LoadImage("assets/tech/chicken_egg_warmer.png")
+	//	rl.ImageResize(image, 45, 45)
+	g.Data["ChickenEggWarmerTile"] = LoadImage(image, 0, 0, 90, 90)
+	rl.ImageResize(image, 45, 45)
+	g.Data["ChickenEggWarmerShopTile"] = LoadImage(image, 0, 0, 45, 45)
+
 }
 
 func (g *Game) LoadScenes() {

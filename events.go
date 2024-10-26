@@ -15,7 +15,7 @@ func (g *Game) NewRandomEvent() Event {
 }
 
 func (g *Game) RandomPriceChange() Effect {
-	var productNames []string
+	var productNames []ProductType
 	for key, _ := range g.Run.Products {
 		productNames = append(productNames, key)
 	}

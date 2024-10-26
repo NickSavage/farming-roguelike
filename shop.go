@@ -40,6 +40,11 @@ func ShopClickWorkstation(g *Game) {
 	g.ShopChooseTech(tech)
 }
 
+func ShopClickChickenEggWarmer(g *Game) {
+	tech := g.CreateChickenEggWarmer()
+	g.ShopChooseTech(tech)
+}
+
 func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {
 	textColor := rl.Black
 	log.Printf("shop %v", shopButton.Technology)
@@ -101,6 +106,13 @@ func (g *Game) InitShopWindow() {
 			OnClick:    ShopClickWorkstation,
 			Technology: tech["Workstation"],
 		},
+		ShopButton{
+			Width:      400,
+			Height:     50,
+			Image:      g.Data["ChickenEggWarmerShopTile"].(Tile),
+			OnClick:    ShopClickChickenEggWarmer,
+			Technology: tech["ChickenEggWarmer"],
+		},
 	}
 	scene.Data["ShopButtons"] = buttons
 }
@@ -116,6 +128,7 @@ func DrawShopWindow(g *Game, window *Window) {
 	g.DrawShopButton(buttons[1], 205, 145)
 	g.DrawShopButton(buttons[2], 205, 200)
 	g.DrawShopButton(buttons[3], 205, 255)
+	g.DrawShopButton(buttons[4], 205, 310)
 	// for _, button := range buttons {
 	// 	g.DrawShopButton(button, 205, 90)
 
