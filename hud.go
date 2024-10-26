@@ -178,17 +178,20 @@ func DrawEndRoundWindowPage1(g *Game, window *Window) {
 	var columnOffset int32 = 150
 
 	var x, y int32
-	for i, tech := range g.Run.Technology {
-		if !tech.ShowEndRound {
-			continue
-		}
+	var i int
+	for key, product := range g.Run.Products {
+
 		x = int32(windowRect.X + 10)
 		y = int32(windowRect.Y + 50 + float32(i*30))
-		value := g.RoundEndValue(tech)
-		subtotal += value
-		text := g.RoundEndText(tech)
-		rl.DrawText(tech.Name, x, y, 20, rl.Black)
+		units := product.Quantity
+		price := product.Price
+		subtotal += units * price
+
+		text := fmt.Sprintf("$%v (%v units at $%v each)", units*price, units, price)
+		rl.DrawText(string(key), x, y, 20, rl.Black)
 		rl.DrawText(text, x+columnOffset, y, 20, rl.Black)
+
+		i += 1
 	}
 
 	total := (subtotal * g.Run.Yield)
@@ -310,55 +313,57 @@ func DrawMarketWindow(g *Game, win *Window) {
 
 	var i, x, y int32
 	var columnOffset int32 = 150
-	var sellAllConfirm string = scene.Data["SellAllConfirm"].(string)
+	// var sellAllConfirm string = scene.Data["SellAllConfirm"].(string)
 
 	products := g.GetProductNames()
 	rl.DrawText("Products", int32(window.X+10), int32(window.Y+50), 25, rl.Black)
-	rl.DrawText("Yield", int32(window.X+10)+columnOffset, int32(window.Y+50), 25, rl.Black)
-	rl.DrawText("Spot Price", int32(window.X+10)+columnOffset*2, int32(window.Y+50), 25, rl.Black)
-	rl.DrawText("Total Earned", int32(window.X+10)+columnOffset*3, int32(window.Y+50), 25, rl.Black)
+	rl.DrawText("Quantity", int32(window.X+10)+columnOffset, int32(window.Y+50), 25, rl.Black)
+	rl.DrawText("Yield", int32(window.X+10)+columnOffset*2, int32(window.Y+50), 25, rl.Black)
+	rl.DrawText("Spot Price", int32(window.X+10)+columnOffset*3, int32(window.Y+50), 25, rl.Black)
+	rl.DrawText("Total Earned", int32(window.X+10)+columnOffset*4, int32(window.Y+50), 25, rl.Black)
 	for _, product := range products {
 		productName := string(product)
 		x = int32(window.X + 10)
 		y = int32(window.Y + 80 + float32(i*30))
 		rl.DrawText(productName, x, y, 20, rl.Black)
-		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[product].Yield), x+columnOffset, y, 20, rl.Black)
-		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[product].Price), x+columnOffset*2, y, 20, rl.Black)
+		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[product].Quantity), x+columnOffset, y, 20, rl.Black)
+		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[product].Yield), x+columnOffset*2, y, 20, rl.Black)
+		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[product].Price), x+columnOffset*3, y, 20, rl.Black)
 		value := g.Run.Products[product].TotalEarned
-		rl.DrawText(fmt.Sprintf("%v", value), x+columnOffset*3, y, 20, rl.Black)
+		rl.DrawText(fmt.Sprintf("%v", value), x+columnOffset*4, y, 20, rl.Black)
 
 		if g.Run.Products[product].Quantity == 0 {
 			i += 1
 			continue
 		}
-		edge := window.X + window.Width
+		// edge := window.X + window.Width
 		// sellButton := g.DrawSellButton(float32(edge-110), float32(y))
 		// sellButton.Text = "Sell Some"
 		// sellButton.Rectangle.Width = 100
 		// g.DrawButton(sellButton)
 
-		if sellAllConfirm == productName {
-			sellAllButton := g.DrawSellButton(float32(edge-110), float32(y))
-			sellAllButton.Color = rl.Red
-			sellAllButton.Text = "Confirm"
-			sellAllButton.Rectangle.Width = 100
-			g.DrawButton(sellAllButton)
-			if g.WasButtonClicked(&sellAllButton) {
-				scene.Data["SellAllConfirm"] = ""
-				g.ScreenSkip = true
-				g.SellProduct(g.Run.Products[product])
-			}
+		// if sellAllConfirm == productName {
+		// 	sellAllButton := g.DrawSellButton(float32(edge-110), float32(y))
+		// 	sellAllButton.Color = rl.Red
+		// 	sellAllButton.Text = "Confirm"
+		// 	sellAllButton.Rectangle.Width = 100
+		// 	g.DrawButton(sellAllButton)
+		// 	if g.WasButtonClicked(&sellAllButton) {
+		// 		scene.Data["SellAllConfirm"] = ""
+		// 		g.ScreenSkip = true
+		// 		g.SellProduct(g.Run.Products[product])
+		// 	}
 
-		} else {
-			sellAllButton := g.DrawSellButton(float32(edge-110), float32(y))
-			sellAllButton.Text = "Sell All"
-			sellAllButton.Rectangle.Width = 100
-			g.DrawButton(sellAllButton)
-			if g.WasButtonClicked(&sellAllButton) {
-				scene.Data["SellAllConfirm"] = productName
-				g.ScreenSkip = true
-			}
-		}
+		// } else {
+		// 	sellAllButton := g.DrawSellButton(float32(edge-110), float32(y))
+		// 	sellAllButton.Text = "Sell All"
+		// 	sellAllButton.Rectangle.Width = 100
+		// 	g.DrawButton(sellAllButton)
+		// 	if g.WasButtonClicked(&sellAllButton) {
+		// 		scene.Data["SellAllConfirm"] = productName
+		// 		g.ScreenSkip = true
+		// 	}
+		// }
 
 		// if g.WasButtonClicked(&sellButton) {
 		// 	OpenSellWindow(g, g.Run.Products[productName])

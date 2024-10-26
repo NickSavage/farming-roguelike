@@ -147,25 +147,41 @@ func (g *Game) drawTiles() {
 	}
 }
 func (g *Game) DrawTechnologySpaces() {
+	mousePosition := rl.GetMousePosition()
+	var rect rl.Rectangle
 	for _, space := range g.Run.TechnologySpaces {
-		x := int32(space.Row * TILE_WIDTH)
-		y := int32(space.Column * TILE_HEIGHT)
-		width := int32(space.Width * TILE_WIDTH)
-		height := int32(space.Height * TILE_HEIGHT)
-		rl.DrawRectangle(x, y, width, height, rl.Blue)
+		x := float32(space.Row * TILE_WIDTH)
+		y := float32(space.Column * TILE_HEIGHT)
+		width := float32(space.Width * TILE_WIDTH)
+		height := float32(space.Height * TILE_HEIGHT)
+		rect = rl.NewRectangle(x, y, width, height)
+		rl.DrawRectangleRec(rect, rl.Blue)
 		if !space.IsFilled {
 			continue
 		}
+		mousePosition = rl.GetMousePosition()
+		if rl.CheckCollisionPointRec(mousePosition, rect) {
+			space.Technology.Tile.Color = rl.Green
+			if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+				g.HandleClickTech(space.Technology)
+			}
+
+		} else {
+			if space.Technology.ReadyToHarvest {
+				space.Technology.Tile.Color = rl.Blue
+			} else {
+				space.Technology.Tile.Color = rl.White
+			}
+		}
+
 		if space.Technology.TileFillSpace {
 			for i := range space.Width {
 				for j := range space.Height {
-
 					DrawTile(
 						space.Technology.Tile,
 						float32(float32(x)+float32(i*TILE_WIDTH)),
 						float32(float32(y)+float32(j*TILE_WIDTH)),
 					)
-
 				}
 			}
 
@@ -235,11 +251,11 @@ func (g *Game) drawGrid() {
 func DrawBoard(g *Game) {
 
 	//	scene := g.Scenes["Board"]
-	rl.BeginMode2D(g.Scenes["Board"].Camera)
+	//	rl.BeginMode2D(g.Scenes["Board"].Camera)
 	g.drawTiles()
 	g.DrawTechnologySpaces()
 	g.drawGrid()
-	rl.EndMode2D()
+	//	rl.EndMode2D()
 
 	g.HandleHover()
 	DrawHUD(g)

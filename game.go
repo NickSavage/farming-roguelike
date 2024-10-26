@@ -14,13 +14,15 @@ const YEARS int = 8
 func (g *Game) InitRun() {
 
 	g.Run = &Run{
-		Money:        100,
-		Productivity: 1.0,
-		CurrentRound: 1,
-		Technology:   make([]*Technology, 0),
-		People:       make([]Person, 1),
-		Events:       GenerateRandomEvents(),
-		Products:     make(map[ProductType]*Product),
+		Money:         100,
+		Productivity:  1.0,
+		CurrentRound:  1,
+		CurrentSeason: Spring,
+		NextSeason:    Summer,
+		Technology:    make([]*Technology, 0),
+		People:        make([]Person, 1),
+		Events:        GenerateRandomEvents(),
+		Products:      make(map[ProductType]*Product),
 	}
 	g.InitTechSpaces()
 	//	g.Run.Technology = append(g.Run.Technology, g.CreateChickenCoopTech())
@@ -32,7 +34,7 @@ func (g *Game) InitTechSpaces() {
 	spaces := []*TechnologySpace{
 		{
 			TechnologyType: PlantSpace,
-			Row:            2,
+			Row:            7,
 			Column:         1,
 			Width:          5,
 			Height:         5,
@@ -40,7 +42,7 @@ func (g *Game) InitTechSpaces() {
 		},
 		{
 			TechnologyType: PlantSpace,
-			Row:            2,
+			Row:            7,
 			Column:         7,
 			Width:          5,
 			Height:         5,
@@ -48,7 +50,7 @@ func (g *Game) InitTechSpaces() {
 		},
 		{
 			TechnologyType: PlantSpace,
-			Row:            2,
+			Row:            7,
 			Column:         13,
 			Width:          5,
 			Height:         5,
@@ -56,7 +58,7 @@ func (g *Game) InitTechSpaces() {
 		},
 		{
 			TechnologyType: BuildingSpace,
-			Row:            9,
+			Row:            13,
 			Column:         1,
 			Width:          2,
 			Height:         2,
@@ -64,7 +66,7 @@ func (g *Game) InitTechSpaces() {
 		},
 		{
 			TechnologyType: BuildingSpace,
-			Row:            9,
+			Row:            13,
 			Column:         4,
 			Width:          2,
 			Height:         2,
@@ -72,7 +74,7 @@ func (g *Game) InitTechSpaces() {
 		},
 		{
 			TechnologyType: BuildingSpace,
-			Row:            9,
+			Row:            13,
 			Column:         7,
 			Width:          2,
 			Height:         2,
@@ -112,6 +114,7 @@ func OnClickEndRound(g *Game) {
 
 	g.Run.CurrentRound += 1
 	g.Run.CurrentSeason.Next()
+	g.Run.NextSeason.Next()
 	g.GetNextEvent()
 
 }

@@ -48,27 +48,27 @@ type TechnologySpace struct {
 }
 
 type Technology struct {
-	Name              string
-	ProductType       ProductType
-	TechnologyType    TechnologyType
-	Tile              Tile
-	TileWidth         int
-	TileHeight        int
-	TileFillSpace     bool
-	Description       string
-	Square            BoardSquare
-	CostMoney         float32
-	CanBuild          func(*Game) bool
-	OnBuild           func(*Game, *Technology) error
-	OnRoundEnd        func(*Game, *Technology)
-	RoundEndProduce   func(*Game, *Technology) float32
-	RoundCounterMax   int
-	RoundCounter      int
-	RoundHandlerIndex int
-	Redraw            bool
-	ShowEndRound      bool
-	ToBeDeleted       bool
-	Space             *TechnologySpace
+	Name            string
+	ProductType     ProductType
+	TechnologyType  TechnologyType
+	Tile            Tile
+	TileWidth       int
+	TileHeight      int
+	TileFillSpace   bool
+	Description     string
+	Square          BoardSquare
+	CostMoney       float32
+	CanBuild        func(*Game) bool
+	OnBuild         func(*Game, *Technology) error
+	OnClick         func(*Game, *Technology) string
+	OnRoundEnd      func(*Game, *Technology)
+	RoundEndProduce func(*Game, *Technology) float32
+	Redraw          bool
+	ToBeDeleted     bool
+	Space           *TechnologySpace
+	ReadyToHarvest  bool
+	ReadyToTouch    bool
+	TempYield       float32
 }
 
 type TechnologyType int
@@ -91,6 +91,7 @@ type Run struct {
 	EndRoundMoney    float32
 	CurrentRound     int
 	CurrentSeason    Season
+	NextSeason       Season
 	Events           []Event
 	TechnologySpaces []*TechnologySpace
 }
