@@ -149,8 +149,8 @@ func DrawSidebar(g *Game) {
 	rl.DrawText(fmt.Sprintf("Yield: %v", g.Run.Yield), 30, 130, 20, rl.White)
 
 	buttons := []*Button{}
-	techButton := g.Button("Technology", 10, 190, OnClickTechWindowButton)
-	buttons = append(buttons, &techButton)
+	// techButton := g.Button("Technology", 10, 190, OnClickTechWindowButton)
+	// buttons = append(buttons, &techButton)
 	shopButton := g.Button("Shop", 10, 240, OnClickShopWindowButton)
 	buttons = append(buttons, &shopButton)
 	priceButton := g.Button("Market", 10, 290, OnClickOpenMarketWindow)
@@ -184,10 +184,9 @@ func DrawEndRoundWindowPage1(g *Game, window *Window) {
 		}
 		x = int32(windowRect.X + 10)
 		y = int32(windowRect.Y + 50 + float32(i*30))
-		index := tech.RoundHandlerIndex
-		value := g.RoundEndValue(tech, &tech.RoundHandler[index])
+		value := g.RoundEndValue(tech)
 		subtotal += value
-		text := g.RoundEndText(tech, &tech.RoundHandler[index])
+		text := g.RoundEndText(tech)
 		rl.DrawText(tech.Name, x, y, 20, rl.Black)
 		rl.DrawText(text, x+columnOffset, y, 20, rl.Black)
 	}
@@ -221,26 +220,26 @@ func DrawEndRoundWindowPage2(g *Game, win *Window) {
 
 	rl.DrawText("Investments", int32(windowRect.X+5), int32(windowRect.Y+5), 30, rl.Black)
 
-	var columnOffset int32 = 150
-	var x, y int32
+	// var columnOffset int32 = 150
+	// var x, y int32
 
-	for i, tech := range g.Run.Technology {
+	// for i, tech := range g.Run.Technology {
 
-		if !tech.ShowEndRound {
-			continue
-		}
-		x = int32(windowRect.X + 10)
-		y = int32(windowRect.Y + 50 + float32(i*30))
-		nextSeason := tech.RoundHandler[tech.RoundHandlerIndex]
+	// 	if !tech.ShowEndRound {
+	// 		continue
+	// 	}
+	// x = int32(windowRect.X + 10)
+	// y = int32(windowRect.Y + 50 + float32(i*30))
+	// nextSeason := tech.RoundHandler[tech.RoundHandlerIndex]
 
-		rl.DrawText(tech.Name, x, y, 20, rl.Black)
-		text := fmt.Sprintf(
-			"-$%v money",
-			nextSeason.CostMoney,
-		)
-		rl.DrawText(text, x+columnOffset, y, 20, rl.Red)
+	// rl.DrawText(tech.Name, x, y, 20, rl.Black)
+	// text := fmt.Sprintf(
+	// 	"-$%v money",
+	// 	nextSeason.CostMoney,
+	// )
+	// rl.DrawText(text, x+columnOffset, y, 20, rl.Red)
 
-	}
+	// }
 	button := g.Button("End Round", 500, 500, OnClickEndRoundConfirmButton)
 
 	g.DrawButton(button)

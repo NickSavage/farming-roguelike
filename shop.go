@@ -10,6 +10,9 @@ func (g *Game) ShopChooseTech(tech *Technology) {
 	if !g.Run.CanSpendMoney(tech.CostMoney) {
 		return
 	}
+	if !tech.CanBuild(g) {
+		return
+	}
 	g.Scenes["HUD"].Windows["ShopWindow"].Display = false
 	space, err := g.GetOpenSpace(tech)
 	if err == nil {
@@ -48,9 +51,14 @@ func ShopClickChickenEggWarmer(g *Game) {
 func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {
 	textColor := rl.Black
 	log.Printf("shop %v", shopButton.Technology)
-	if !g.Run.CanSpendMoney(shopButton.Technology.CostMoney) {
-		textColor = rl.LightGray
 
+	if !g.Run.CanSpendMoney(shopButton.Technology.CostMoney) ||
+		!shopButton.Technology.CanBuild(g) {
+		textColor = rl.LightGray
+	}
+	_, err := g.GetOpenSpace(shopButton.Technology)
+	if err != nil {
+		textColor = rl.LightGray
 	}
 	rect := rl.Rectangle{
 		X:      x,

@@ -102,8 +102,8 @@ func PreEndRound(g *Game) {
 func OnClickEndRound(g *Game) {
 
 	for _, tech := range g.Run.Technology {
-		tech.RoundHandler[tech.RoundHandlerIndex].OnRoundEnd(g, tech)
-		g.Run.EndRoundMoney -= tech.RoundHandler[tech.RoundHandlerIndex].CostMoney
+		tech.OnRoundEnd(g, tech)
+		//		g.Run.EndRoundMoney -= tech.RoundHandler[tech.RoundHandlerIndex].CostMoney
 	}
 	g.Run.EndRoundMoney += g.sellAllProducts()
 	g.Run.Money += g.Run.EndRoundMoney * g.Run.Yield

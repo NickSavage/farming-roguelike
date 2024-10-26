@@ -58,8 +58,10 @@ type Technology struct {
 	Description       string
 	Square            BoardSquare
 	CostMoney         float32
+	CanBuild          func(*Game) bool
 	OnBuild           func(*Game, *Technology) error
-	RoundHandler      []TechnologyRoundHandler
+	OnRoundEnd        func(*Game, *Technology)
+	RoundEndProduce   func(*Game, *Technology) float32
 	RoundCounterMax   int
 	RoundCounter      int
 	RoundHandlerIndex int
@@ -75,13 +77,6 @@ const (
 	PlantSpace TechnologyType = iota
 	BuildingSpace
 )
-
-type TechnologyRoundHandler struct {
-	Season          Season
-	CostMoney       float32
-	OnRoundEnd      func(*Game, *Technology)
-	RoundEndProduce func(*Game, *Technology) float32
-}
 
 type Person struct {
 }

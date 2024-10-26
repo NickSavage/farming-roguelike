@@ -44,16 +44,16 @@ func (g *Game) GetProductNames() []ProductType {
 	return results
 }
 
-func (g *Game) RoundEndValue(tech *Technology, handler *TechnologyRoundHandler) float32 {
-	units := handler.RoundEndProduce(g, tech)
+func (g *Game) RoundEndValue(tech *Technology) float32 {
+	units := tech.RoundEndProduce(g, tech)
 	price := g.Run.Products[tech.ProductType].Price
 	return units * price
 
 }
 
-func (g *Game) RoundEndText(tech *Technology, handler *TechnologyRoundHandler) string {
+func (g *Game) RoundEndText(tech *Technology) string {
 
-	units := handler.RoundEndProduce(g, tech)
+	units := tech.RoundEndProduce(g, tech)
 	price := g.Run.Products[tech.ProductType].Price
 	text := "$%v (%v units at $%v each)"
 	return fmt.Sprintf(text, units*price, units, price)
@@ -110,24 +110,21 @@ func (g *Game) CreateChickenCoopTech() *Technology {
 
 func (g *Game) ChickenCoop() *Technology {
 	result := &Technology{
-		Name:           "Chicken Coop",
-		ProductType:    Chicken,
-		TechnologyType: BuildingSpace,
-		Tile:           g.Data["ChickenCoopTile"].(Tile),
-		TileWidth:      1,
-		TileHeight:     1,
-		TileFillSpace:  false,
-		Square:         BoardSquare{},
-		Description:    "asdasd",
-		CostMoney:      50,
-		OnBuild:        ChickenCoopOnBuild,
-		Redraw:         false,
-		RoundHandler: []TechnologyRoundHandler{
-			{
-				OnRoundEnd:      ChickenCoopRoundEnd,
-				RoundEndProduce: ChickenCoopProduce,
-			},
-		},
+		Name:              "Chicken Coop",
+		ProductType:       Chicken,
+		TechnologyType:    BuildingSpace,
+		Tile:              g.Data["ChickenCoopTile"].(Tile),
+		TileWidth:         1,
+		TileHeight:        1,
+		TileFillSpace:     false,
+		Square:            BoardSquare{},
+		Description:       "asdasd",
+		CostMoney:         50,
+		CanBuild:          ChickenCoopCanBuild,
+		OnBuild:           ChickenCoopOnBuild,
+		Redraw:            false,
+		OnRoundEnd:        ChickenCoopRoundEnd,
+		RoundEndProduce:   ChickenCoopProduce,
 		RoundHandlerIndex: 0,
 		ShowEndRound:      true,
 	}
@@ -140,6 +137,10 @@ func (g *Game) CanBuild(tech *Technology) bool {
 		log.Printf("err %v", err)
 		return false
 	}
+	return true
+}
+
+func ChickenCoopCanBuild(g *Game) bool {
 	return true
 }
 
@@ -182,46 +183,31 @@ func (g *Game) CreateWheatTech() *Technology {
 
 func (g *Game) WheatField() *Technology {
 	return &Technology{
-		Name:           "Wheat",
-		ProductType:    Wheat,
-		TechnologyType: PlantSpace,
-		Tile:           g.Data["WheatTile"].(Tile),
-		TileWidth:      1,
-		TileHeight:     1,
-		TileFillSpace:  true,
-		Square:         BoardSquare{},
-		CostMoney:      50,
-		Description:    "asdasd",
-		OnBuild:        WheatFieldOnBuild,
-		Redraw:         false,
-		RoundHandler: []TechnologyRoundHandler{
-			{
-				Season:          Spring,
-				OnRoundEnd:      WheatFieldRoundSpring,
-				RoundEndProduce: WheatFieldProduce,
-			},
-			{
-				Season:          Summer,
-				OnRoundEnd:      WheatFieldRoundSummer,
-				RoundEndProduce: WheatFieldProduce,
-			},
-			{
-				Season:          Autumn,
-				OnRoundEnd:      WheatFieldRoundAutumn,
-				RoundEndProduce: WheatFieldProduce,
-			},
-			{
-				Season:          Winter,
-				OnRoundEnd:      WheatFieldRoundWinter,
-				RoundEndProduce: WheatFieldProduce,
-			},
-		},
+		Name:              "Wheat",
+		ProductType:       Wheat,
+		TechnologyType:    PlantSpace,
+		Tile:              g.Data["WheatTile"].(Tile),
+		TileWidth:         1,
+		TileHeight:        1,
+		TileFillSpace:     true,
+		Square:            BoardSquare{},
+		CostMoney:         50,
+		Description:       "asdasd",
+		CanBuild:          WheatFieldCanBuild,
+		OnBuild:           WheatFieldOnBuild,
+		Redraw:            false,
+		OnRoundEnd:        WheatFieldRoundEnd,
+		RoundEndProduce:   WheatFieldProduce,
 		RoundCounterMax:   0,
 		RoundCounter:      0,
 		RoundHandlerIndex: 0,
 		ShowEndRound:      true,
 	}
 
+}
+
+func WheatFieldCanBuild(g *Game) bool {
+	return true
 }
 
 func WheatFieldOnBuild(g *Game, tech *Technology) error {
@@ -237,25 +223,9 @@ func WheatFieldProduce(g *Game, tech *Technology) float32 {
 	}
 }
 
-func WheatFieldRoundSpring(g *Game, tech *Technology) {
-	tech.RoundHandlerIndex += 1
-	tech.Tile.TileFrame.X += 45
-	tech.Redraw = true
-}
-func WheatFieldRoundSummer(g *Game, tech *Technology) {
-	tech.RoundHandlerIndex += 1
-	tech.Tile.TileFrame.X += 45
-	tech.Redraw = true
-}
-func WheatFieldRoundAutumn(g *Game, tech *Technology) {
+func WheatFieldRoundEnd(g *Game, tech *Technology) {
 	g.Run.Products["Wheat"].Quantity += WheatFieldProduce(g, tech)
 	tech.RoundHandlerIndex += 1
-	tech.Tile.TileFrame.X += 45
-	tech.Redraw = true
-	g.RemoveTech(tech)
-}
-func WheatFieldRoundWinter(g *Game, tech *Technology) {
-	tech.RoundHandlerIndex += 0
 	tech.Tile.TileFrame.X += 45
 	tech.Redraw = true
 }
@@ -281,46 +251,31 @@ func (g *Game) CreatePotatoTech() *Technology {
 
 func (g *Game) PotatoField() *Technology {
 	return &Technology{
-		Name:           "Potato",
-		ProductType:    Potato,
-		TechnologyType: PlantSpace,
-		Tile:           g.Data["PotatoTile"].(Tile),
-		TileWidth:      1,
-		TileHeight:     1,
-		TileFillSpace:  true,
-		Square:         BoardSquare{},
-		CostMoney:      50,
-		Description:    "asdasd",
-		OnBuild:        PotatoFieldOnBuild,
-		Redraw:         false,
-		RoundHandler: []TechnologyRoundHandler{
-			{
-				Season:          Spring,
-				OnRoundEnd:      PotatoFieldRoundSpring,
-				RoundEndProduce: PotatoFieldProduce,
-			},
-			{
-				Season:          Summer,
-				OnRoundEnd:      PotatoFieldRoundSummer,
-				RoundEndProduce: PotatoFieldProduce,
-			},
-			{
-				Season:          Autumn,
-				OnRoundEnd:      PotatoFieldRoundAutumn,
-				RoundEndProduce: PotatoFieldProduce,
-			},
-			{
-				Season:          Winter,
-				OnRoundEnd:      PotatoFieldRoundWinter,
-				RoundEndProduce: PotatoFieldProduce,
-			},
-		},
+		Name:              "Potato",
+		ProductType:       Potato,
+		TechnologyType:    PlantSpace,
+		Tile:              g.Data["PotatoTile"].(Tile),
+		TileWidth:         1,
+		TileHeight:        1,
+		TileFillSpace:     true,
+		Square:            BoardSquare{},
+		CostMoney:         50,
+		Description:       "asdasd",
+		CanBuild:          PotatoFieldCanBuild,
+		OnBuild:           PotatoFieldOnBuild,
+		Redraw:            false,
+		OnRoundEnd:        PotatoFieldRoundEnd,
+		RoundEndProduce:   PotatoFieldProduce,
 		RoundCounterMax:   0,
 		RoundCounter:      0,
 		RoundHandlerIndex: 0,
 		ShowEndRound:      true,
 	}
 
+}
+
+func PotatoFieldCanBuild(g *Game) bool {
+	return true
 }
 
 func PotatoFieldOnBuild(g *Game, tech *Technology) error {
@@ -335,25 +290,9 @@ func PotatoFieldProduce(g *Game, tech *Technology) float32 {
 		return 0
 	}
 }
-
-func PotatoFieldRoundSpring(g *Game, tech *Technology) {
-	tech.RoundHandlerIndex += 1
-	tech.Tile.TileFrame.X += 45
-	tech.Redraw = true
-}
-func PotatoFieldRoundSummer(g *Game, tech *Technology) {
-	tech.RoundHandlerIndex += 1
-	tech.Tile.TileFrame.X += 45
-	tech.Redraw = true
-}
-func PotatoFieldRoundAutumn(g *Game, tech *Technology) {
+func PotatoFieldRoundEnd(g *Game, tech *Technology) {
 	g.Run.Products["Potato"].Quantity += PotatoFieldProduce(g, tech)
 	tech.RoundHandlerIndex += 1
-	tech.Tile.TileFrame.X += 45
-	tech.Redraw = true
-}
-func PotatoFieldRoundWinter(g *Game, tech *Technology) {
-	tech.RoundHandlerIndex += 0
 	tech.Tile.TileFrame.X += 45
 	tech.Redraw = true
 }
@@ -378,28 +317,29 @@ func (g *Game) CreateWorkstationTech() *Technology {
 
 func (g *Game) Workstation() *Technology {
 	return &Technology{
-		Name:           "Workstation",
-		TechnologyType: BuildingSpace,
-		Tile:           g.Data["WorkstationTile"].(Tile),
-		TileWidth:      1,
-		TileHeight:     1,
-		TileFillSpace:  false,
-		Square:         BoardSquare{},
-		CostMoney:      25,
-		Description:    "asdasd",
-		OnBuild:        WorkstationOnBuild,
-		Redraw:         false,
-		RoundHandler: []TechnologyRoundHandler{
-			{
-				OnRoundEnd: WorkstationRoundEnd,
-			},
-		},
+		Name:              "Workstation",
+		TechnologyType:    BuildingSpace,
+		Tile:              g.Data["WorkstationTile"].(Tile),
+		TileWidth:         1,
+		TileHeight:        1,
+		TileFillSpace:     false,
+		Square:            BoardSquare{},
+		CostMoney:         25,
+		Description:       "asdasd",
+		CanBuild:          WorkstationCanBuild,
+		OnBuild:           WorkstationOnBuild,
+		Redraw:            false,
+		OnRoundEnd:        WorkstationRoundEnd,
 		RoundCounterMax:   0,
 		RoundCounter:      0,
 		RoundHandlerIndex: 0,
 		ShowEndRound:      false,
 	}
 
+}
+
+func WorkstationCanBuild(g *Game) bool {
+	return true
 }
 
 func WorkstationOnBuild(g *Game, tech *Technology) error {
@@ -430,29 +370,37 @@ func (g *Game) CreateChickenEggWarmer() *Technology {
 
 func (g *Game) ChickenEggWarmer() *Technology {
 	return &Technology{
-		Name:           "ChickenEggWarmer",
-		ProductType:    Chicken,
-		TechnologyType: BuildingSpace,
-		Tile:           g.Data["ChickenEggWarmerTile"].(Tile),
-		TileWidth:      1,
-		TileHeight:     1,
-		TileFillSpace:  false,
-		Square:         BoardSquare{},
-		CostMoney:      25,
-		Description:    "asdasd",
-		OnBuild:        ChickenEggWarmerOnBuild,
-		Redraw:         false,
-		RoundHandler: []TechnologyRoundHandler{
-			{
-				OnRoundEnd: WorkstationRoundEnd,
-			},
-		},
+		Name:              "ChickenEggWarmer",
+		ProductType:       Chicken,
+		TechnologyType:    BuildingSpace,
+		Tile:              g.Data["ChickenEggWarmerTile"].(Tile),
+		TileWidth:         1,
+		TileHeight:        1,
+		TileFillSpace:     false,
+		Square:            BoardSquare{},
+		CostMoney:         25,
+		Description:       "asdasd",
+		CanBuild:          ChickenEggWarmerCanBuild,
+		OnBuild:           ChickenEggWarmerOnBuild,
+		Redraw:            false,
+		OnRoundEnd:        ChickenEggWarmerRoundEnd,
 		RoundCounterMax:   0,
 		RoundCounter:      0,
 		RoundHandlerIndex: 0,
 		ShowEndRound:      false,
 	}
 
+}
+
+func ChickenEggWarmerCanBuild(g *Game) bool {
+	hasCoop := false
+	for _, tech := range g.Run.Technology {
+		if tech.Name == "Chicken Coop" {
+			hasCoop = true
+			break
+		}
+	}
+	return hasCoop
 }
 
 func ChickenEggWarmerOnBuild(g *Game, tech *Technology) error {
