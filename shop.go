@@ -87,6 +87,45 @@ func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {
 	}
 }
 
+func (g *Game) DrawPlantPurchaseButton(shopButton *ShopButton, x, y float32) {
+
+	//	textColor := rl.Black
+	log.Printf("shop %v", shopButton.Technology)
+
+	if !g.Run.CanSpendMoney(shopButton.Technology.CostMoney) ||
+		!shopButton.Technology.CanBuild(g, shopButton.Technology) {
+		shopButton.Image.Color = rl.LightGray
+		// textColor = rl.LightGray
+	}
+	if !g.Run.CanSpendAction(shopButton.Technology.CostActions) {
+		shopButton.Image.Color = rl.LightGray
+		// textColor = rl.LightGray
+	}
+	_, err := g.GetOpenSpace(shopButton.Technology)
+	if err != nil {
+		shopButton.Image.Color = rl.LightGray
+		// textColor = rl.LightGray
+	}
+
+	rect := rl.Rectangle{
+		X:      x,
+		Y:      y,
+		Width:  float32(100),
+		Height: float32(100),
+	}
+	rl.DrawRectangleLinesEx(rect, 1, rl.Black)
+	rl.DrawRectangleRec(rect, shopButton.BackgroundColor)
+	DrawTile(shopButton.Image, x+5, y+5)
+
+	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+
+		mousePosition := rl.GetMousePosition()
+		if rl.CheckCollisionPointRec(mousePosition, rect) {
+			shopButton.OnClick(g)
+		}
+	}
+}
+
 func (g *Game) InitShopWindow() {
 	log.Printf("init shop")
 	tech := g.Technology
@@ -139,10 +178,12 @@ func DrawShopWindow(g *Game, window *Window) {
 
 	buttons := scene.Data["ShopButtons"].([]ShopButton)
 	g.DrawShopButton(buttons[0], 205, 90)
-	g.DrawShopButton(buttons[1], 205, 145)
-	g.DrawShopButton(buttons[2], 205, 200)
 	g.DrawShopButton(buttons[3], 205, 255)
 	g.DrawShopButton(buttons[4], 205, 310)
+
+	g.DrawPlantPurchaseButton(WheatShopButton(g), 205, 400)
+	g.DrawPlantPurchaseButton(PotatoShopButton(g), 310, 400)
+	// g.DrawPlantPurchaseButton(buttons[2], 260, 400)
 	// for _, button := range buttons {
 	// 	g.DrawShopButton(button, 205, 90)
 

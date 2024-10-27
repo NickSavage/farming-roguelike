@@ -202,6 +202,17 @@ func (g *Game) WheatField() *Technology {
 	}
 }
 
+func WheatShopButton(g *Game) *ShopButton {
+	result := &ShopButton{
+		Width:      50,
+		Height:     50,
+		Image:      g.Data["WheatIcon"].(Tile),
+		OnClick:    ShopClickWheatField,
+		Technology: g.CreateWheatTech(),
+	}
+	return result
+}
+
 func WheatFieldCanBuild(g *Game, tech *Technology) bool {
 	if g.Run.CurrentSeason == Spring {
 		return true
@@ -289,6 +300,17 @@ func (g *Game) PotatoField() *Technology {
 		ReadyToTouch:    true,
 	}
 
+}
+
+func PotatoShopButton(g *Game) *ShopButton {
+	result := &ShopButton{
+		Width:      100,
+		Height:     100,
+		Image:      g.Data["PotatoIcon"].(Tile),
+		OnClick:    ShopClickPotatoField,
+		Technology: g.CreatePotatoTech(),
+	}
+	return result
 }
 
 func PotatoFieldCanBuild(g *Game, tech *Technology) bool {

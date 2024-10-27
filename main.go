@@ -112,6 +112,11 @@ func (g *Game) LoadAssets() {
 	rl.ImageResize(image, 45, 45)
 	g.Data["ChickenEggWarmerShopTile"] = LoadImage(image, 0, 0, 45, 45)
 
+	image = rl.LoadImage("assets/icons/wheat.png")
+	g.Data["WheatIcon"] = LoadImage(image, 0, 0, 90, 90)
+	image = rl.LoadImage("assets/icons/potato.png")
+	g.Data["PotatoIcon"] = LoadImage(image, 0, 0, 90, 90)
+
 }
 
 func (g *Game) LoadScenes() {
