@@ -138,10 +138,10 @@ func DrawSidebar(g *Game) {
 	// 	rl.White,
 	// )
 
-	// rl.DrawText(
-	// 	fmt.Sprintf("Actions: %v/%v", g.Run.RoundActionsRemaining, g.Run.RoundActions),
-	// 	30, 50, 20, rl.White,
-	// )
+	rl.DrawText(
+		fmt.Sprintf("Actions: %v/%v", g.Run.ActionsRemaining, g.Run.ActionsMaximum),
+		30, 30, 20, rl.White,
+	)
 	rl.DrawText(fmt.Sprintf("Round: %v", g.Run.CurrentRound), 30, 50, 20, rl.White)
 	rl.DrawText(fmt.Sprintf("Money: $%v", g.Run.Money), 30, 70, 20, rl.White)
 	rl.DrawText(fmt.Sprintf("Productivity: %v", g.Run.Productivity), 30, 90, 20, rl.White)

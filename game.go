@@ -14,15 +14,17 @@ const YEARS int = 8
 func (g *Game) InitRun() {
 
 	g.Run = &Run{
-		Money:         100,
-		Productivity:  1.0,
-		CurrentRound:  1,
-		CurrentSeason: Spring,
-		NextSeason:    Summer,
-		Technology:    make([]*Technology, 0),
-		People:        make([]Person, 1),
-		Events:        GenerateRandomEvents(),
-		Products:      make(map[ProductType]*Product),
+		Money:            100,
+		Productivity:     1.0,
+		CurrentRound:     1,
+		CurrentSeason:    Spring,
+		NextSeason:       Summer,
+		Technology:       make([]*Technology, 0),
+		People:           make([]Person, 1),
+		Events:           GenerateRandomEvents(),
+		Products:         make(map[ProductType]*Product),
+		ActionsMaximum:   5,
+		ActionsRemaining: 5,
 	}
 	g.InitTechSpaces()
 	//	g.Run.Technology = append(g.Run.Technology, g.CreateChickenCoopTech())
@@ -105,12 +107,12 @@ func OnClickEndRound(g *Game) {
 
 	for _, tech := range g.Run.Technology {
 		tech.OnRoundEnd(g, tech)
-		//		g.Run.EndRoundMoney -= tech.RoundHandler[tech.RoundHandlerIndex].CostMoney
 	}
 	g.Run.EndRoundMoney += g.sellAllProducts()
 	g.Run.Money += g.Run.EndRoundMoney * g.Run.Yield
 	g.Run.Money = float32(math.Round(float64(g.Run.Money)))
 	g.Run.EndRoundMoney = 0
+	g.Run.ActionsRemaining = g.Run.ActionsMaximum
 
 	g.Run.CurrentRound += 1
 	g.Run.CurrentSeason.Next()
@@ -196,6 +198,21 @@ func GenerateRandomEvents() []Event {
 
 }
 
+func (r *Run) CanSpendAction(actions int) bool {
+	if r.ActionsRemaining >= actions {
+		return true
+	}
+	return false
+}
+
+func (r *Run) SpendAction(actions int) error {
+
+	if r.CanSpendAction(actions) {
+		r.ActionsRemaining -= 1
+		return nil
+	}
+	return errors.New("cannot spend action, not enough actions")
+}
 func (r *Run) CanSpendMoney(money float32) bool {
 	if r.Money >= money {
 		return true

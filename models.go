@@ -58,12 +58,12 @@ type Technology struct {
 	Description     string
 	Square          BoardSquare
 	CostMoney       float32
-	CanBuild        func(*Game) bool
+	CostActions     int
+	CanBuild        func(*Game, *Technology) bool
 	OnBuild         func(*Game, *Technology) error
 	OnClick         func(*Game, *Technology) string
 	OnRoundEnd      func(*Game, *Technology)
 	RoundEndProduce func(*Game, *Technology) float32
-	Redraw          bool
 	ToBeDeleted     bool
 	Space           *TechnologySpace
 	ReadyToHarvest  bool
@@ -94,6 +94,8 @@ type Run struct {
 	NextSeason       Season
 	Events           []Event
 	TechnologySpaces []*TechnologySpace
+	ActionsRemaining int
+	ActionsMaximum   int
 }
 
 type Event struct {

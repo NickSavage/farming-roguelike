@@ -10,7 +10,10 @@ func (g *Game) ShopChooseTech(tech *Technology) {
 	if !g.Run.CanSpendMoney(tech.CostMoney) {
 		return
 	}
-	if !tech.CanBuild(g) {
+	if !g.Run.CanSpendAction(tech.CostActions) {
+		return
+	}
+	if !tech.CanBuild(g, tech) {
 		return
 	}
 	g.Scenes["HUD"].Windows["ShopWindow"].Display = false
@@ -53,7 +56,10 @@ func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {
 	log.Printf("shop %v", shopButton.Technology)
 
 	if !g.Run.CanSpendMoney(shopButton.Technology.CostMoney) ||
-		!shopButton.Technology.CanBuild(g) {
+		!shopButton.Technology.CanBuild(g, shopButton.Technology) {
+		textColor = rl.LightGray
+	}
+	if !g.Run.CanSpendAction(shopButton.Technology.CostActions) {
 		textColor = rl.LightGray
 	}
 	_, err := g.GetOpenSpace(shopButton.Technology)

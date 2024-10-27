@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	//	"sort"
+	"errors"
 	//
 	// rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -46,10 +47,18 @@ func (g *Game) GetProductNames() []ProductType {
 
 func (g *Game) PlaceTech(tech *Technology, space *TechnologySpace) error {
 	space.IsFilled = true
-	space.Technology = tech
+	copy := &tech
+	space.Technology = *copy
 	tech.Space = space
 
-	if g.CanBuild(tech) {
+	err := g.Run.SpendAction(tech.CostActions)
+	if err != nil {
+		return errors.New("cannot spend action")
+	}
+
+	err = g.Run.SpendMoney(tech.CostMoney)
+
+	if err == nil {
 		err := tech.OnBuild(g, tech)
 		if err == nil {
 			g.Run.Technology = append(g.Run.Technology, tech)
@@ -74,15 +83,15 @@ func (g *Game) RemoveTech(tech *Technology) {
 	g.Run.Technology = results
 }
 
-func (g *Game) HandleClickTech(tech *Technology) {
-	tech.OnClick(g, tech)
+func (g *Game) HandleClickTech(tech *Technology) string {
+	return tech.OnClick(g, tech)
 }
 
 // chicken
 
 func (g *Game) CreateChickenCoopTech() *Technology {
 
-	result := g.Technology["ChickenCoop"]
+	result := g.ChickenCoop()
 	result.Square = BoardSquare{
 		//		Tile:         g.Data["ChickenCoopTile"].(Tile),
 		TileType:    "Technology",
@@ -112,7 +121,6 @@ func (g *Game) ChickenCoop() *Technology {
 		CanBuild:        ChickenCoopCanBuild,
 		OnBuild:         ChickenCoopOnBuild,
 		OnClick:         ChickenCoopOnClick,
-		Redraw:          false,
 		OnRoundEnd:      ChickenCoopRoundEnd,
 		RoundEndProduce: ChickenCoopProduce,
 		TempYield:       1,
@@ -120,16 +128,7 @@ func (g *Game) ChickenCoop() *Technology {
 	return result
 }
 
-func (g *Game) CanBuild(tech *Technology) bool {
-	err := g.Run.SpendMoney(tech.CostMoney)
-	if err != nil {
-		log.Printf("err %v", err)
-		return false
-	}
-	return true
-}
-
-func ChickenCoopCanBuild(g *Game) bool {
+func ChickenCoopCanBuild(g *Game, tech *Technology) bool {
 	return true
 }
 
@@ -161,7 +160,7 @@ func ChickenCoopRoundEnd(g *Game, tech *Technology) {
 
 func (g *Game) CreateWheatTech() *Technology {
 
-	result := g.Technology["WheatField"]
+	result := g.WheatField()
 	result.Square = BoardSquare{
 		//		Tile:         g.Data["WheatTile"].(Tile),
 		TileType: "Technology",
@@ -196,14 +195,14 @@ func (g *Game) WheatField() *Technology {
 		CanBuild:        WheatFieldCanBuild,
 		OnBuild:         WheatFieldOnBuild,
 		OnClick:         WheatFieldOnClick,
-		Redraw:          false,
 		OnRoundEnd:      WheatFieldRoundEnd,
 		RoundEndProduce: WheatFieldProduce,
 		TempYield:       1,
+		ReadyToTouch:    true,
 	}
 }
 
-func WheatFieldCanBuild(g *Game) bool {
+func WheatFieldCanBuild(g *Game, tech *Technology) bool {
 	if g.Run.CurrentSeason == Spring {
 		return true
 	}
@@ -224,12 +223,24 @@ func WheatFieldProduce(g *Game, tech *Technology) float32 {
 func WheatFieldRoundEnd(g *Game, tech *Technology) {
 	if g.Run.NextSeason == Autumn {
 		tech.ReadyToHarvest = true
+	} else if g.Run.NextSeason == Winter {
+		g.RemoveTech(tech)
+	} else {
+		tech.ReadyToTouch = true
 	}
 	tech.Tile.TileFrame.X += 45
-	tech.Redraw = true
 }
 func WheatFieldOnClick(g *Game, tech *Technology) string {
-	if tech.ReadyToHarvest {
+	if tech.ReadyToTouch {
+		err := g.Run.SpendAction(1)
+		if err == nil {
+			tech.TempYield += 0.05
+			tech.ReadyToTouch = false
+			return fmt.Sprintf("Yield: %v", tech.TempYield)
+		}
+		tech.ReadyToTouch = false
+
+	} else if tech.ReadyToHarvest {
 		produced := WheatFieldProduce(g, tech)
 		g.Run.Products["Wheat"].Quantity += produced
 		g.RemoveTech(tech)
@@ -242,7 +253,7 @@ func WheatFieldOnClick(g *Game, tech *Technology) string {
 
 func (g *Game) CreatePotatoTech() *Technology {
 
-	result := g.Technology["PotatoField"]
+	result := g.PotatoField()
 	result.Square = BoardSquare{
 		//	Tile:         g.Data["PotatoTile"].(Tile),
 		TileType: "Technology",
@@ -272,15 +283,15 @@ func (g *Game) PotatoField() *Technology {
 		CanBuild:        PotatoFieldCanBuild,
 		OnBuild:         PotatoFieldOnBuild,
 		OnClick:         PotatoFieldOnClick,
-		Redraw:          false,
 		OnRoundEnd:      PotatoFieldRoundEnd,
 		RoundEndProduce: PotatoFieldProduce,
 		TempYield:       1,
+		ReadyToTouch:    true,
 	}
 
 }
 
-func PotatoFieldCanBuild(g *Game) bool {
+func PotatoFieldCanBuild(g *Game, tech *Technology) bool {
 	return true
 }
 
@@ -301,7 +312,6 @@ func PotatoFieldRoundEnd(g *Game, tech *Technology) {
 		tech.ReadyToHarvest = true
 	}
 	tech.Tile.TileFrame.X += 45
-	tech.Redraw = true
 }
 
 func PotatoFieldOnClick(g *Game, tech *Technology) string {
@@ -318,7 +328,7 @@ func PotatoFieldOnClick(g *Game, tech *Technology) string {
 
 func (g *Game) CreateWorkstationTech() *Technology {
 
-	result := g.Technology["Workstation"]
+	result := g.Workstation()
 	result.Square = BoardSquare{
 		//	Tile:         g.Data["WorkstationTile"].(Tile),
 		TileType: "Technology",
@@ -342,17 +352,18 @@ func (g *Game) Workstation() *Technology {
 		TileFillSpace:  false,
 		Square:         BoardSquare{},
 		CostMoney:      25,
+		CostActions:    1,
 		Description:    "asdasd",
 		CanBuild:       WorkstationCanBuild,
 		OnBuild:        WorkstationOnBuild,
 		OnClick:        WorkstationOnClick,
-		Redraw:         false,
 		OnRoundEnd:     WorkstationRoundEnd,
 	}
 
 }
 
-func WorkstationCanBuild(g *Game) bool {
+func WorkstationCanBuild(g *Game, tech *Technology) bool {
+	// if g.Run.CanSpendAction(g)
 	return true
 }
 
@@ -371,7 +382,7 @@ func WorkstationOnClick(g *Game, tech *Technology) string {
 
 func (g *Game) CreateChickenEggWarmer() *Technology {
 
-	result := g.Technology["ChickenEggWarmer"]
+	result := g.CreateChickenEggWarmer()
 	result.Square = BoardSquare{
 		//	Tile:         g.Data["WorkstationTile"].(Tile),
 		TileType: "Technology",
@@ -400,13 +411,12 @@ func (g *Game) ChickenEggWarmer() *Technology {
 		CanBuild:       ChickenEggWarmerCanBuild,
 		OnBuild:        ChickenEggWarmerOnBuild,
 		OnClick:        ChickenEggWarmerOnClick,
-		Redraw:         false,
 		OnRoundEnd:     ChickenEggWarmerRoundEnd,
 	}
 
 }
 
-func ChickenEggWarmerCanBuild(g *Game) bool {
+func ChickenEggWarmerCanBuild(g *Game, tech *Technology) bool {
 	hasCoop := false
 	for _, tech := range g.Run.Technology {
 		if tech.Name == "Chicken Coop" {

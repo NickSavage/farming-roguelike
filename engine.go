@@ -38,6 +38,13 @@ type Scene struct {
 	Windows     map[string]*Window
 	Menu        *BoardRightClickMenu
 	RenderMenu  bool
+	Messages    []Message
+}
+
+type Message struct {
+	Text  string
+	Vec   rl.Vector2
+	Timer int
 }
 
 type Window struct {

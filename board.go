@@ -147,6 +147,8 @@ func (g *Game) drawTiles() {
 	}
 }
 func (g *Game) DrawTechnologySpaces() {
+
+	scene := g.Scenes["Board"]
 	mousePosition := rl.GetMousePosition()
 	var rect rl.Rectangle
 	for _, space := range g.Run.TechnologySpaces {
@@ -163,12 +165,20 @@ func (g *Game) DrawTechnologySpaces() {
 		if rl.CheckCollisionPointRec(mousePosition, rect) {
 			space.Technology.Tile.Color = rl.Green
 			if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-				g.HandleClickTech(space.Technology)
+				result := g.HandleClickTech(space.Technology)
+				message := Message{
+					Text:  result,
+					Vec:   rl.Vector2{X: x, Y: y},
+					Timer: 30,
+				}
+				scene.Messages = append(scene.Messages, message)
 			}
 
 		} else {
 			if space.Technology.ReadyToHarvest {
 				space.Technology.Tile.Color = rl.Blue
+			} else if space.Technology.ReadyToTouch {
+				space.Technology.Tile.Color = rl.Red
 			} else {
 				space.Technology.Tile.Color = rl.White
 			}
@@ -246,6 +256,21 @@ func (g *Game) drawGrid() {
 
 }
 
+func (g *Game) DrawMessages() {
+	scene := g.Scenes["Board"]
+	var results []Message
+	for _, message := range scene.Messages {
+		rl.DrawText(message.Text, int32(message.Vec.X+50), int32(message.Vec.Y), 25, rl.Black)
+		message.Timer -= 1
+		message.Vec.Y -= 1
+		if message.Timer != 0 {
+			results = append(results, message)
+		}
+	}
+	scene.Messages = results
+
+}
+
 // main draw function
 
 func DrawBoard(g *Game) {
@@ -257,6 +282,7 @@ func DrawBoard(g *Game) {
 	g.drawGrid()
 	//	rl.EndMode2D()
 
+	g.DrawMessages()
 	g.HandleHover()
 	DrawHUD(g)
 	// g.DrawContextMenu(g.Scenes["Board"])
