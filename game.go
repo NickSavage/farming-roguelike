@@ -123,7 +123,7 @@ func OnClickEndRound(g *Game) {
 
 func (g *Game) GetNextEvent() {
 
-	newEvent := g.NewRandomEvent()
+	newEvent := g.RoundEndPriceChanges()
 	newEvent.RoundIndex = g.Run.CurrentRound
 	g.Run.Events[newEvent.RoundIndex] = newEvent
 }

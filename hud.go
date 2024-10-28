@@ -179,7 +179,10 @@ func DrawEndRoundWindowPage1(g *Game, window *Window) {
 
 	var x, y int32
 	var i int
-	for key, product := range g.Run.Products {
+	productNames := g.GetProductNames()
+
+	for _, product := range productNames {
+		product := g.Run.Products[product]
 
 		x = int32(windowRect.X + 10)
 		y = int32(windowRect.Y + 50 + float32(i*30))
@@ -188,7 +191,7 @@ func DrawEndRoundWindowPage1(g *Game, window *Window) {
 		subtotal += units * price
 
 		text := fmt.Sprintf("$%v (%v units at $%v each)", units*price, units, price)
-		rl.DrawText(string(key), x, y, 20, rl.Black)
+		rl.DrawText(string(product.Type), x, y, 20, rl.Black)
 		rl.DrawText(text, x+columnOffset, y, 20, rl.Black)
 
 		i += 1
@@ -271,14 +274,14 @@ func DrawNextEventWindow(g *Game, win *Window) {
 	g.DrawButton(button)
 	rl.DrawText(event.Name, 225, 60, 30, rl.Black)
 
-	for _, effect := range event.Effects {
+	for i, effect := range event.Effects {
 		if effect.IsPriceChange {
 			newPrice := g.Run.Products[effect.ProductImpacted].Price * float32(1+effect.PriceChange)
 			newPrice = float32(math.Round(float64(newPrice*100))) / 100
 
 			displayChange := math.Round(float64(effect.PriceChange*100*100)) / 100
 			text := fmt.Sprintf("Price of %v is now %v (%v%%)", effect.ProductImpacted, newPrice, displayChange)
-			rl.DrawText(text, 225, 95, 20, rl.Black)
+			rl.DrawText(text, 225, int32(95+(i*20)), 20, rl.Black)
 		}
 	}
 

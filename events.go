@@ -6,7 +6,7 @@ import (
 
 func (g *Game) NewRandomEvent() Event {
 	effects := []Effect{}
-	effects = append(effects, g.RandomPriceChange())
+	// effects = append(effects, g.RandomPriceChange())
 	result := Event{
 		Name:    "asdf",
 		Effects: effects,
@@ -14,18 +14,31 @@ func (g *Game) NewRandomEvent() Event {
 	return result
 }
 
-func (g *Game) RandomPriceChange() Effect {
-	var productNames []ProductType
-	for key, _ := range g.Run.Products {
-		productNames = append(productNames, key)
+func (g *Game) RoundEndPriceChanges() Event {
+	effects := []Effect{}
+	productNames := g.GetProductNames()
+	for _, product := range productNames {
+		effect := g.RandomPriceChange(product)
+		effects = append(effects, effect)
 	}
-	index := rand.Intn(len(productNames))
+	result := Event{
+		Name:    "Price Changes",
+		Effects: effects,
+	}
+	return result
+}
+
+func (g *Game) RandomPriceChange(product ProductType) Effect {
 	baseRandom := rand.Float64()
 
 	scaledRandom := baseRandom*0.2 - 0.1
 	return Effect{
 		IsPriceChange:   true,
-		ProductImpacted: productNames[index],
+		ProductImpacted: product,
 		PriceChange:     float32(scaledRandom),
 	}
 }
+
+// func (g *Game) CellTowerEvent() Effect {
+
+// }

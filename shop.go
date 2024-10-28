@@ -53,6 +53,7 @@ func ShopClickChickenEggWarmer(g *Game) {
 
 func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {
 	textColor := rl.Black
+	canBuild := true
 
 	shopButton.BackgroundColor = rl.White
 	log.Printf("shop %v", shopButton.Technology)
@@ -60,13 +61,16 @@ func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {
 	if !g.Run.CanSpendMoney(shopButton.Technology.CostMoney) ||
 		!shopButton.Technology.CanBuild(g, shopButton.Technology) {
 		textColor = rl.LightGray
+		canBuild = false
 	}
 	if !g.Run.CanSpendAction(shopButton.Technology.CostActions) {
 		textColor = rl.LightGray
+		canBuild = false
 	}
 	_, err := g.GetOpenSpace(shopButton.Technology)
 	if err != nil {
 		textColor = rl.LightGray
+		canBuild = false
 	}
 	rect := rl.Rectangle{
 		X:      x,
@@ -79,7 +83,10 @@ func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {
 
 	if rl.CheckCollisionPointRec(mousePosition, rect) {
 
-		shopButton.BackgroundColor = rl.LightGray
+		if canBuild {
+
+			shopButton.BackgroundColor = rl.LightGray
+		}
 
 		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 			shopButton.OnClick(g)
