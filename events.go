@@ -4,6 +4,14 @@ import (
 	"math/rand"
 )
 
+func (g *Game) InitEvents() []Event {
+	events := []Event{}
+	events = append(events, g.LandClearageEvent())
+	events = append(events, g.CellTowerEvent())
+
+	return events
+}
+
 func (g *Game) NewRandomEvent() Event {
 	effects := []Effect{}
 	// effects = append(effects, g.RandomPriceChange())
@@ -39,6 +47,34 @@ func (g *Game) RandomPriceChange(product ProductType) Effect {
 	}
 }
 
-// func (g *Game) CellTowerEvent() Effect {
+func (g *Game) LandClearageEvent() Event {
+	effects := []Effect{
+		{
+			IsPriceChange: false,
+			EventTrigger:  LandClearageTrigger,
+		},
+	}
+	result := Event{
+		Name:    "Land Clearage",
+		Effects: effects,
+	}
+	return result
+}
 
-// }
+func LandClearageTrigger(g *Game) {
+	g.Run.EventTracker.LandClearageTriggered = true
+}
+
+func (g *Game) CellTowerEvent() Event {
+	effects := []Effect{
+		{
+			IsPriceChange: false,
+			EventTrigger:  LandClearageTrigger,
+		},
+	}
+	result := Event{
+		Name:    "Cell Tower",
+		Effects: effects,
+	}
+	return result
+}

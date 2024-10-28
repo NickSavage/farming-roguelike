@@ -92,10 +92,16 @@ type Run struct {
 	CurrentRound     int
 	CurrentSeason    Season
 	NextSeason       Season
-	Events           []Event
+	PossibleEvents   []Event
+	EventTracker     EventTracker
 	TechnologySpaces []*TechnologySpace
 	ActionsRemaining int
 	ActionsMaximum   int
+}
+
+type EventTracker struct {
+	LandClearageTriggered bool
+	LandClearageFinished  bool
 }
 
 type Event struct {
@@ -107,6 +113,7 @@ type Effect struct {
 	ProductImpacted ProductType
 	IsPriceChange   bool
 	PriceChange     float32 // percentage
+	EventTrigger    func(*Game)
 }
 
 type Product struct {

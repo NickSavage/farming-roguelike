@@ -21,7 +21,7 @@ func (g *Game) InitRun() {
 		NextSeason:       Summer,
 		Technology:       make([]*Technology, 0),
 		People:           make([]Person, 1),
-		Events:           GenerateRandomEvents(),
+		PossibleEvents:   GenerateRandomEvents(),
 		Products:         make(map[ProductType]*Product),
 		ActionsMaximum:   5,
 		ActionsRemaining: 5,
