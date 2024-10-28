@@ -1,10 +1,10 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
-	//	"sort"
-	"errors"
+	"sort"
 	//
 	// rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -41,7 +41,12 @@ func (g *Game) GetProductNames() []ProductType {
 		results = append(results, product.Type)
 	}
 	// todo sort
-	//sort.Strings(results)
+	sort.Slice(results, func(i, j int) bool {
+		strI := string(results[i])
+		strJ := string(results[j])
+		return strI < strJ
+	})
+
 	return results
 }
 

@@ -53,6 +53,8 @@ func ShopClickChickenEggWarmer(g *Game) {
 
 func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {
 	textColor := rl.Black
+
+	shopButton.BackgroundColor = rl.White
 	log.Printf("shop %v", shopButton.Technology)
 
 	if !g.Run.CanSpendMoney(shopButton.Technology.CostMoney) ||
@@ -72,24 +74,29 @@ func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {
 		Width:  float32(shopButton.Width),
 		Height: float32(shopButton.Height),
 	}
-	rl.DrawRectangleLinesEx(rect, 1, rl.Black)
-	rl.DrawRectangleRec(rect, shopButton.BackgroundColor)
-	DrawTile(shopButton.Image, x+5, y+2)
-	rl.DrawText(shopButton.Technology.Name, int32(x+50), int32(y+2), 20, textColor)
-	rl.DrawText(shopButton.Technology.Description, int32(x+50), int32(y+22), 10, textColor)
 
-	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+	mousePosition := rl.GetMousePosition()
 
-		mousePosition := rl.GetMousePosition()
-		if rl.CheckCollisionPointRec(mousePosition, rect) {
+	if rl.CheckCollisionPointRec(mousePosition, rect) {
+
+		shopButton.BackgroundColor = rl.LightGray
+
+		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 			shopButton.OnClick(g)
 		}
 	}
+	rl.DrawRectangleRec(rect, shopButton.BackgroundColor)
+	rl.DrawRectangleLinesEx(rect, 1, rl.Black)
+	DrawTile(shopButton.Image, x+5, y+2)
+	rl.DrawText(shopButton.Technology.Name, int32(x), int32(y+50), 20, textColor)
+	rl.DrawText(shopButton.Technology.Description, int32(x), int32(y+70), 10, textColor)
 }
 
 func (g *Game) DrawPlantPurchaseButton(shopButton *ShopButton, x, y float32) {
 
 	//	textColor := rl.Black
+
+	shopButton.BackgroundColor = rl.White
 	log.Printf("shop %v", shopButton.Technology)
 
 	if !g.Run.CanSpendMoney(shopButton.Technology.CostMoney) ||
@@ -113,17 +120,18 @@ func (g *Game) DrawPlantPurchaseButton(shopButton *ShopButton, x, y float32) {
 		Width:  float32(100),
 		Height: float32(100),
 	}
-	rl.DrawRectangleLinesEx(rect, 1, rl.Black)
-	rl.DrawRectangleRec(rect, shopButton.BackgroundColor)
-	DrawTile(shopButton.Image, x+5, y+5)
 
-	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+	mousePosition := rl.GetMousePosition()
+	if rl.CheckCollisionPointRec(mousePosition, rect) {
+		shopButton.BackgroundColor = rl.LightGray
 
-		mousePosition := rl.GetMousePosition()
-		if rl.CheckCollisionPointRec(mousePosition, rect) {
+		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 			shopButton.OnClick(g)
 		}
 	}
+	rl.DrawRectangleLinesEx(rect, 1, rl.Black)
+	rl.DrawRectangleRec(rect, shopButton.BackgroundColor)
+	DrawTile(shopButton.Image, x+5, y+5)
 }
 
 func (g *Game) InitShopWindow() {
@@ -132,36 +140,22 @@ func (g *Game) InitShopWindow() {
 	scene := g.Scenes["Board"]
 	buttons := []ShopButton{
 		ShopButton{
-			Width:      400,
-			Height:     50,
+			Width:      150,
+			Height:     300,
 			Image:      g.Data["ChickenCoopShopTile"].(Tile),
 			OnClick:    ShopClickChickenCoop,
 			Technology: tech["ChickenCoop"],
 		},
 		ShopButton{
-			Width:      400,
-			Height:     50,
-			Image:      g.Data["WheatTile"].(Tile),
-			OnClick:    ShopClickWheatField,
-			Technology: tech["WheatField"],
-		},
-		ShopButton{
-			Width:      400,
-			Height:     50,
-			Image:      g.Data["PotatoTile"].(Tile),
-			OnClick:    ShopClickPotatoField,
-			Technology: tech["PotatoField"],
-		},
-		ShopButton{
-			Width:      400,
-			Height:     50,
+			Width:      150,
+			Height:     300,
 			Image:      g.Data["WorkstationTile"].(Tile),
 			OnClick:    ShopClickWorkstation,
 			Technology: tech["Workstation"],
 		},
 		ShopButton{
-			Width:      400,
-			Height:     50,
+			Width:      150,
+			Height:     300,
 			Image:      g.Data["ChickenEggWarmerShopTile"].(Tile),
 			OnClick:    ShopClickChickenEggWarmer,
 			Technology: tech["ChickenEggWarmer"],
@@ -177,12 +171,12 @@ func DrawShopWindow(g *Game, window *Window) {
 	rl.DrawText("Shop", 205, 55, 30, rl.Black)
 
 	buttons := scene.Data["ShopButtons"].([]ShopButton)
-	g.DrawShopButton(buttons[0], 205, 90)
-	g.DrawShopButton(buttons[3], 205, 255)
-	g.DrawShopButton(buttons[4], 205, 310)
+	g.DrawShopButton(buttons[0], 215, 90)
+	g.DrawShopButton(buttons[1], 375, 90)
+	g.DrawShopButton(buttons[2], 535, 90)
 
-	g.DrawPlantPurchaseButton(WheatShopButton(g), 205, 400)
-	g.DrawPlantPurchaseButton(PotatoShopButton(g), 310, 400)
+	g.DrawPlantPurchaseButton(WheatShopButton(g), 215, 400)
+	g.DrawPlantPurchaseButton(PotatoShopButton(g), 325, 400)
 	// g.DrawPlantPurchaseButton(buttons[2], 260, 400)
 	// for _, button := range buttons {
 	// 	g.DrawShopButton(button, 205, 90)
