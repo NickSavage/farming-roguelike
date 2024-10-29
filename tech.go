@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
+	"os"
 	"sort"
 	//
 	// rl "github.com/gen2brain/raylib-go/raylib"
@@ -11,6 +13,7 @@ import (
 
 func (g *Game) InitTechnology() {
 	log.Printf("init tech")
+	g.LoadInitialData()
 	tech := make(map[string]*Technology)
 
 	tech["ChickenCoop"] = g.ChickenCoop()
@@ -21,6 +24,37 @@ func (g *Game) InitTechnology() {
 	tech["ChickenEggWarmer"] = g.ChickenEggWarmer()
 
 	g.Technology = tech
+}
+
+func (g *Game) LoadInitialData() {
+	var initialData []InitialData
+
+	// Load the JSON data from the file into memory
+	file, err := os.Open("./assets/initialTech.json")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+
+	jsonDecoder := json.NewDecoder(file)
+
+	err = jsonDecoder.Decode(&initialData)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Create an empty map to store the data
+	dataMap := make(map[string]InitialData)
+
+	// Iterate over each item in the initialData slice
+	for _, item := range initialData {
+		// Store the item in the map with its product type as key
+		dataMap[item.Name] = item
+	}
+	log.Printf("data %v", dataMap)
+	g.InitialData = dataMap
 }
 
 func (g *Game) InitProduct(productType ProductType, price float32) {
@@ -112,6 +146,8 @@ func (g *Game) CreateChickenCoopTech() *Technology {
 }
 
 func (g *Game) ChickenCoop() *Technology {
+
+	log.Printf("data %v", g.InitialData)
 	result := &Technology{
 		Name:            "Chicken Coop",
 		ProductType:     Chicken,
@@ -122,7 +158,7 @@ func (g *Game) ChickenCoop() *Technology {
 		TileFillSpace:   false,
 		Square:          BoardSquare{},
 		Description:     "asdasd",
-		CostMoney:       50,
+		CostMoney:       g.InitialData["Chicken"].Cost,
 		CanBuild:        ChickenCoopCanBuild,
 		OnBuild:         ChickenCoopOnBuild,
 		OnClick:         ChickenCoopOnClick,
@@ -138,12 +174,12 @@ func ChickenCoopCanBuild(g *Game, tech *Technology) bool {
 }
 
 func ChickenCoopOnBuild(g *Game, tech *Technology) error {
-	g.InitProduct(tech.ProductType, 5)
+	g.InitProduct(tech.ProductType, g.InitialData["Chicken"].Price)
 	return nil
 }
 
 func ChickenCoopProduce(g *Game, tech *Technology) float32 {
-	return 5 * g.Run.Productivity * g.Run.Products["Chicken"].Yield * tech.TempYield
+	return g.InitialData["Chicken"].Production * g.Run.Productivity * g.Run.Products["Chicken"].Yield * tech.TempYield
 }
 
 func ChickenCoopOnClick(g *Game, tech *Technology) string {
@@ -178,7 +214,7 @@ func (g *Game) CreateWheatTech() *Technology {
 	g.Run.Products["Wheat"] = &Product{
 		Type:     Wheat,
 		Quantity: 0,
-		Price:    1,
+		Price:    g.InitialData["Wheat"].Price,
 		Yield:    1,
 	}
 
@@ -187,15 +223,16 @@ func (g *Game) CreateWheatTech() *Technology {
 
 func (g *Game) WheatField() *Technology {
 	return &Technology{
-		Name:            "Wheat",
-		ProductType:     Wheat,
-		TechnologyType:  PlantSpace,
-		Tile:            g.Data["WheatTile"].(Tile),
-		TileWidth:       1,
-		TileHeight:      1,
-		TileFillSpace:   true,
-		Square:          BoardSquare{},
-		CostMoney:       50,
+		Name:           "Wheat",
+		ProductType:    Wheat,
+		TechnologyType: PlantSpace,
+		Tile:           g.Data["WheatTile"].(Tile),
+		TileWidth:      1,
+		TileHeight:     1,
+		TileFillSpace:  true,
+		Square:         BoardSquare{},
+		CostMoney:      g.InitialData["Wheat"].Cost,
+
 		Description:     "asdasd",
 		CanBuild:        WheatFieldCanBuild,
 		OnBuild:         WheatFieldOnBuild,
@@ -226,12 +263,12 @@ func WheatFieldCanBuild(g *Game, tech *Technology) bool {
 }
 
 func WheatFieldOnBuild(g *Game, tech *Technology) error {
-	g.InitProduct(tech.ProductType, 1)
+	g.InitProduct(tech.ProductType, g.InitialData["Wheat"].Price)
 	return nil
 }
 
 func WheatFieldProduce(g *Game, tech *Technology) float32 {
-	result := float32(125) * g.Run.Productivity * g.Run.Products["Wheat"].Yield * tech.TempYield
+	result := g.InitialData["Wheat"].Production * g.Run.Productivity * g.Run.Products["Wheat"].Yield * tech.TempYield
 	log.Printf("wheat %v", result)
 	return result
 }
@@ -280,7 +317,7 @@ func (g *Game) CreatePotatoTech() *Technology {
 		Occupied: true,
 	}
 
-	g.InitProduct(result.ProductType, 5)
+	g.InitProduct(result.ProductType, g.InitialData["Potato"].Price)
 	return result
 }
 
@@ -294,7 +331,7 @@ func (g *Game) PotatoField() *Technology {
 		TileHeight:      1,
 		TileFillSpace:   true,
 		Square:          BoardSquare{},
-		CostMoney:       50,
+		CostMoney:       g.InitialData["Potato"].Cost,
 		Description:     "asdasd",
 		CanBuild:        PotatoFieldCanBuild,
 		OnBuild:         PotatoFieldOnBuild,
@@ -319,17 +356,20 @@ func PotatoShopButton(g *Game) *ShopButton {
 }
 
 func PotatoFieldCanBuild(g *Game, tech *Technology) bool {
-	return true
+	if g.Run.CurrentSeason == Spring {
+		return true
+	}
+	return false
 }
 
 func PotatoFieldOnBuild(g *Game, tech *Technology) error {
-	g.InitProduct(tech.ProductType, 1)
+	g.InitProduct(tech.ProductType, g.InitialData["Potato"].Price)
 	return nil
 }
 
 func PotatoFieldProduce(g *Game, tech *Technology) float32 {
 	if g.Run.CurrentSeason == Autumn {
-		return float32(125) * g.Run.Productivity * g.Run.Products["Potato"].Yield * tech.TempYield
+		return g.InitialData["Potato"].Production * g.Run.Productivity * g.Run.Products["Potato"].Yield * tech.TempYield
 	} else {
 		return 0
 	}
@@ -337,12 +377,25 @@ func PotatoFieldProduce(g *Game, tech *Technology) float32 {
 func PotatoFieldRoundEnd(g *Game, tech *Technology) {
 	if g.Run.NextSeason == Autumn {
 		tech.ReadyToHarvest = true
+	} else if g.Run.NextSeason == Winter {
+		g.RemoveTech(tech)
+	} else {
+		tech.ReadyToTouch = true
 	}
+
 	tech.Tile.TileFrame.X += 45
 }
 
 func PotatoFieldOnClick(g *Game, tech *Technology) string {
-	if tech.ReadyToHarvest {
+	if tech.ReadyToTouch {
+		err := g.Run.SpendAction(1)
+		if err == nil {
+			tech.TempYield += 0.05
+			tech.ReadyToTouch = false
+			return fmt.Sprintf("Yield: %v", tech.TempYield)
+		}
+		tech.ReadyToTouch = false
+	} else if tech.ReadyToHarvest {
 		produced := PotatoFieldProduce(g, tech)
 		g.Run.Products["Potato"].Quantity += produced
 		g.RemoveTech(tech)
@@ -455,7 +508,7 @@ func ChickenEggWarmerCanBuild(g *Game, tech *Technology) bool {
 }
 
 func ChickenEggWarmerOnBuild(g *Game, tech *Technology) error {
-	g.InitProduct("Chicken", 5)
+	g.InitProduct("Chicken", g.InitialData["Chicken"].Price)
 	g.Run.Products["Chicken"].Yield += 0.05
 
 	return nil

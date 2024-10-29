@@ -163,7 +163,7 @@ func main() {
 
 	rl.SetTargetFPS(60)
 
-	g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["ShopWindow"])
+	//	g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["ShopWindow"])
 	for !rl.WindowShouldClose() {
 		g.Counter += 1
 		if g.Counter == 60 {

@@ -19,6 +19,7 @@ type Game struct {
 	ScreenSkip   bool
 	WindowOpen   bool
 	Technology   map[string]*Technology
+	InitialData  map[string]InitialData
 }
 
 type Run struct {
@@ -152,4 +153,11 @@ func (s Season) String() string {
 
 func (s *Season) Next() {
 	*s = (*s + 1) % 4 // Cycle back to Spring after Winter
+}
+
+type InitialData struct {
+	Name       string  `json:"name"`
+	Price      float32 `json:"price"`
+	Cost       float32 `json:"cost"`
+	Production float32 `json:"production"`
 }
