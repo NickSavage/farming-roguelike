@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gen2brain/raylib-go/raylib"
-	//	"log"
+	"log"
 	"math"
 )
 
@@ -262,39 +262,56 @@ func DrawEndRoundWindowPage2(g *Game, win *Window) {
 
 }
 
+func (g *Game) HandleChooseEvent(event Event) {
+	g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["NextEvent"])
+	g.ApplyEvent(event)
+	g.ApplyPriceChanges(event)
+
+}
+
 func DrawNextEventWindow(g *Game, win *Window) {
 
 	window := rl.NewRectangle(220, 50, 900, 500)
 	rl.DrawRectangleRec(window, rl.White)
-	rl.DrawRectangleLinesEx(window, 5, rl.Black)
+	rl.DrawRectangleLinesEx(window, 2, rl.Black)
 
-	button := g.Button("Confirm", 500, 500, OnClickConfirmNextEvent)
+	log.Printf("events %v round %v", g.Run.Events, g.Run.CurrentRound)
+	events := g.Run.EventChoices
+	var x int32
+	var y int32 = 60
 
-	event := g.Run.Events[g.Run.CurrentRound]
-	g.DrawButton(button)
-	rl.DrawText(event.Name, 225, 60, 30, rl.Black)
+	for i, event := range events {
+		x = int32(240 + (i * 300))
+		rect := rl.NewRectangle(float32(x)+5, float32(y), 300, 400)
 
-	for i, effect := range event.Effects {
-		if effect.IsPriceChange {
-			newPrice := g.Run.Products[effect.ProductImpacted].Price * float32(1+effect.PriceChange)
-			newPrice = float32(math.Round(float64(newPrice*100))) / 100
-
-			displayChange := math.Round(float64(effect.PriceChange*100*100)) / 100
-			text := fmt.Sprintf("Price of %v is now %v (%v%%)", effect.ProductImpacted, newPrice, displayChange)
-			rl.DrawText(text, 225, int32(95+(i*20)), 20, rl.Black)
+		rl.DrawRectangleRec(rect, rl.White)
+		mousePosition := rl.GetMousePosition()
+		if rl.CheckCollisionPointRec(mousePosition, rect) {
+			rl.DrawRectangleRec(rect, rl.LightGray)
+			if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+				g.HandleChooseEvent(event)
+			}
 		}
-	}
+		rl.DrawRectangleLinesEx(rect, 5, rl.Black)
 
-	if g.WasButtonClicked(&button) {
-		button.OnClick(g)
-	}
+		rl.DrawText(event.Name, x+5, y+10, 30, rl.Black)
 
+		for i, effect := range event.Effects {
+			if effect.IsPriceChange {
+				newPrice := g.Run.Products[effect.ProductImpacted].Price * float32(1+effect.PriceChange)
+				newPrice = float32(math.Round(float64(newPrice*100))) / 100
+
+				displayChange := math.Round(float64(effect.PriceChange*100*100)) / 100
+				text := fmt.Sprintf("%v: %v (%v%%)", effect.ProductImpacted, newPrice, displayChange)
+				rl.DrawText(text, x+5, y+int32(45+(i*20)), 20, rl.Black)
+			}
+		}
+
+	}
 }
 
 func OnClickConfirmNextEvent(g *Game) {
-	g.ProcessNextEvent()
 	g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["NextEvent"])
-
 }
 
 func (g *Game) DrawSellButton(x, y float32) Button {

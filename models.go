@@ -21,6 +21,26 @@ type Game struct {
 	Technology   map[string]*Technology
 }
 
+type Run struct {
+	Technology       []*Technology
+	People           []Person
+	Products         map[ProductType]*Product
+	Money            float32
+	Yield            float32
+	Productivity     float32
+	EndRoundMoney    float32
+	CurrentRound     int
+	CurrentSeason    Season
+	NextSeason       Season
+	EventChoices     []Event
+	Events           []Event
+	PossibleEvents   []Event
+	EventTracker     EventTracker
+	TechnologySpaces []*TechnologySpace
+	ActionsRemaining int
+	ActionsMaximum   int
+}
+
 type BoardSquare struct {
 	Tile              Tile
 	TileType          string
@@ -81,24 +101,6 @@ const (
 type Person struct {
 }
 
-type Run struct {
-	Technology       []*Technology
-	People           []Person
-	Products         map[ProductType]*Product
-	Money            float32
-	Yield            float32
-	Productivity     float32
-	EndRoundMoney    float32
-	CurrentRound     int
-	CurrentSeason    Season
-	NextSeason       Season
-	PossibleEvents   []Event
-	EventTracker     EventTracker
-	TechnologySpaces []*TechnologySpace
-	ActionsRemaining int
-	ActionsMaximum   int
-}
-
 type EventTracker struct {
 	LandClearageTriggered bool
 	LandClearageFinished  bool
@@ -108,6 +110,7 @@ type Event struct {
 	RoundIndex int
 	Name       string
 	Effects    []Effect
+	BlankEvent bool
 }
 type Effect struct {
 	ProductImpacted ProductType

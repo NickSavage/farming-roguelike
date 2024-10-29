@@ -36,6 +36,21 @@ func (g *Game) RoundEndPriceChanges() Event {
 	return result
 }
 
+func (g *Game) ApplyEvent(event Event) {
+	g.Run.EventChoices = []Event{}
+	g.Run.Events = append(g.Run.Events, event)
+	g.ApplyPriceChanges(event)
+}
+
+func (g *Game) ApplyPriceChanges(event Event) {
+	for _, effect := range event.Effects {
+		if effect.IsPriceChange {
+			current := g.Run.Products[effect.ProductImpacted].Price
+			g.Run.Products[effect.ProductImpacted].Price = current * (1 + effect.PriceChange)
+		}
+	}
+}
+
 func (g *Game) RandomPriceChange(product ProductType) Effect {
 	baseRandom := rand.Float64()
 

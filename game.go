@@ -22,6 +22,7 @@ func (g *Game) InitRun() {
 		Technology:       make([]*Technology, 0),
 		People:           make([]Person, 1),
 		PossibleEvents:   GenerateRandomEvents(),
+		Events:           []Event{{BlankEvent: true}},
 		Products:         make(map[ProductType]*Product),
 		ActionsMaximum:   5,
 		ActionsRemaining: 5,
@@ -117,26 +118,17 @@ func OnClickEndRound(g *Game) {
 	g.Run.CurrentRound += 1
 	g.Run.CurrentSeason.Next()
 	g.Run.NextSeason.Next()
-	g.GetNextEvent()
+	g.GetNextEvents()
 
 }
 
-func (g *Game) GetNextEvent() {
+func (g *Game) GetNextEvents() {
 
 	newEvent := g.RoundEndPriceChanges()
-	newEvent.RoundIndex = g.Run.CurrentRound
-	g.Run.Events[newEvent.RoundIndex] = newEvent
-}
+	g.Run.EventChoices = append(g.Run.EventChoices, newEvent)
 
-func (g *Game) ProcessNextEvent() {
-	event := g.Run.Events[g.Run.CurrentRound]
-	for _, effect := range event.Effects {
-		if effect.IsPriceChange {
-			log.Printf("Price of %v change by %v", effect.ProductImpacted, effect.PriceChange)
-			current := g.Run.Products[effect.ProductImpacted].Price
-			g.Run.Products[effect.ProductImpacted].Price = current * (1 + effect.PriceChange)
-		}
-	}
+	newEvent = g.RoundEndPriceChanges()
+	g.Run.EventChoices = append(g.Run.EventChoices, newEvent)
 }
 
 func (g *Game) DrawTechHoverWindow(tech Technology, x, y float32) {
