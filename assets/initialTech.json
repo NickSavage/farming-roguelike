@@ -25,8 +25,20 @@
     "price": 1.99,
     "cost": 50,
     "production": 125,
-    "rarity": "common"
+      "rarity": "common",
   },
+{
+    "name": "Potato",
+    "productType": "Potato", // Assuming this is the key for the product type.
+    "rarity": "Common",
+    "costMoney": 50,
+    "description": "asdasd",
+    "production": 125,
+    "tile": {
+        "width": 1,
+        "height": 1,
+        "fillSpace": true
+    }
   {
     "name": "Carrot",
     "price": 2.49,

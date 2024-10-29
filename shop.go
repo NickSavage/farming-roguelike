@@ -182,8 +182,16 @@ func DrawShopWindow(g *Game, window *Window) {
 	g.DrawShopButton(buttons[1], 375, 90)
 	g.DrawShopButton(buttons[2], 535, 90)
 
-	g.DrawPlantPurchaseButton(WheatShopButton(g), 215, 400)
-	g.DrawPlantPurchaseButton(PotatoShopButton(g), 325, 400)
+	plants := g.Run.CurrentRoundShopPlants
+
+	var x float32 = 215
+	for i, plant := range plants {
+		log.Printf("plant %v", plant)
+		g.DrawPlantPurchaseButton(plant.ShopButton(g), x+float32(i*100), 400)
+	}
+
+	// g.DrawPlantPurchaseButton(WheatShopButton(g), 215, 400)
+	// g.DrawPlantPurchaseButton(PotatoShopButton(g), 325, 400)
 	// g.DrawPlantPurchaseButton(buttons[2], 260, 400)
 	// for _, button := range buttons {
 	// 	g.DrawShopButton(button, 205, 90)

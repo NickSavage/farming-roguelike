@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Chicken Coop",
+    "productType": "Chicken",
+    "technologyType": "BuildingSpace",
+    "price": 1.99,
+    "costMoney": 50,
+    "production": 5,
+    "rarity": "common",
+    "description": "aoeaoeao",
+    "tile": {
+      "id": "ChickenCoopTile",
+      "width": 1,
+      "height": 1,
+      "fillSpace": false
+    }
+  },
+  {
+    "name": "Wheat",
+    "productType": "Wheat",
+    "technologyType": "PlantSpace",
+      "price": 1,
+    "costMoney": 50,
+    "production": 100,
+    "rarity": "Common",
+    "description": "asdasd",
+    "tile": {
+      "id": "WheatTile",
+      "width": 1,
+      "height": 1,
+      "fillSpace": true
+    }
+  },
+  {
+    "name": "Potato",
+    "rarity": "Common",
+      "price": 2,
+    "costMoney": 50,
+    "description": "asdasd",
+    "production": 125,
+    "productType": "Potato",
+    "technologyType": "PlantSpace",
+    "tile": {
+      "id": "PotatoTile",
+      "width": 1,
+      "height": 1,
+      "fillSpace": true
+    }
+  }
+]

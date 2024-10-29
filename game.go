@@ -28,9 +28,8 @@ func (g *Game) InitRun() {
 		ActionsRemaining: 5,
 	}
 	g.InitTechSpaces()
-	//	g.Run.Technology = append(g.Run.Technology, g.CreateChickenCoopTech())
-	// g.Run.Technology = append(g.Run.Technology, g.CreateWheatTech())
 
+	g.Run.CurrentRoundShopPlants = g.ShopRandomPlants(2)
 }
 
 func (g *Game) InitTechSpaces() {
@@ -119,6 +118,8 @@ func OnClickEndRound(g *Game) {
 	g.Run.CurrentSeason.Next()
 	g.Run.NextSeason.Next()
 	g.GetNextEvents()
+
+	g.Run.CurrentRoundShopPlants = g.ShopRandomPlants(2)
 
 }
 
@@ -258,4 +259,40 @@ func (r *Run) GenerateYield() float32 {
 	scaledF := float32(f*1.2 + 0.8*(1-f))
 	return scaledF
 
+}
+
+func (g *Game) ShopRandomPlants(needed int) []*Technology {
+	// Filter technologies with Type == PlantSpace and collect their keys into a slice
+	plantSpaceTechnologies := make([]*Technology, 0)
+	for _, tech := range g.Technology {
+		if tech.TechnologyType == PlantSpace {
+			plantSpaceTechnologies = append(plantSpaceTechnologies, tech)
+		}
+	}
+
+	// Select a slice of unique random technologies from the filtered list
+	result := []*Technology{}
+	keysToPickFrom := make([]string, 0)
+	for key, _ := range g.Technology {
+		if _, found := findPlantSpaceTech(g.Technology, key); found {
+			keysToPickFrom = append(keysToPickFrom, key)
+		}
+	}
+
+	for i := 0; i < needed && len(keysToPickFrom) > 0; i++ {
+		index := rand.Intn(len(keysToPickFrom))
+		selectedKey := keysToPickFrom[index]
+		keysToPickFrom = append(keysToPickFrom[:index], keysToPickFrom[index+1:]...)
+		result = append(result, g.Technology[selectedKey])
+	}
+
+	return result
+}
+
+func findPlantSpaceTech(techMap map[string]*Technology, key string) (bool, bool) {
+	_, found := techMap[key]
+	if found && techMap[key].TechnologyType == PlantSpace {
+		return true, true
+	}
+	return false, false
 }

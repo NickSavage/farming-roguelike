@@ -23,23 +23,24 @@ type Game struct {
 }
 
 type Run struct {
-	Technology       []*Technology
-	People           []Person
-	Products         map[ProductType]*Product
-	Money            float32
-	Yield            float32
-	Productivity     float32
-	EndRoundMoney    float32
-	CurrentRound     int
-	CurrentSeason    Season
-	NextSeason       Season
-	EventChoices     []Event
-	Events           []Event
-	PossibleEvents   []Event
-	EventTracker     EventTracker
-	TechnologySpaces []*TechnologySpace
-	ActionsRemaining int
-	ActionsMaximum   int
+	Technology             []*Technology
+	People                 []Person
+	Products               map[ProductType]*Product
+	Money                  float32
+	Yield                  float32
+	Productivity           float32
+	EndRoundMoney          float32
+	CurrentRound           int
+	CurrentSeason          Season
+	CurrentRoundShopPlants []*Technology
+	NextSeason             Season
+	EventChoices           []Event
+	Events                 []Event
+	PossibleEvents         []Event
+	EventTracker           EventTracker
+	TechnologySpaces       []*TechnologySpace
+	ActionsRemaining       int
+	ActionsMaximum         int
 }
 
 type BoardSquare struct {
@@ -72,6 +73,7 @@ type Technology struct {
 	Name            string
 	ProductType     ProductType
 	TechnologyType  TechnologyType
+	Rarity          string
 	Tile            Tile
 	TileWidth       int
 	TileHeight      int
@@ -85,6 +87,7 @@ type Technology struct {
 	OnClick         func(*Game, *Technology) string
 	OnRoundEnd      func(*Game, *Technology)
 	RoundEndProduce func(*Game, *Technology) float32
+	ShopButton      func(*Game) *ShopButton
 	ToBeDeleted     bool
 	Space           *TechnologySpace
 	ReadyToHarvest  bool
@@ -92,11 +95,11 @@ type Technology struct {
 	TempYield       float32
 }
 
-type TechnologyType int
+type TechnologyType = string
 
 const (
-	PlantSpace TechnologyType = iota
-	BuildingSpace
+	PlantSpace    TechnologyType = "PlantSpace"
+	BuildingSpace TechnologyType = "PlantSpace"
 )
 
 type Person struct {
@@ -156,9 +159,20 @@ func (s *Season) Next() {
 }
 
 type InitialData struct {
-	Name       string  `json:"name"`
-	Price      float32 `json:"price"`
-	Cost       float32 `json:"cost"`
-	Production float32 `json:"production"`
-	Rarity     string  `json:"rarity"`
+	Name           string         `json:"name"`
+	Price          float32        `json:"price"`
+	ProductType    string         `json:"productType"`
+	TechnologyType string         `json:"technologyType"`
+	CostMoney      float32        `json:"costMoney"`
+	Production     float32        `json:"production"`
+	Rarity         string         `json:"rarity"`
+	Description    string         `json:"description"`
+	TileConfig     TechTileConfig `json:"tile"`
+}
+
+type TechTileConfig struct {
+	ID        string `json:"id"`
+	Width     int    `json:"width"`
+	Height    int    `json:"height"`
+	FillSpace bool   `json:"fillSpace"`
 }
