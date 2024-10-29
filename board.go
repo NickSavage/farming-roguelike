@@ -37,6 +37,8 @@ func (g *Game) GetOpenSpace(tech *Technology) (*TechnologySpace, error) {
 			continue
 		}
 		if space.TechnologyType != tech.TechnologyType {
+			log.Printf("%v %v", space.TechnologyType, tech.TechnologyType)
+			log.Printf("%T %T", space.TechnologyType, tech.TechnologyType)
 			continue
 		}
 		return space, nil

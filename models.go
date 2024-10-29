@@ -82,6 +82,8 @@ type Technology struct {
 	Square          BoardSquare
 	CostMoney       float32
 	CostActions     int
+	InitialPrice    float32
+	BaseProduction  float32
 	CanBuild        func(*Game, *Technology) bool
 	OnBuild         func(*Game, *Technology) error
 	OnClick         func(*Game, *Technology) string
@@ -99,7 +101,7 @@ type TechnologyType = string
 
 const (
 	PlantSpace    TechnologyType = "PlantSpace"
-	BuildingSpace TechnologyType = "PlantSpace"
+	BuildingSpace TechnologyType = "BuildingSpace"
 )
 
 type Person struct {
@@ -137,6 +139,7 @@ const (
 	Chicken ProductType = "Chicken"
 	Wheat   ProductType = "Wheat"
 	Potato  ProductType = "Potato"
+	Carrot  ProductType = "Carrot"
 )
 
 // Define the type for the enum

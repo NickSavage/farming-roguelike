@@ -40,6 +40,11 @@ func ShopClickPotatoField(g *Game) {
 	g.ShopChooseTech(tech)
 }
 
+func ShopClickCarrotField(g *Game) {
+
+	tech := g.CreateCarrotTech()
+	g.ShopChooseTech(tech)
+}
 func ShopClickWorkstation(g *Game) {
 
 	tech := g.CreateWorkstationTech()
@@ -60,15 +65,18 @@ func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {
 
 	if !g.Run.CanSpendMoney(shopButton.Technology.CostMoney) ||
 		!shopButton.Technology.CanBuild(g, shopButton.Technology) {
+		log.Printf("can't build money %v", shopButton.Technology.Name)
 		textColor = rl.LightGray
 		canBuild = false
 	}
 	if !g.Run.CanSpendAction(shopButton.Technology.CostActions) {
+		log.Printf("can't build action %v", shopButton.Technology.Name)
 		textColor = rl.LightGray
 		canBuild = false
 	}
 	_, err := g.GetOpenSpace(shopButton.Technology)
 	if err != nil {
+		log.Printf("no room %v", shopButton.Technology.Name)
 		textColor = rl.LightGray
 		canBuild = false
 	}
@@ -186,7 +194,6 @@ func DrawShopWindow(g *Game, window *Window) {
 
 	var x float32 = 215
 	for i, plant := range plants {
-		log.Printf("plant %v", plant)
 		g.DrawPlantPurchaseButton(plant.ShopButton(g), x+float32(i*100), 400)
 	}
 

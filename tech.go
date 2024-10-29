@@ -19,6 +19,7 @@ func (g *Game) InitTechnology() {
 	tech["ChickenCoop"] = g.ChickenCoop()
 	tech["WheatField"] = g.WheatField()
 	tech["PotatoField"] = g.PotatoField()
+	tech["CarrotField"] = g.CarrotField()
 
 	tech["Workstation"] = g.Workstation()
 	tech["ChickenEggWarmer"] = g.ChickenEggWarmer()
@@ -42,6 +43,8 @@ func (g *Game) CreateTechFromInitialData(input InitialData) Technology {
 		Square:         BoardSquare{},
 		TempYield:      1,
 		ReadyToTouch:   true,
+		InitialPrice:   input.Price,
+		BaseProduction: input.Production,
 	}
 }
 
@@ -182,12 +185,14 @@ func ChickenCoopCanBuild(g *Game, tech *Technology) bool {
 }
 
 func ChickenCoopOnBuild(g *Game, tech *Technology) error {
-	g.InitProduct(tech.ProductType, g.InitialData["Chicken"].Price)
+	g.InitProduct(tech.ProductType, tech.InitialPrice)
+	tech.ReadyToTouch = false
 	return nil
 }
 
 func ChickenCoopProduce(g *Game, tech *Technology) float32 {
-	return g.InitialData["Chicken"].Production * g.Run.Productivity * g.Run.Products["Chicken"].Yield * tech.TempYield
+	log.Printf("%v, %v, %v, %v", tech.BaseProduction, g.Run.Productivity, g.Run.Products["Chicken"].Yield, tech.TempYield)
+	return tech.BaseProduction * g.Run.Productivity * g.Run.Products["Chicken"].Yield * tech.TempYield
 }
 
 func ChickenCoopOnClick(g *Game, tech *Technology) string {
@@ -388,6 +393,82 @@ func PotatoFieldOnClick(g *Game, tech *Technology) string {
 	return ""
 }
 
+// carrot
+
+func (g *Game) CreateCarrotTech() *Technology {
+	result := g.CarrotField()
+	result.Square = BoardSquare{
+		TileType: "Technology",
+		Width:    5,
+		Height:   5,
+		Occupied: true,
+	}
+
+	return result
+}
+
+func (g *Game) CarrotField() *Technology {
+	tech := g.CreateTechFromInitialData(g.InitialData["Carrot"])
+	tech.CanBuild = CarrotFieldCanBuild
+	tech.OnBuild = CarrotFieldOnBuild
+	tech.OnClick = CarrotFieldOnClick
+	tech.OnRoundEnd = CarrotFieldRoundEnd
+	tech.RoundEndProduce = CarrotFieldProduce
+	tech.ShopButton = CarrotShopButton
+	return &tech
+}
+
+func CarrotShopButton(g *Game) *ShopButton {
+	result := &ShopButton{
+		Width:      80,
+		Height:     120,
+		Image:      g.Data["WorkstationTile"].(Tile),
+		OnClick:    ShopClickCarrotField,
+		Technology: g.CreateCarrotTech(),
+	}
+	return result
+}
+
+func CarrotFieldCanBuild(g *Game, tech *Technology) bool {
+	if g.Run.CurrentSeason == Spring || g.Run.CurrentSeason == Autumn {
+		return true
+	}
+	return false
+}
+
+func CarrotFieldOnBuild(g *Game, tech *Technology) error {
+	g.InitProduct(tech.ProductType, tech.InitialPrice)
+	return nil
+}
+
+func CarrotFieldProduce(g *Game, tech *Technology) float32 {
+	if g.Run.CurrentSeason == Autumn && g.Run.NextSeason == Winter {
+		return tech.BaseProduction * g.Run.Productivity * g.Run.Products["Carrot"].Yield * tech.TempYield
+	} else {
+		return 0
+	}
+}
+
+func CarrotFieldRoundEnd(g *Game, tech *Technology) {
+	if g.Run.NextSeason == Winter && g.Run.CurrentSeason != Autumn {
+		tech.ReadyToHarvest = true
+		tech.Tile.TileFrame.X += 50
+	}
+
+	tech.ReadyToTouch = false
+}
+
+func CarrotFieldOnClick(g *Game, tech *Technology) string {
+	if tech.ReadyToHarvest {
+		produced := CarrotFieldProduce(g, tech)
+		g.Run.Products["Carrot"].Quantity += produced
+		g.RemoveTech(tech)
+		return fmt.Sprintf("Carrots: %v", produced)
+	} else {
+		return ""
+	}
+}
+
 // workstation
 
 func (g *Game) CreateWorkstationTech() *Technology {
@@ -492,7 +573,6 @@ func ChickenEggWarmerCanBuild(g *Game, tech *Technology) bool {
 }
 
 func ChickenEggWarmerOnBuild(g *Game, tech *Technology) error {
-	g.InitProduct("Chicken", g.InitialData["Chicken"].Price)
 	g.Run.Products["Chicken"].Yield += 0.05
 
 	return nil

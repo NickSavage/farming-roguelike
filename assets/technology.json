@@ -19,7 +19,7 @@
     "name": "Wheat",
     "productType": "Wheat",
     "technologyType": "PlantSpace",
-      "price": 1,
+    "price": 1,
     "costMoney": 50,
     "production": 100,
     "rarity": "Common",
@@ -34,7 +34,7 @@
   {
     "name": "Potato",
     "rarity": "Common",
-      "price": 2,
+    "price": 2,
     "costMoney": 50,
     "description": "asdasd",
     "production": 125,
@@ -42,6 +42,22 @@
     "technologyType": "PlantSpace",
     "tile": {
       "id": "PotatoTile",
+      "width": 1,
+      "height": 1,
+      "fillSpace": true
+    }
+  },
+  {
+    "name": "Carrot",
+    "rarity": "Common",
+    "price": 3,
+    "costMoney": 100,
+    "description": "A delicious and healthy snack!",
+    "production": 175,
+    "productType": "Carrot",
+    "technologyType": "PlantSpace",
+    "tile": {
+      "id": "WorkstationTile",
       "width": 1,
       "height": 1,
       "fillSpace": true
