@@ -57,7 +57,7 @@
     "productType": "Carrot",
     "technologyType": "PlantSpace",
     "tile": {
-      "id": "WorkstationTile",
+      "id": "CarrotIcon",
       "width": 1,
       "height": 1,
       "fillSpace": true

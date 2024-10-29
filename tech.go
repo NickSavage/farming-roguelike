@@ -28,7 +28,6 @@ func (g *Game) InitTechnology() {
 }
 
 func (g *Game) CreateTechFromInitialData(input InitialData) Technology {
-	log.Printf("inptu %v", input)
 	return Technology{
 		Name:           input.Name,
 		Description:    input.Description,
@@ -422,7 +421,7 @@ func CarrotShopButton(g *Game) *ShopButton {
 	result := &ShopButton{
 		Width:      80,
 		Height:     120,
-		Image:      g.Data["WorkstationTile"].(Tile),
+		Image:      g.Data["CarrotIcon"].(Tile),
 		OnClick:    ShopClickCarrotField,
 		Technology: g.CreateCarrotTech(),
 	}
