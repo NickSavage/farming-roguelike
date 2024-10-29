@@ -160,4 +160,5 @@ type InitialData struct {
 	Price      float32 `json:"price"`
 	Cost       float32 `json:"cost"`
 	Production float32 `json:"production"`
+	Rarity     string  `json:"rarity"`
 }

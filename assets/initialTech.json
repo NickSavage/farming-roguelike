@@ -1,20 +1,128 @@
 [
-    {
-        "name": "Chicken",
-        "price": 1.99,
-        "cost": 50,
-        "production": 5
-    },
-    {
-        "name": "Wheat",
-        "price": 2.49,
-        "cost": 50,
-        "production": 100
-    },
-    {
-        "name": "Potato",
-        "price": 1.99,
-        "cost": 50,
-        "production": 125
-    }
+  {
+    "name": "Apple",
+    "price": 6.49,
+    "cost": 200,
+    "production": 280,
+    "rarity": "legendary"
+  },
+  {
+    "name": "Chicken",
+    "price": 1.99,
+    "cost": 50,
+    "production": 5,
+    "rarity": "common"
+  },
+  {
+    "name": "Wheat",
+    "price": 2.49,
+    "cost": 50,
+    "production": 100,
+    "rarity": "common"
+  },
+  {
+    "name": "Potato",
+    "price": 1.99,
+    "cost": 50,
+    "production": 125,
+    "rarity": "common"
+  },
+  {
+    "name": "Carrot",
+    "price": 2.49,
+    "cost": 75,
+    "production": 90,
+    "rarity": "uncommon"
+  },
+  {
+    "name": "Beef",
+    "price": 5.99,
+    "cost": 200,
+    "production": 10,
+    "rarity": "uncommon"
+  },
+  {
+    "name": "Eggplant",
+    "price": 3.49,
+    "cost": 100,
+    "production": 75,
+    "rarity": "uncommon"
+  },
+  {
+    "name": "Pig",
+    "price": 4.99,
+    "cost": 150,
+    "production": 15,
+    "rarity": "uncommon"
+  },
+  {
+    "name": "Tomato",
+    "price": 2.99,
+    "cost": 75,
+    "production": 120,
+    "rarity": "uncommon"
+  },
+  {
+    "name": "Strawberry",
+    "price": 3.49,
+    "cost": 100,
+    "production": 90,
+    "rarity": "uncommon"
+  },
+  {
+    "name": "Grape",
+    "price": 4.99,
+    "cost": 150,
+    "production": 180,
+    "rarity": "rare"
+  },
+  {
+    "name": "Walnut",
+    "price": 8.49,
+    "cost": 275,
+    "production": 360,
+    "rarity": "rare"
+  },
+  {
+    "name": "Corn",
+    "price": 4.99,
+    "cost": 150,
+    "production": 400,
+    "rarity": "rare"
+  },
+  {
+    "name": "Pear",
+    "price": 5.49,
+    "cost": 175,
+    "production": 220,
+    "rarity": "rare"
+  },
+  {
+    "name": "Avocado",
+    "price": 7.99,
+    "cost": 250,
+    "production": 320,
+    "rarity": "legendary"
+  },
+  {
+    "name": "Almond",
+    "price": 9.49,
+    "cost": 325,
+    "production": 420,
+    "rarity": "legendary"
+  },
+  {
+    "name": "Cherry",
+    "price": 5.99,
+    "cost": 200,
+    "production": 440,
+    "rarity": "legendary"
+  },
+  {
+    "name": "Coffee Beans",
+    "price": 10.49,
+    "cost": 375,
+    "production": 460,
+    "rarity": "legendary"
+  }
 ]
