@@ -117,7 +117,9 @@ func (g *Game) LoadAssets() {
 	image = rl.LoadImage("assets/icons/potato.png")
 	g.Data["PotatoIcon"] = LoadImage(image, 0, 0, 90, 90)
 	image = rl.LoadImage("assets/icons/carrots.png")
-	g.Data["CarrotIcon"] = LoadImage(image, 0, 0, 90, 90)
+	g.Data["CarrotShopIcon"] = LoadImage(image, 0, 0, 90, 90)
+	rl.ImageResize(image, 45, 45)
+	g.Data["CarrotIcon"] = LoadImage(image, 0, 0, 45, 45)
 
 }
 

@@ -317,7 +317,6 @@ func (g *Game) CreatePotatoTech() *Technology {
 		Occupied: true,
 	}
 
-	g.InitProduct(result.ProductType, g.InitialData["Potato"].Price)
 	return result
 }
 
@@ -421,7 +420,7 @@ func CarrotShopButton(g *Game) *ShopButton {
 	result := &ShopButton{
 		Width:      80,
 		Height:     120,
-		Image:      g.Data["CarrotIcon"].(Tile),
+		Image:      g.Data["CarrotShopIcon"].(Tile),
 		OnClick:    ShopClickCarrotField,
 		Technology: g.CreateCarrotTech(),
 	}
@@ -441,7 +440,7 @@ func CarrotFieldOnBuild(g *Game, tech *Technology) error {
 }
 
 func CarrotFieldProduce(g *Game, tech *Technology) float32 {
-	if g.Run.CurrentSeason == Autumn && g.Run.NextSeason == Winter {
+	if g.Run.CurrentSeason == Winter {
 		return tech.BaseProduction * g.Run.Productivity * g.Run.Products["Carrot"].Yield * tech.TempYield
 	} else {
 		return 0
@@ -449,9 +448,8 @@ func CarrotFieldProduce(g *Game, tech *Technology) float32 {
 }
 
 func CarrotFieldRoundEnd(g *Game, tech *Technology) {
-	if g.Run.NextSeason == Winter && g.Run.CurrentSeason != Autumn {
+	if g.Run.NextSeason == Winter {
 		tech.ReadyToHarvest = true
-		tech.Tile.TileFrame.X += 50
 	}
 
 	tech.ReadyToTouch = false

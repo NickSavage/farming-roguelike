@@ -61,22 +61,17 @@ func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {
 	canBuild := true
 
 	shopButton.BackgroundColor = rl.White
-	log.Printf("shop %v", shopButton.Technology)
-
 	if !g.Run.CanSpendMoney(shopButton.Technology.CostMoney) ||
 		!shopButton.Technology.CanBuild(g, shopButton.Technology) {
-		log.Printf("can't build money %v", shopButton.Technology.Name)
 		textColor = rl.LightGray
 		canBuild = false
 	}
 	if !g.Run.CanSpendAction(shopButton.Technology.CostActions) {
-		log.Printf("can't build action %v", shopButton.Technology.Name)
 		textColor = rl.LightGray
 		canBuild = false
 	}
 	_, err := g.GetOpenSpace(shopButton.Technology)
 	if err != nil {
-		log.Printf("no room %v", shopButton.Technology.Name)
 		textColor = rl.LightGray
 		canBuild = false
 	}
@@ -112,7 +107,6 @@ func (g *Game) DrawPlantPurchaseButton(shopButton *ShopButton, x, y float32) {
 	//	textColor := rl.Black
 
 	shopButton.BackgroundColor = rl.White
-	log.Printf("shop %v", shopButton.Technology)
 
 	if !g.Run.CanSpendMoney(shopButton.Technology.CostMoney) ||
 		!shopButton.Technology.CanBuild(g, shopButton.Technology) {
