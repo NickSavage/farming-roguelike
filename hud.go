@@ -46,6 +46,7 @@ func OpenSellWindow(g *Game, product *Product) {
 
 func (g *Game) InitHUD() {
 	scene := g.Scenes["HUD"]
+	log.Printf("init hud")
 
 	g.SidebarWidth = int32(200)
 
@@ -275,7 +276,6 @@ func DrawNextEventWindow(g *Game, win *Window) {
 	rl.DrawRectangleRec(window, rl.White)
 	rl.DrawRectangleLinesEx(window, 2, rl.Black)
 
-	log.Printf("events %v round %v", g.Run.Events, g.Run.CurrentRound)
 	events := g.Run.EventChoices
 	var x int32
 	var y int32 = 60

@@ -62,5 +62,33 @@
       "height": 1,
       "fillSpace": true
     }
+  },
+  {
+    "name": "ChickenEggWarmer",
+    "productType": "Chicken",
+    "technologyType": "BuildingSpace",
+    "rarity": "Rare",
+    "tile": {
+      "id": "ChickenEggWarmerTile",
+      "width": 1,
+      "height": 1,
+      "fillSpace": false
+    },
+    "costMoney": 25,
+    "description": "asdasd"
+  },
+  {
+    "name": "Workstation",
+    "technologyType": "BuildingSpace",
+    "productTyle": "None",
+    "rarity": "Uncommon",
+    "tile": {
+      "id": "WorkstationTile",
+      "width": 1,
+      "height": 1,
+      "fillSpace": false
+    },
+    "costMoney": 25,
+    "description": "asdasd"
   }
 ]
