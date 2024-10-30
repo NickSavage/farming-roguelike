@@ -328,6 +328,7 @@ func CarrotFieldCanBuild(g *Game, tech *Technology) bool {
 
 func CarrotFieldOnBuild(g *Game, tech *Technology) error {
 	g.InitProduct(tech.ProductType, tech.InitialPrice)
+	tech.ReadyToTouch = false
 	return nil
 }
 
@@ -353,22 +354,13 @@ func CarrotFieldOnClick(g *Game, tech *Technology) string {
 // workstation
 
 func (g *Game) CreateWorkstationTech() *Technology {
-	return &Technology{
-		Name:           "Workstation",
-		TechnologyType: "BuildingSpace",
-		Tile:           g.Data["WorkstationTile"].(Tile),
-		TileWidth:      1,
-		TileHeight:     1,
-		TileFillSpace:  false,
-		Square:         BoardSquare{},
-		CostMoney:      25,
-		CostActions:    1,
-		Description:    "asdasd",
-		CanBuild:       WorkstationCanBuild,
-		OnBuild:        WorkstationOnBuild,
-		OnClick:        WorkstationOnClick,
-		OnRoundEnd:     WorkstationRoundEnd,
-	}
+
+	tech := g.CreateTechFromInitialData(g.InitialData["Workstation"])
+	tech.CanBuild = WorkstationCanBuild
+	tech.OnBuild = WorkstationOnBuild
+	tech.OnClick = WorkstationOnClick
+	tech.OnRoundEnd = WorkstationRoundEnd
+	return &tech
 
 }
 
@@ -379,6 +371,7 @@ func WorkstationCanBuild(g *Game, tech *Technology) bool {
 
 func WorkstationOnBuild(g *Game, tech *Technology) error {
 	g.Run.Productivity += 0.05
+	tech.ReadyToTouch = false
 
 	return nil
 
@@ -392,7 +385,7 @@ func WorkstationOnClick(g *Game, tech *Technology) string {
 
 func (g *Game) CreateChickenEggWarmer() *Technology {
 
-	tech := g.CreateTechFromInitialData(g.InitialData["Carrot"])
+	tech := g.CreateTechFromInitialData(g.InitialData["Chicken Egg Warmer"])
 
 	tech.CanBuild = ChickenEggWarmerCanBuild
 	tech.OnBuild = ChickenEggWarmerOnBuild
@@ -414,7 +407,7 @@ func ChickenEggWarmerCanBuild(g *Game, tech *Technology) bool {
 
 func ChickenEggWarmerOnBuild(g *Game, tech *Technology) error {
 	g.Run.Products["Chicken"].Yield += 0.05
-
+	tech.ReadyToTouch = false
 	return nil
 
 }

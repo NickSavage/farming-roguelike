@@ -42,9 +42,9 @@
     "production": 125,
     "productType": "Potato",
     "technologyType": "PlantSpace",
-    "shopIcon": "PotatoTile",
+    "shopIcon": "PotatoIcon",
     "tile": {
-      "id": "PotatoIcon",
+      "id": "PotatoTile",
       "width": 1,
       "height": 1,
       "fillSpace": true
@@ -68,7 +68,7 @@
     }
   },
   {
-    "name": "ChickenEggWarmer",
+    "name": "Chicken Egg Warmer",
     "productType": "Chicken",
     "technologyType": "BuildingSpace",
     "rarity": "Rare",
