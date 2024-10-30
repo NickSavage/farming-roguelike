@@ -78,6 +78,7 @@ type Technology struct {
 	TileWidth       int
 	TileHeight      int
 	TileFillSpace   bool
+	ShopIcon        string
 	Description     string
 	Square          BoardSquare
 	CostMoney       float32
@@ -171,6 +172,7 @@ type InitialData struct {
 	Rarity         string         `json:"rarity"`
 	Description    string         `json:"description"`
 	TileConfig     TechTileConfig `json:"tile"`
+	ShopIcon       string         `json:"shopIcon"`
 }
 
 type TechTileConfig struct {

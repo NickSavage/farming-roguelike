@@ -38,6 +38,7 @@ func (g *Game) CreateTechFromInitialData(input InitialData) Technology {
 		TileWidth:      input.TileConfig.Width,
 		TileHeight:     input.TileConfig.Height,
 		TileFillSpace:  input.TileConfig.FillSpace,
+		ShopIcon:       input.ShopIcon,
 		CostMoney:      input.CostMoney,
 		Square:         BoardSquare{},
 		TempYield:      1,
@@ -154,6 +155,16 @@ func (g *Game) RoundEndProduce(tech *Technology) float32 {
 	return tech.BaseProduction * g.Run.Productivity * g.Run.Products[tech.ProductType].Yield * tech.TempYield
 }
 
+func (g *Game) ShopButton(tech *Technology) *ShopButton {
+	result := &ShopButton{
+		Width:      50,
+		Height:     50,
+		Image:      g.Data[tech.ShopIcon].(Tile),
+		Technology: tech,
+	}
+	return result
+}
+
 // chicken
 
 func (g *Game) CreateChickenCoopTech() *Technology {
@@ -200,19 +211,7 @@ func (g *Game) CreateWheatTech() *Technology {
 	tech.OnBuild = WheatFieldOnBuild
 	tech.OnClick = WheatFieldOnClick
 	tech.OnRoundEnd = WheatFieldRoundEnd
-	tech.ShopButton = WheatShopButton
 	return &tech
-}
-
-func WheatShopButton(g *Game) *ShopButton {
-	result := &ShopButton{
-		Width:      50,
-		Height:     50,
-		Image:      g.Data["WheatIcon"].(Tile),
-		OnClick:    ShopClickWheatField,
-		Technology: g.CreateWheatTech(),
-	}
-	return result
 }
 
 func WheatFieldCanBuild(g *Game, tech *Technology) bool {
@@ -264,19 +263,7 @@ func (g *Game) CreatePotatoTech() *Technology {
 	tech.OnBuild = PotatoFieldOnBuild
 	tech.OnClick = PotatoFieldOnClick
 	tech.OnRoundEnd = PotatoFieldRoundEnd
-	tech.ShopButton = PotatoShopButton
 	return &tech
-}
-
-func PotatoShopButton(g *Game) *ShopButton {
-	result := &ShopButton{
-		Width:      100,
-		Height:     100,
-		Image:      g.Data["PotatoIcon"].(Tile),
-		OnClick:    ShopClickPotatoField,
-		Technology: g.CreatePotatoTech(),
-	}
-	return result
 }
 
 func PotatoFieldCanBuild(g *Game, tech *Technology) bool {
@@ -329,19 +316,7 @@ func (g *Game) CreateCarrotTech() *Technology {
 	tech.OnBuild = CarrotFieldOnBuild
 	tech.OnClick = CarrotFieldOnClick
 	tech.OnRoundEnd = CarrotFieldRoundEnd
-	tech.ShopButton = CarrotShopButton
 	return &tech
-}
-
-func CarrotShopButton(g *Game) *ShopButton {
-	result := &ShopButton{
-		Width:      80,
-		Height:     120,
-		Image:      g.Data["CarrotShopIcon"].(Tile),
-		OnClick:    ShopClickCarrotField,
-		Technology: g.CreateCarrotTech(),
-	}
-	return result
 }
 
 func CarrotFieldCanBuild(g *Game, tech *Technology) bool {

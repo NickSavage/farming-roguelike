@@ -92,7 +92,7 @@ func (g *Game) DrawShopButton(shopButton ShopButton, x, y float32) {
 		}
 
 		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-			shopButton.OnClick(g)
+			g.ShopChooseTech(shopButton.Technology)
 		}
 	}
 	rl.DrawRectangleRec(rect, shopButton.BackgroundColor)
@@ -135,7 +135,7 @@ func (g *Game) DrawPlantPurchaseButton(shopButton *ShopButton, x, y float32) {
 		shopButton.BackgroundColor = rl.LightGray
 
 		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-			shopButton.OnClick(g)
+			g.ShopChooseTech(shopButton.Technology)
 		}
 	}
 	rl.DrawRectangleLinesEx(rect, 1, rl.Black)
@@ -188,7 +188,8 @@ func DrawShopWindow(g *Game, window *Window) {
 
 	var x float32 = 215
 	for i, plant := range plants {
-		g.DrawPlantPurchaseButton(plant.ShopButton(g), x+float32(i*100), 400)
+		log.Printf("draw %v", plant)
+		g.DrawPlantPurchaseButton(g.ShopButton(plant), x+float32(i*100), 400)
 	}
 
 	// g.DrawPlantPurchaseButton(WheatShopButton(g), 215, 400)

@@ -8,6 +8,7 @@
     "production": 5,
     "rarity": "common",
     "description": "aoeaoeao",
+    "shopIcon": "ChickenCoopTile",
     "tile": {
       "id": "ChickenCoopTile",
       "width": 1,
@@ -24,6 +25,7 @@
     "production": 100,
     "rarity": "Common",
     "description": "asdasd",
+    "shopIcon": "WheatIcon",
     "tile": {
       "id": "WheatTile",
       "width": 1,
@@ -40,8 +42,9 @@
     "production": 125,
     "productType": "Potato",
     "technologyType": "PlantSpace",
+    "shopIcon": "PotatoTile",
     "tile": {
-      "id": "PotatoTile",
+      "id": "PotatoIcon",
       "width": 1,
       "height": 1,
       "fillSpace": true
@@ -56,6 +59,7 @@
     "production": 175,
     "productType": "Carrot",
     "technologyType": "PlantSpace",
+    "shopIcon": "CarrotShopIcon",
     "tile": {
       "id": "CarrotIcon",
       "width": 1,
@@ -68,6 +72,7 @@
     "productType": "Chicken",
     "technologyType": "BuildingSpace",
     "rarity": "Rare",
+    "shopIcon": "ChickenEggWarmerTile",
     "tile": {
       "id": "ChickenEggWarmerTile",
       "width": 1,
@@ -82,6 +87,7 @@
     "technologyType": "BuildingSpace",
     "productTyle": "None",
     "rarity": "Uncommon",
+    "shopIcon": "WorkstationTile",
     "tile": {
       "id": "WorkstationTile",
       "width": 1,
