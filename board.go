@@ -316,14 +316,14 @@ func (g *Game) HandleHover() {
 			if !space.IsFilled {
 				return
 			}
-			if space.Technology != nil {
-				g.DrawTechHoverWindow(
-					*space.Technology,
-					mousePosition.X,
-					mousePosition.Y,
-				)
+			// if space.Technology != nil {
+			// 	g.DrawTechHoverWindow(
+			// 		space.Technology,
+			// 		mousePosition.X,
+			// 		mousePosition.Y,
+			// 	)
 
-			}
+			// }
 
 		} else if scene.RenderMenu {
 			counter = 10

@@ -29,8 +29,8 @@ func (g *Game) InitTechnology() {
 	g.Technology = tech
 }
 
-func (g *Game) CreateTechFromInitialData(input InitialData) Technology {
-	return Technology{
+func (g *Game) CreateTechFromInitialData(input InitialData) *Technology {
+	return &Technology{
 		Name:           input.Name,
 		Description:    input.Description,
 		TechnologyType: TechnologyType(input.TechnologyType),
@@ -112,8 +112,8 @@ func (g *Game) GetProductNames() []ProductType {
 
 func (g *Game) PlaceTech(tech *Technology, space *TechnologySpace) error {
 	space.IsFilled = true
-	copy := &tech
-	space.Technology = *copy
+	copy := *tech
+	space.Technology = &copy
 	tech.Space = space
 
 	err := g.Run.SpendAction(tech.CostActions)
@@ -126,7 +126,7 @@ func (g *Game) PlaceTech(tech *Technology, space *TechnologySpace) error {
 	if err == nil {
 		err := tech.OnBuild(g, tech)
 		if err == nil {
-			g.Run.Technology = append(g.Run.Technology, tech)
+			g.Run.Technology = append(g.Run.Technology, space.Technology)
 		}
 	}
 	return nil
@@ -176,7 +176,7 @@ func (g *Game) CreateChickenCoopTech() *Technology {
 	tech.OnBuild = ChickenCoopOnBuild
 	tech.OnClick = ChickenCoopOnClick
 	tech.OnRoundEnd = ChickenCoopRoundEnd
-	return &tech
+	return tech
 }
 
 func ChickenCoopCanBuild(g *Game, tech *Technology) bool {
@@ -190,6 +190,7 @@ func ChickenCoopOnBuild(g *Game, tech *Technology) error {
 }
 
 func ChickenCoopOnClick(g *Game, tech *Technology) string {
+	log.Printf("?")
 	if tech.ReadyToHarvest {
 		produced := g.RoundEndProduce(tech)
 		g.Run.Products["Chicken"].Quantity += produced
@@ -213,7 +214,7 @@ func (g *Game) CreateWheatTech() *Technology {
 	tech.OnBuild = WheatFieldOnBuild
 	tech.OnClick = WheatFieldOnClick
 	tech.OnRoundEnd = WheatFieldRoundEnd
-	return &tech
+	return tech
 }
 
 func WheatFieldCanBuild(g *Game, tech *Technology) bool {
@@ -265,7 +266,7 @@ func (g *Game) CreatePotatoTech() *Technology {
 	tech.OnBuild = PotatoFieldOnBuild
 	tech.OnClick = PotatoFieldOnClick
 	tech.OnRoundEnd = PotatoFieldRoundEnd
-	return &tech
+	return tech
 }
 
 func PotatoFieldCanBuild(g *Game, tech *Technology) bool {
@@ -318,7 +319,7 @@ func (g *Game) CreateCarrotTech() *Technology {
 	tech.OnBuild = CarrotFieldOnBuild
 	tech.OnClick = CarrotFieldOnClick
 	tech.OnRoundEnd = CarrotFieldRoundEnd
-	return &tech
+	return tech
 }
 
 func CarrotFieldCanBuild(g *Game, tech *Technology) bool {
@@ -362,7 +363,7 @@ func (g *Game) CreateWorkstationTech() *Technology {
 	tech.OnBuild = WorkstationOnBuild
 	tech.OnClick = WorkstationOnClick
 	tech.OnRoundEnd = WorkstationRoundEnd
-	return &tech
+	return tech
 
 }
 
@@ -393,7 +394,7 @@ func (g *Game) CreateChickenEggWarmer() *Technology {
 	tech.OnBuild = ChickenEggWarmerOnBuild
 	tech.OnClick = ChickenEggWarmerOnClick
 	tech.OnRoundEnd = ChickenEggWarmerRoundEnd
-	return &tech
+	return tech
 }
 
 func ChickenEggWarmerCanBuild(g *Game, tech *Technology) bool {
@@ -430,7 +431,7 @@ func (g *Game) CreateCellTowerTech() *Technology {
 	tech.OnBuild = CellTowerOnBuild
 	tech.OnClick = CellTowerOnClick
 	tech.OnRoundEnd = CellTowerRoundEnd
-	return &tech
+	return tech
 
 }
 
@@ -446,7 +447,7 @@ func CellTowerOnBuild(g *Game, tech *Technology) error {
 
 }
 func CellTowerRoundEnd(g *Game, tech *Technology) {
-	g.Run.EndRoundMoney += 50
+	g.Run.EndRoundMoney += tech.BaseProduction
 
 }
 func CellTowerOnClick(g *Game, tech *Technology) string {
