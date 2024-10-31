@@ -24,6 +24,8 @@ func (g *Game) InitTechnology() {
 	tech["Workstation"] = g.CreateWorkstationTech()
 	tech["ChickenEggWarmer"] = g.CreateChickenEggWarmer()
 
+	tech["CellTower"] = g.CreateCellTowerTech()
+
 	g.Technology = tech
 }
 
@@ -416,5 +418,37 @@ func ChickenEggWarmerRoundEnd(g *Game, tech *Technology) {
 }
 
 func ChickenEggWarmerOnClick(g *Game, tech *Technology) string {
+	return ""
+}
+
+// workstation
+
+func (g *Game) CreateCellTowerTech() *Technology {
+
+	tech := g.CreateTechFromInitialData(g.InitialData["Cell Tower"])
+	tech.CanBuild = CellTowerCanBuild
+	tech.OnBuild = CellTowerOnBuild
+	tech.OnClick = CellTowerOnClick
+	tech.OnRoundEnd = CellTowerRoundEnd
+	return &tech
+
+}
+
+func CellTowerCanBuild(g *Game, tech *Technology) bool {
+	// if g.Run.CanSpendAction(g)
+	return true
+}
+
+func CellTowerOnBuild(g *Game, tech *Technology) error {
+	tech.ReadyToTouch = false
+
+	return nil
+
+}
+func CellTowerRoundEnd(g *Game, tech *Technology) {
+	g.Run.EndRoundMoney += 50
+
+}
+func CellTowerOnClick(g *Game, tech *Technology) string {
 	return ""
 }

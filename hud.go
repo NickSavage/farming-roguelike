@@ -297,6 +297,7 @@ func DrawNextEventWindow(g *Game, win *Window) {
 		rl.DrawText(event.Name, x+5, y+10, 30, rl.Black)
 
 		for i, effect := range event.Effects {
+			log.Printf("effect %v", effect)
 			if effect.IsPriceChange {
 				newPrice := g.Run.Products[effect.ProductImpacted].Price * float32(1+effect.PriceChange)
 				newPrice = float32(math.Round(float64(newPrice*100))) / 100

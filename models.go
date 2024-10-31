@@ -101,8 +101,9 @@ type Technology struct {
 type TechnologyType = string
 
 const (
-	PlantSpace    TechnologyType = "PlantSpace"
-	BuildingSpace TechnologyType = "BuildingSpace"
+	PlantSpace     TechnologyType = "PlantSpace"
+	BuildingSpace  TechnologyType = "BuildingSpace"
+	CellTowerSpace TechnologyType = "CellTowerSpace"
 )
 
 type Person struct {
@@ -114,10 +115,12 @@ type EventTracker struct {
 }
 
 type Event struct {
-	RoundIndex int
-	Name       string
-	Effects    []Effect
-	BlankEvent bool
+	RoundIndex  int
+	Name        string
+	Description string
+	Effects     []Effect
+	BlankEvent  bool
+	OnTrigger   func(*Game)
 }
 type Effect struct {
 	ProductImpacted ProductType

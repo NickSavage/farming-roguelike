@@ -21,7 +21,7 @@ func (g *Game) InitRun() {
 		NextSeason:       Summer,
 		Technology:       make([]*Technology, 0),
 		People:           make([]Person, 1),
-		PossibleEvents:   GenerateRandomEvents(),
+		PossibleEvents:   g.InitEvents(),
 		Events:           []Event{{BlankEvent: true}},
 		Products:         make(map[ProductType]*Product),
 		ActionsMaximum:   5,
@@ -82,6 +82,14 @@ func (g *Game) InitTechSpaces() {
 			Height:         2,
 			IsFilled:       false,
 		},
+		{
+			TechnologyType: CellTowerSpace,
+			Row:            16,
+			Column:         2,
+			Width:          2,
+			Height:         2,
+			IsFilled:       false,
+		},
 	}
 	g.Run.TechnologySpaces = spaces
 
@@ -125,11 +133,7 @@ func OnClickEndRound(g *Game) {
 
 func (g *Game) GetNextEvents() {
 
-	newEvent := g.RoundEndPriceChanges()
-	g.Run.EventChoices = append(g.Run.EventChoices, newEvent)
-
-	newEvent = g.RoundEndPriceChanges()
-	g.Run.EventChoices = append(g.Run.EventChoices, newEvent)
+	g.Run.EventChoices = g.PickEventChoices(2)
 }
 
 func (g *Game) DrawTechHoverWindow(tech Technology, x, y float32) {

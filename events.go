@@ -1,45 +1,60 @@
 package main
 
 import (
+	"log"
 	"math/rand"
 )
 
 func (g *Game) InitEvents() []Event {
 	events := []Event{}
+	log.Printf("init")
 	events = append(events, g.LandClearageEvent())
 	events = append(events, g.CellTowerEvent())
-
 	return events
 }
 
-func (g *Game) NewRandomEvent() Event {
-	effects := []Effect{}
-	// effects = append(effects, g.RandomPriceChange())
-	result := Event{
-		Name:    "asdf",
-		Effects: effects,
+func (g *Game) PickEventChoices(choices int) []Event {
+	var results []Event
+
+	for _ = range choices {
+
+		for _, event := range g.Run.PossibleEvents {
+			alreadyPicked := false
+			for _, existingChoice := range results {
+				if existingChoice.Name == event.Name {
+					alreadyPicked = true
+					break
+				}
+			}
+			if alreadyPicked {
+				continue
+			}
+			log.Printf("event before %v", event)
+			event.Effects = g.RoundEndPriceChanges()
+			log.Printf("event after %v", event.Effects)
+			results = append(results, event)
+			break
+		}
 	}
-	return result
+	return results
 }
 
-func (g *Game) RoundEndPriceChanges() Event {
+func (g *Game) RoundEndPriceChanges() []Effect {
 	effects := []Effect{}
 	productNames := g.GetProductNames()
 	for _, product := range productNames {
 		effect := g.RandomPriceChange(product)
 		effects = append(effects, effect)
 	}
-	result := Event{
-		Name:    "Price Changes",
-		Effects: effects,
-	}
-	return result
+	log.Printf("effects %v", effects)
+	return effects
 }
 
 func (g *Game) ApplyEvent(event Event) {
 	g.Run.EventChoices = []Event{}
 	g.Run.Events = append(g.Run.Events, event)
 	g.ApplyPriceChanges(event)
+	event.OnTrigger(g)
 }
 
 func (g *Game) ApplyPriceChanges(event Event) {
@@ -70,8 +85,9 @@ func (g *Game) LandClearageEvent() Event {
 		},
 	}
 	result := Event{
-		Name:    "Land Clearage",
-		Effects: effects,
+		Name:      "Land Clearage",
+		OnTrigger: LandClearageTrigger,
+		Effects:   effects,
 	}
 	return result
 }
@@ -84,12 +100,26 @@ func (g *Game) CellTowerEvent() Event {
 	effects := []Effect{
 		{
 			IsPriceChange: false,
-			EventTrigger:  LandClearageTrigger,
+			EventTrigger:  CellTowerOnTrigger,
 		},
 	}
 	result := Event{
-		Name:    "Cell Tower",
+		Name:        "Cell Tower",
+		Description: "A major telecom company has approached you about building a cell tower on your property.",
+		OnTrigger:   CellTowerOnTrigger,
+
 		Effects: effects,
 	}
 	return result
+}
+
+func CellTowerOnTrigger(g *Game) {
+	for _, space := range g.Run.TechnologySpaces {
+		if space.TechnologyType != CellTowerSpace {
+			continue
+		}
+		g.PlaceTech(g.Technology["CellTower"], space)
+
+	}
+
 }

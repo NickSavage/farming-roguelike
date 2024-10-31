@@ -96,5 +96,21 @@
     },
     "costMoney": 25,
     "description": "asdasd"
+  },
+  {
+    "name": "Cell Tower",
+    "technologyType": "CellTowerSpace",
+    "productType": "CellTower",
+    "rarity": "Impossible",
+    "shopIcon": "CellTowerTile",
+    "tile": {
+      "id": "CellTowerTile",
+      "width": 1,
+      "height": 1,
+      "fillSpace": false
+    },
+    "costMoney": 25,
+    "description": "asdasd"
   }
+  
 ]
