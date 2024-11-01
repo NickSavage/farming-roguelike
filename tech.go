@@ -75,10 +75,8 @@ func (g *Game) LoadInitialData() {
 	// Iterate over each item in the initialData slice
 	for _, item := range initialData {
 		// Store the item in the map with its product type as key
-		log.Printf("item %v", item)
 		dataMap[item.Name] = item
 	}
-	log.Printf("data %v", dataMap)
 	g.InitialData = dataMap
 }
 

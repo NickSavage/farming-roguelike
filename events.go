@@ -1,17 +1,52 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"math/rand"
+	"os"
 )
 
-func (g *Game) InitEvents() []Event {
-	events := []Event{}
+func (g *Game) InitEvents() ([]Event, error) {
 	log.Printf("init")
-	events = append(events, g.BlankEvent())
-	events = append(events, g.LandClearageEvent())
-	events = append(events, g.CellTowerEvent())
-	return events
+
+	events := []Event{}
+	var data []EventJSON
+
+	fns := make(map[string]func(*Game))
+	fns["Nothing"] = BlankEventOnTrigger
+	fns["Cell Tower"] = CellTowerOnTrigger
+	fns["Land Clearage"] = LandClearageOnTrigger
+
+	file, err := os.Open("./assets/events.json")
+	if err != nil {
+		fmt.Println(err)
+		return events, err
+	}
+	defer file.Close()
+
+	jsonDecoder := json.NewDecoder(file)
+
+	err = jsonDecoder.Decode(&data)
+	if err != nil {
+		fmt.Println(err)
+		return events, err
+	}
+
+	var event Event
+
+	// Iterate over each item in the initialData slice
+	for _, item := range data {
+		event = Event{
+			Name:        item.Name,
+			Description: item.Description,
+			OnTrigger:   fns[item.Name],
+		}
+		events = append(events, event)
+
+	}
+	return events, nil
 }
 
 func (g *Game) PickEventChoices(choices int) []Event {

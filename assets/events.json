@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Nothing",
+    "description": "All is quiet tonight."
+  },
+  {
+    "name": "Land Clearage",
+    "description": "Add a new field"
+  },
+  {
+    "name": "Cell Tower",
+    "description": "A major telecom company has approached you about building a cell tower on your property."
+  }
+]

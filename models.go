@@ -115,6 +115,11 @@ type EventTracker struct {
 	LandClearageFinished  bool
 }
 
+type EventJSON struct {
+	Name        string
+	Description string
+}
+
 type Event struct {
 	RoundIndex  int
 	Name        string

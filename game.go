@@ -13,6 +13,11 @@ const YEARS int = 8
 
 func (g *Game) InitRun() {
 
+	events, err := g.InitEvents()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	g.Run = &Run{
 		Money:            100,
 		Productivity:     1.0,
@@ -21,7 +26,7 @@ func (g *Game) InitRun() {
 		NextSeason:       Summer,
 		Technology:       make([]*Technology, 0),
 		People:           make([]Person, 1),
-		PossibleEvents:   g.InitEvents(),
+		PossibleEvents:   events,
 		Events:           []Event{{BlankEvent: true}},
 		Products:         make(map[ProductType]*Product),
 		ActionsMaximum:   5,
