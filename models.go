@@ -33,7 +33,10 @@ type Run struct {
 	Productivity           float32
 	EndRoundMoney          float32
 	MoneyRequirement       float32
+	MoneyRequirementStart  float32
+	MoneyRequirementRate   float32
 	CurrentRound           int
+	CurrentYear            int
 	CurrentSeason          Season
 	CurrentRoundShopPlants []*Technology
 	NextSeason             Season

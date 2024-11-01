@@ -20,20 +20,23 @@ func (g *Game) InitRun() {
 	}
 
 	g.Run = &Run{
-		Money:            100,
-		MoneyRequirement: 400,
-		Productivity:     1.0,
-		CurrentRound:     1,
-		CurrentSeason:    Spring,
-		NextSeason:       Summer,
-		Technology:       make([]*Technology, 0),
-		People:           make([]Person, 1),
-		PossibleEvents:   events,
-		Events:           []Event{{BlankEvent: true}},
-		Products:         make(map[ProductType]*Product),
-		ActionsMaximum:   5,
-		ActionsRemaining: 5,
+		Money:                 100,
+		MoneyRequirementStart: 200,
+		MoneyRequirementRate:  2,
+		Productivity:          1.0,
+		CurrentRound:          1,
+		CurrentYear:           1,
+		CurrentSeason:         Spring,
+		NextSeason:            Summer,
+		Technology:            make([]*Technology, 0),
+		People:                make([]Person, 1),
+		PossibleEvents:        events,
+		Events:                []Event{{BlankEvent: true}},
+		Products:              make(map[ProductType]*Product),
+		ActionsMaximum:        5,
+		ActionsRemaining:      5,
 	}
+	g.Run.MoneyRequirement = g.Run.calculateMoneyRequirement()
 	g.InitTechSpaces()
 
 	g.Run.CurrentRoundShopPlants = g.ShopRandomPlants(2)
@@ -171,23 +174,33 @@ func OnClickEndRound(g *Game) {
 	g.Run.NextSeason.Next()
 	g.GetNextEvents()
 
-	g.Run.CurrentRoundShopPlants = g.ShopRandomPlants(2)
+	// end of year stuff
+	if g.Run.CurrentSeason == Spring {
+		g.Run.CurrentYear += 1
+		if g.CheckGameOver() {
+			g.GameOver = true
+			g.GameOverTriggered = true
+			g.EndGame()
+		}
 
-	if g.CheckGameOver() {
-		g.GameOver = true
-		g.GameOverTriggered = true
-		g.EndGame()
+		// if game isn't over, increment this
+		g.Run.MoneyRequirement = g.Run.calculateMoneyRequirement()
+		g.Run.CurrentRoundShopPlants = g.ShopRandomPlants(2)
 	}
 }
 
 func (g *Game) CheckGameOver() bool {
-	if g.Run.CurrentSeason == Spring && g.Run.Money < g.Run.MoneyRequirement {
+	if g.Run.Money < g.Run.MoneyRequirement {
 		return true
 	}
 	if g.Run.CurrentRound > ROUNDS {
 		return true
 	}
 	return false
+}
+
+func (r *Run) calculateMoneyRequirement() float32 {
+	return float32(float64(r.MoneyRequirementStart) * math.Pow(float64(r.MoneyRequirementRate), float64(r.CurrentYear)-1))
 }
 
 func (g *Game) EndGame() {
