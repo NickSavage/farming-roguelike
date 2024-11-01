@@ -10,16 +10,18 @@ import (
 )
 
 const YEARS int = 8
+const ROUNDS int = YEARS * 4
 
 func (g *Game) InitRun() {
 
-	events, err := g.InitEvents()
+	events, err := InitEvents()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	g.Run = &Run{
 		Money:            100,
+		MoneyRequirement: 400,
 		Productivity:     1.0,
 		CurrentRound:     1,
 		CurrentSeason:    Spring,
@@ -171,6 +173,25 @@ func OnClickEndRound(g *Game) {
 
 	g.Run.CurrentRoundShopPlants = g.ShopRandomPlants(2)
 
+	if g.CheckGameOver() {
+		g.GameOver = true
+		g.GameOverTriggered = true
+		g.EndGame()
+	}
+}
+
+func (g *Game) CheckGameOver() bool {
+	if g.Run.CurrentSeason == Spring && g.Run.Money < g.Run.MoneyRequirement {
+		return true
+	}
+	if g.Run.CurrentRound > ROUNDS {
+		return true
+	}
+	return false
+}
+
+func (g *Game) EndGame() {
+
 }
 
 func (g *Game) GetNextEvents() {
@@ -205,20 +226,6 @@ func (g *Game) drawExistingTechIcon(tech Technology, x, y float32) {
 	mousePosition := rl.GetMousePosition()
 	if rl.CheckCollisionPointRec(mousePosition, rect) {
 		g.DrawTechHoverWindow(tech, x+30, y+30)
-	}
-
-}
-
-func DrawTechnologyWindow(g *Game, win *Window) {
-	windowWidth := 900
-	offset := 90
-	rl.DrawRectangle(200, 50, int32(windowWidth), 500, rl.White)
-
-	rl.DrawText("Technology", 205, 55, 30, rl.Black)
-
-	for i, tech := range g.Run.Technology {
-		g.drawExistingTechIcon(*tech, float32(210+(i*offset)), 90)
-
 	}
 
 }

@@ -14,11 +14,6 @@ func OnClickShopWindowButton(g *Game) {
 	g.ActivateWindow(scene.Windows, scene.Windows["ShopWindow"])
 }
 
-func OnClickTechWindowButton(g *Game) {
-	scene := g.Scenes["HUD"]
-	g.ActivateWindow(scene.Windows, scene.Windows["TechWindow"])
-}
-
 func OnClickOpenEndRoundPage1Window(g *Game) {
 	scene := g.Scenes["HUD"]
 	PreEndRound(g)
@@ -56,11 +51,6 @@ func (g *Game) InitHUD() {
 		Display:    false,
 		DrawWindow: DrawShopWindow,
 	}
-	scene.Windows["TechWindow"] = &Window{
-		Name:       "Tech Window",
-		Display:    false,
-		DrawWindow: DrawTechnologyWindow,
-	}
 
 	scene.Windows["EndRound1"] = &Window{
 		Name:       "End Round 1",
@@ -87,6 +77,11 @@ func (g *Game) InitHUD() {
 		Display:    false,
 		DrawWindow: DrawSellWindow,
 	}
+	scene.Windows["GameOver"] = &Window{
+		Name:       "Game Over",
+		Display:    false,
+		DrawWindow: DrawGameOverWindow,
+	}
 
 	scene.Data["SellAllConfirm"] = ""
 
@@ -98,6 +93,10 @@ func UpdateHUD(g *Game) {
 		if g.WasButtonClicked(&button) {
 			button.OnClick(g)
 		}
+	}
+	if g.GameOverTriggered {
+		g.ActivateWindow(scene.Windows, scene.Windows["GameOver"])
+		g.GameOverTriggered = false
 	}
 
 }
@@ -144,10 +143,11 @@ func DrawSidebar(g *Game) {
 		30, 30, 20, rl.White,
 	)
 	rl.DrawText(fmt.Sprintf("Round: %v", g.Run.CurrentRound), 30, 50, 20, rl.White)
-	rl.DrawText(fmt.Sprintf("Money: $%v", g.Run.Money), 30, 70, 20, rl.White)
-	rl.DrawText(fmt.Sprintf("Productivity: %v", g.Run.Productivity), 30, 90, 20, rl.White)
-	rl.DrawText(fmt.Sprintf("Season: %v", g.Run.CurrentSeason.String()), 30, 110, 20, rl.White)
-	rl.DrawText(fmt.Sprintf("Yield: %v", g.Run.Yield), 30, 130, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("Required Money: $%v", g.Run.MoneyRequirement), 30, 70, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("Money: $%v", g.Run.Money), 30, 90, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("Productivity: %v", g.Run.Productivity), 30, 110, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("Season: %v", g.Run.CurrentSeason.String()), 30, 130, 20, rl.White)
+	rl.DrawText(fmt.Sprintf("Yield: %v", g.Run.Yield), 30, 150, 20, rl.White)
 
 	buttons := []*Button{}
 	// techButton := g.Button("Technology", 10, 190, OnClickTechWindowButton)
@@ -397,4 +397,12 @@ func DrawSellWindow(g *Game, win *Window) {
 		g.ActivateWindow(scene.Windows, scene.Windows["Sell"])
 		g.ActivateWindow(scene.Windows, scene.Windows["Prices"])
 	}
+}
+
+func DrawGameOverWindow(g *Game, win *Window) {
+	window := rl.NewRectangle(220, 50, 500, 500)
+	rl.DrawRectangleRec(window, rl.White)
+	rl.DrawRectangleLinesEx(window, 5, rl.Black)
+
+	rl.DrawText("Game Over!", 225, 60, 30, rl.Black)
 }

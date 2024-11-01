@@ -8,18 +8,20 @@ type BoardCoord struct {
 }
 
 type Game struct {
-	Scenes       map[string]*Scene
-	Data         map[string]interface{}
-	screenWidth  int32
-	screenHeight int32
-	SidebarWidth int32
-	Run          *Run
-	Counter      int32
-	Seconds      int32
-	ScreenSkip   bool
-	WindowOpen   bool
-	Technology   map[string]*Technology
-	InitialData  map[string]InitialData
+	Scenes            map[string]*Scene
+	Data              map[string]interface{}
+	screenWidth       int32
+	screenHeight      int32
+	SidebarWidth      int32
+	Run               *Run
+	Counter           int32
+	Seconds           int32
+	ScreenSkip        bool
+	WindowOpen        bool
+	Technology        map[string]*Technology
+	InitialData       map[string]InitialData
+	GameOver          bool
+	GameOverTriggered bool
 }
 
 type Run struct {
@@ -30,6 +32,7 @@ type Run struct {
 	Yield                  float32
 	Productivity           float32
 	EndRoundMoney          float32
+	MoneyRequirement       float32
 	CurrentRound           int
 	CurrentSeason          Season
 	CurrentRoundShopPlants []*Technology

@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func (g *Game) InitEvents() ([]Event, error) {
+func InitEvents() ([]Event, error) {
 	log.Printf("init")
 
 	events := []Event{}
