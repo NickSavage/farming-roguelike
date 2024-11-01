@@ -72,6 +72,10 @@ type BoardMenuItem struct {
 	CheckIsDisabled func(*Game, *BoardSquare) bool
 }
 
+func InitEngine() {
+	log.Printf("hello world")
+}
+
 func DrawTile(t Tile, x, y float32) {
 
 	rl.DrawTextureRec(
@@ -172,6 +176,8 @@ func (g *Game) Update() {
 	if g.ScreenSkip {
 		if rl.IsMouseButtonUp(rl.MouseButtonLeft) {
 			g.ScreenSkip = false
+
+			//			log.Printf("remove screen skip: mouse down %v", rl.IsMouseButtonPressed(rl.MouseLeftButton))
 		}
 	}
 }
@@ -199,7 +205,6 @@ func (g *Game) DisableAllWindows(windows map[string]*Window) {
 }
 
 func (g *Game) ActivateWindow(windows map[string]*Window, window *Window) {
-	log.Printf("triffer")
 	g.ScreenSkip = true
 	if window.Display {
 		g.DisableAllWindows(windows)

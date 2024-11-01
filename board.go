@@ -152,6 +152,9 @@ func (g *Game) DrawTechnologySpaces() {
 	mousePosition := rl.GetMousePosition()
 	var rect rl.Rectangle
 	for _, space := range g.Run.TechnologySpaces {
+		if !space.Active {
+			continue
+		}
 		x := float32(space.Row * TILE_WIDTH)
 		y := float32(space.Column * TILE_HEIGHT)
 		width := float32(space.Width * TILE_WIDTH)
@@ -162,7 +165,9 @@ func (g *Game) DrawTechnologySpaces() {
 			continue
 		}
 		mousePosition = rl.GetMousePosition()
-		if rl.CheckCollisionPointRec(mousePosition, rect) {
+
+		if !g.WindowOpen && rl.CheckCollisionPointRec(mousePosition, rect) {
+
 			space.Technology.Tile.Color = rl.Green
 			if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 				result := g.HandleClickTech(space.Technology)

@@ -112,9 +112,9 @@ func (g *Game) GetProductNames() []ProductType {
 
 func (g *Game) PlaceTech(tech *Technology, space *TechnologySpace) error {
 	space.IsFilled = true
+	tech.Space = space
 	copy := *tech
 	space.Technology = &copy
-	tech.Space = space
 
 	err := g.Run.SpendAction(tech.CostActions)
 	if err != nil {
@@ -134,6 +134,7 @@ func (g *Game) PlaceTech(tech *Technology, space *TechnologySpace) error {
 
 func (g *Game) RemoveTech(tech *Technology) {
 
+	log.Printf("space %v", tech.Space)
 	tech.ToBeDeleted = true
 	space := tech.Space
 	space.IsFilled = false
@@ -241,6 +242,7 @@ func WheatFieldRoundEnd(g *Game, tech *Technology) {
 }
 func WheatFieldOnClick(g *Game, tech *Technology) string {
 	if tech.ReadyToTouch {
+		log.Printf("touch")
 		err := g.Run.SpendAction(1)
 		if err == nil {
 			tech.TempYield += 0.05

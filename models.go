@@ -67,6 +67,7 @@ type TechnologySpace struct {
 	Width          int // in tiles
 	Height         int // in tiles
 	IsFilled       bool
+	Active         bool // whether the game displays or not
 }
 
 type Technology struct {

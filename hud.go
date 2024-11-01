@@ -226,27 +226,6 @@ func DrawEndRoundWindowPage2(g *Game, win *Window) {
 	rl.DrawRectangleLinesEx(windowRect, 5, rl.Black)
 
 	rl.DrawText("Investments", int32(windowRect.X+5), int32(windowRect.Y+5), 30, rl.Black)
-
-	// var columnOffset int32 = 150
-	// var x, y int32
-
-	// for i, tech := range g.Run.Technology {
-
-	// 	if !tech.ShowEndRound {
-	// 		continue
-	// 	}
-	// x = int32(windowRect.X + 10)
-	// y = int32(windowRect.Y + 50 + float32(i*30))
-	// nextSeason := tech.RoundHandler[tech.RoundHandlerIndex]
-
-	// rl.DrawText(tech.Name, x, y, 20, rl.Black)
-	// text := fmt.Sprintf(
-	// 	"-$%v money",
-	// 	nextSeason.CostMoney,
-	// )
-	// rl.DrawText(text, x+columnOffset, y, 20, rl.Red)
-
-	// }
 	button := g.Button("End Round", 500, 500, OnClickEndRoundConfirmButton)
 
 	g.DrawButton(button)
@@ -267,7 +246,9 @@ func (g *Game) HandleChooseEvent(event Event) {
 	g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["NextEvent"])
 	g.ApplyEvent(event)
 	g.ApplyPriceChanges(event)
+	g.ScreenSkip = true
 
+	//log.Printf("apply screen skip: mouse down %v", rl.IsMouseButtonPressed(rl.MouseLeftButton))
 }
 
 func DrawNextEventWindow(g *Game, win *Window) {
@@ -296,15 +277,16 @@ func DrawNextEventWindow(g *Game, win *Window) {
 
 		rl.DrawText(event.Name, x+5, y+10, 30, rl.Black)
 
+		rl.DrawText(event.Description, x+5, y+45, 15, rl.Black)
+
 		for i, effect := range event.Effects {
-			log.Printf("effect %v", effect)
 			if effect.IsPriceChange {
 				newPrice := g.Run.Products[effect.ProductImpacted].Price * float32(1+effect.PriceChange)
 				newPrice = float32(math.Round(float64(newPrice*100))) / 100
 
 				displayChange := math.Round(float64(effect.PriceChange*100*100)) / 100
 				text := fmt.Sprintf("%v: %v (%v%%)", effect.ProductImpacted, newPrice, displayChange)
-				rl.DrawText(text, x+5, y+int32(45+(i*20)), 20, rl.Black)
+				rl.DrawText(text, x+5, y+int32(60+(i*20)), 20, rl.Black)
 			}
 		}
 

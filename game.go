@@ -41,6 +41,7 @@ func (g *Game) InitTechSpaces() {
 			Width:          5,
 			Height:         5,
 			IsFilled:       false,
+			Active:         true,
 		},
 		{
 			TechnologyType: PlantSpace,
@@ -49,6 +50,7 @@ func (g *Game) InitTechSpaces() {
 			Width:          5,
 			Height:         5,
 			IsFilled:       false,
+			Active:         true,
 		},
 		{
 			TechnologyType: PlantSpace,
@@ -57,6 +59,34 @@ func (g *Game) InitTechSpaces() {
 			Width:          5,
 			Height:         5,
 			IsFilled:       false,
+			Active:         true,
+		},
+		{
+			TechnologyType: PlantSpace,
+			Row:            19,
+			Column:         1,
+			Width:          5,
+			Height:         5,
+			IsFilled:       false,
+			Active:         false,
+		},
+		{
+			TechnologyType: PlantSpace,
+			Row:            19,
+			Column:         7,
+			Width:          5,
+			Height:         5,
+			IsFilled:       false,
+			Active:         false,
+		},
+		{
+			TechnologyType: PlantSpace,
+			Row:            19,
+			Column:         13,
+			Width:          5,
+			Height:         5,
+			IsFilled:       false,
+			Active:         false,
 		},
 		{
 			TechnologyType: BuildingSpace,
@@ -65,6 +95,7 @@ func (g *Game) InitTechSpaces() {
 			Width:          2,
 			Height:         2,
 			IsFilled:       false,
+			Active:         true,
 		},
 		{
 			TechnologyType: BuildingSpace,
@@ -73,6 +104,7 @@ func (g *Game) InitTechSpaces() {
 			Width:          2,
 			Height:         2,
 			IsFilled:       false,
+			Active:         true,
 		},
 		{
 			TechnologyType: BuildingSpace,
@@ -81,6 +113,7 @@ func (g *Game) InitTechSpaces() {
 			Width:          2,
 			Height:         2,
 			IsFilled:       false,
+			Active:         true,
 		},
 		{
 			TechnologyType: CellTowerSpace,
@@ -89,6 +122,7 @@ func (g *Game) InitTechSpaces() {
 			Width:          2,
 			Height:         2,
 			IsFilled:       false,
+			Active:         true,
 		},
 	}
 	g.Run.TechnologySpaces = spaces
@@ -96,6 +130,9 @@ func (g *Game) InitTechSpaces() {
 	scene := g.Scenes["Board"]
 	grid := scene.Data["Grid"].([][]BoardSquare)
 	for _, space := range g.Run.TechnologySpaces {
+		if !space.Active {
+			continue
+		}
 		for x := range space.Width {
 			for y := range space.Height {
 				grid[space.Row+x][space.Column+y].IsTechnologySpace = true
@@ -205,7 +242,7 @@ func (r *Run) CanSpendAction(actions int) bool {
 func (r *Run) SpendAction(actions int) error {
 
 	if r.CanSpendAction(actions) {
-		r.ActionsRemaining -= 1
+		r.ActionsRemaining -= actions
 		return nil
 	}
 	return errors.New("cannot spend action, not enough actions")

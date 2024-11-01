@@ -8,6 +8,7 @@ import (
 func (g *Game) InitEvents() []Event {
 	events := []Event{}
 	log.Printf("init")
+	events = append(events, g.BlankEvent())
 	events = append(events, g.LandClearageEvent())
 	events = append(events, g.CellTowerEvent())
 	return events
@@ -77,23 +78,42 @@ func (g *Game) RandomPriceChange(product ProductType) Effect {
 	}
 }
 
-func (g *Game) LandClearageEvent() Event {
-	effects := []Effect{
-		{
-			IsPriceChange: false,
-			EventTrigger:  LandClearageTrigger,
-		},
-	}
+// blank event
+
+func (g *Game) BlankEvent() Event {
 	result := Event{
-		Name:      "Land Clearage",
-		OnTrigger: LandClearageTrigger,
-		Effects:   effects,
+		Name:        "Nothing",
+		Description: "Add a new field",
+		OnTrigger:   BlankEventOnTrigger,
+	}
+	return result
+
+}
+
+func BlankEventOnTrigger(g *Game) {
+
+}
+
+// specific events
+
+func (g *Game) LandClearageEvent() Event {
+	result := Event{
+		Name:        "Land Clearage",
+		Description: "Add a new field",
+		OnTrigger:   LandClearageOnTrigger,
 	}
 	return result
 }
 
-func LandClearageTrigger(g *Game) {
-	g.Run.EventTracker.LandClearageTriggered = true
+func LandClearageOnTrigger(g *Game) {
+	for _, space := range g.Run.TechnologySpaces {
+		if space.Active {
+			continue
+		}
+		space.Active = true
+		break // only pick one
+	}
+	// g.Run.EventTracker.LandClearageTriggered = true
 }
 
 func (g *Game) CellTowerEvent() Event {
