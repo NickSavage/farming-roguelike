@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	//	"fmt"
 	"log"
 	"math/rand"
 
@@ -145,11 +144,21 @@ func (g *Game) drawTiles() {
 	grid := g.Scenes["Board"].Data["Grid"].([][]BoardSquare)
 	for i := range grid {
 		for j := range grid[i] {
-			DrawTile(
-				g.Data["GrassTile"].(Tile),
-				float32(i*TILE_HEIGHT+int(g.SidebarWidth)),
-				float32(j*TILE_WIDTH),
-			)
+			if i == 0 && j == 0 {
+				DrawTile(
+					g.Data["DirtTile"].(Tile),
+					float32(i*TILE_WIDTH+int(g.SidebarWidth)),
+					float32(j*TILE_HEIGHT),
+				)
+
+			} else {
+				DrawTile(
+					g.Data["GrassTile"].(Tile),
+					float32(i*TILE_WIDTH+int(g.SidebarWidth)),
+					float32(j*TILE_HEIGHT),
+				)
+
+			}
 		}
 	}
 }
@@ -203,7 +212,7 @@ func (g *Game) DrawTechnologySpaces() {
 					DrawTile(
 						space.Technology.Tile,
 						float32(float32(x)+float32(i*TILE_WIDTH)),
-						float32(float32(y)+float32(j*TILE_WIDTH)),
+						float32(float32(y)+float32(j*TILE_HEIGHT)),
 					)
 				}
 			}
