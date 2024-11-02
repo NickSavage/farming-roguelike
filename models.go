@@ -43,7 +43,7 @@ type Run struct {
 	EventChoices           []Event
 	Events                 []Event
 	PossibleEvents         []Event
-	EventTracker           EventTracker
+	EventTracker           map[string]bool // track if its been called or not
 	TechnologySpaces       []*TechnologySpace
 	ActionsRemaining       int
 	ActionsMaximum         int
@@ -117,15 +117,15 @@ type Person struct {
 }
 
 type EventTracker struct {
-	LandClearageTriggered bool
-	LandClearageFinished  bool
-	HireHelpTriggered     bool
-	CellTowerTriggered    bool
+	LandClearage bool
+	HireHelp     bool
+	CellTower    bool
 }
 
 type EventJSON struct {
 	Name        string
 	Description string
+	Repeatable  bool
 }
 
 type Event struct {
@@ -135,7 +135,7 @@ type Event struct {
 	Effects     []Effect
 	BlankEvent  bool
 	OnTrigger   func(*Game)
-	CanUse      func(*Game) bool
+	Repeatable  bool
 }
 type Effect struct {
 	ProductImpacted ProductType

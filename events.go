@@ -20,12 +20,6 @@ func InitEvents() ([]Event, error) {
 	triggerFunctions["Land Clearage"] = LandClearageOnTrigger
 	triggerFunctions["Hire Help"] = HireHelpOnTrigger
 
-	canUseFunctions := make(map[string]func(*Game) bool)
-	canUseFunctions["Nothing"] = BlankEventCanUse
-	canUseFunctions["Cell Tower"] = BlankEventCanUse
-	canUseFunctions["Land Clearage"] = BlankEventCanUse
-	canUseFunctions["Hire Help"] = HireHelpCanUse
-
 	file, err := os.Open("./assets/events.json")
 	if err != nil {
 		fmt.Println(err)
@@ -48,9 +42,10 @@ func InitEvents() ([]Event, error) {
 		event = Event{
 			Name:        item.Name,
 			Description: item.Description,
+			Repeatable:  item.Repeatable,
 			OnTrigger:   triggerFunctions[item.Name],
-			CanUse:      canUseFunctions[item.Name],
 		}
+
 		events = append(events, event)
 
 	}
@@ -77,7 +72,7 @@ func (g *Game) PickEventChoices(choices int) []Event {
 		if alreadyPicked {
 			continue
 		}
-		if !event.CanUse(g) {
+		if !CheckCanUseEvent(g, event) {
 			continue
 		}
 		log.Printf("event before %v", event)
@@ -107,6 +102,9 @@ func (g *Game) ApplyEvent(event Event) {
 	g.Run.Events = append(g.Run.Events, event)
 	g.ApplyPriceChanges(event)
 	event.OnTrigger(g)
+	if !event.Repeatable {
+		g.Run.EventTracker[event.Name] = true
+	}
 }
 
 func (g *Game) ApplyPriceChanges(event Event) {
@@ -129,16 +127,23 @@ func (g *Game) RandomPriceChange(product ProductType) Effect {
 	}
 }
 
-// blank event
+func CheckCanUseEvent(g *Game, event Event) bool {
+
+	if result, ok := g.Run.EventTracker[event.Name]; ok {
+		if result {
+			return false
+		}
+		return true
+	} else {
+		return true
+	}
+}
+
+// specific events
 
 func BlankEventOnTrigger(g *Game) {
 
 }
-func BlankEventCanUse(g *Game) bool {
-	return true
-}
-
-// specific events
 
 func LandClearageOnTrigger(g *Game) {
 	for _, space := range g.Run.TechnologySpaces {
@@ -158,25 +163,10 @@ func CellTowerOnTrigger(g *Game) {
 		g.PlaceTech(g.Technology["CellTower"], space)
 
 	}
-	g.Run.EventTracker.CellTowerTriggered = true
 
-}
-func CellTowerCanUse(g *Game) bool {
-	if !g.Run.EventTracker.CellTowerTriggered {
-		return true
-	}
-	return false
 }
 
 func HireHelpOnTrigger(g *Game) {
 	g.Run.ActionsMaximum += 1
 	g.Run.ActionsRemaining += 1
-	g.Run.EventTracker.HireHelpTriggered = true
-}
-
-func HireHelpCanUse(g *Game) bool {
-	if !g.Run.EventTracker.HireHelpTriggered {
-		return true
-	}
-	return false
 }

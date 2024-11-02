@@ -32,6 +32,7 @@ func (g *Game) InitRun() {
 		People:                make([]Person, 1),
 		PossibleEvents:        events,
 		Events:                []Event{{BlankEvent: true}},
+		EventTracker:          make(map[string]bool),
 		Products:              make(map[ProductType]*Product),
 		ActionsMaximum:        5,
 		ActionsRemaining:      5,

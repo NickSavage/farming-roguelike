@@ -1,18 +1,22 @@
 [
   {
     "name": "Nothing",
+    "repeatable": true,
     "description": "All is quiet tonight."
   },
   {
     "name": "Land Clearage",
+    "repeatable": true,
     "description": "Add a new field"
   },
   {
     "name": "Cell Tower",
+    "repeatable": false,
     "description": "A major telecom company has approached you about building a cell tower on your property."
   },
   {
     "name": "Hire Help",
+    "repeatable": false,
     "description": "Getting some extra hands for the harvest"
   }
 ]
