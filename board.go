@@ -30,6 +30,13 @@ func (g *Game) GetSquareFromCoords(input BoardCoord) *BoardSquare {
 
 }
 
+func (g *Game) GetVecFromCoords(input BoardCoord) rl.Vector2 {
+	return rl.Vector2{
+		X: float32(input.Row*TILE_WIDTH + int(g.SidebarWidth)),
+		Y: float32(input.Column * TILE_HEIGHT),
+	}
+}
+
 func (g *Game) GetOpenSpace(tech *Technology) (*TechnologySpace, error) {
 
 	for _, space := range g.Run.TechnologySpaces {
@@ -140,7 +147,7 @@ func (g *Game) drawTiles() {
 		for j := range grid[i] {
 			DrawTile(
 				g.Data["GrassTile"].(Tile),
-				float32(i*TILE_HEIGHT),
+				float32(i*TILE_HEIGHT+int(g.SidebarWidth)),
 				float32(j*TILE_WIDTH),
 			)
 		}
@@ -155,8 +162,9 @@ func (g *Game) DrawTechnologySpaces() {
 		if !space.Active {
 			continue
 		}
-		x := float32(space.Row * TILE_WIDTH)
-		y := float32(space.Column * TILE_HEIGHT)
+		vec := g.GetVecFromCoords(BoardCoord{Row: space.Row, Column: space.Column})
+		x := vec.X
+		y := vec.Y
 		width := float32(space.Width * TILE_WIDTH)
 		height := float32(space.Height * TILE_HEIGHT)
 		rect = rl.NewRectangle(x, y, width, height)
@@ -214,10 +222,10 @@ func (g *Game) drawGrid() {
 	columns := g.Scenes["Board"].Data["Columns"].(int)
 	rows := g.Scenes["Board"].Data["Rows"].(int)
 
-	maxX := float32(columns) * spacing
+	maxX := float32(columns)*spacing + float32(g.SidebarWidth)
 	//maxY := float32(g.screenHeight - 100)
 	maxY := float32(columns) * spacing
-	x = 0
+	x = float32(g.SidebarWidth)
 	//	y := 0
 	startVec := rl.Vector2{X: 0, Y: 0}
 	endVec := rl.Vector2{X: 0, Y: maxY}
@@ -235,7 +243,7 @@ func (g *Game) drawGrid() {
 	}
 	var y float32
 	y = 0
-	startVec = rl.Vector2{X: 0, Y: 0}
+	startVec = rl.Vector2{X: float32(g.SidebarWidth), Y: 0}
 	endVec = rl.Vector2{X: maxX, Y: 0}
 	for {
 		startVec.Y = y
@@ -250,7 +258,7 @@ func (g *Game) drawGrid() {
 
 	}
 	rl.DrawRectangleLinesEx(rl.Rectangle{
-		X:      0,
+		X:      float32(g.SidebarWidth),
 		Y:      0,
 		Width:  maxX,
 		Height: maxY,

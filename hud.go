@@ -105,7 +105,6 @@ func DrawHUD(g *Game) {
 	scene := g.Scenes["HUD"]
 	height := int32(150)
 	//	rl.DrawRectangle(0, g.screenHeight-height, g.screenWidth, height, rl.Black)
-	rl.DrawRectangle(0, 0, g.SidebarWidth, g.screenHeight, rl.Black)
 
 	DrawSidebar(g)
 	g.DrawButtons(scene.Buttons)
@@ -129,6 +128,8 @@ func DrawHUD(g *Game) {
 }
 
 func DrawSidebar(g *Game) {
+
+	rl.DrawRectangle(0, 0, g.SidebarWidth, g.screenHeight, rl.Black)
 
 	// rl.DrawText(
 	// 	fmt.Sprintf("Net Worth: %v", g.Run.CalculateNetWorth()),
