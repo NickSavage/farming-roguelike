@@ -14,10 +14,17 @@ func InitEvents() ([]Event, error) {
 	events := []Event{}
 	var data []EventJSON
 
-	fns := make(map[string]func(*Game))
-	fns["Nothing"] = BlankEventOnTrigger
-	fns["Cell Tower"] = CellTowerOnTrigger
-	fns["Land Clearage"] = LandClearageOnTrigger
+	triggerFunctions := make(map[string]func(*Game))
+	triggerFunctions["Nothing"] = BlankEventOnTrigger
+	triggerFunctions["Cell Tower"] = CellTowerOnTrigger
+	triggerFunctions["Land Clearage"] = LandClearageOnTrigger
+	triggerFunctions["Hire Help"] = HireHelpOnTrigger
+
+	canUseFunctions := make(map[string]func(*Game) bool)
+	canUseFunctions["Nothing"] = BlankEventCanUse
+	canUseFunctions["Cell Tower"] = BlankEventCanUse
+	canUseFunctions["Land Clearage"] = BlankEventCanUse
+	canUseFunctions["Hire Help"] = HireHelpCanUse
 
 	file, err := os.Open("./assets/events.json")
 	if err != nil {
@@ -41,7 +48,8 @@ func InitEvents() ([]Event, error) {
 		event = Event{
 			Name:        item.Name,
 			Description: item.Description,
-			OnTrigger:   fns[item.Name],
+			OnTrigger:   triggerFunctions[item.Name],
+			CanUse:      canUseFunctions[item.Name],
 		}
 		events = append(events, event)
 
@@ -52,23 +60,31 @@ func InitEvents() ([]Event, error) {
 func (g *Game) PickEventChoices(choices int) []Event {
 	var results []Event
 
-	for _ = range choices {
+	var events = make([]Event, len(g.Run.PossibleEvents))
+	copy(events, g.Run.PossibleEvents)
+	rand.Shuffle(len(events), func(i, j int) {
+		events[i], events[j] = events[j], events[i]
+	})
 
-		for _, event := range g.Run.PossibleEvents {
-			alreadyPicked := false
-			for _, existingChoice := range results {
-				if existingChoice.Name == event.Name {
-					alreadyPicked = true
-					break
-				}
+	for _, event := range events {
+		alreadyPicked := false
+		for _, existingChoice := range results {
+			if existingChoice.Name == event.Name {
+				alreadyPicked = true
+				break
 			}
-			if alreadyPicked {
-				continue
-			}
-			log.Printf("event before %v", event)
-			event.Effects = g.RoundEndPriceChanges()
-			log.Printf("event after %v", event.Effects)
-			results = append(results, event)
+		}
+		if alreadyPicked {
+			continue
+		}
+		if !event.CanUse(g) {
+			continue
+		}
+		log.Printf("event before %v", event)
+		event.Effects = g.RoundEndPriceChanges()
+		log.Printf("event after %v", event.Effects)
+		results = append(results, event)
+		if len(results) >= choices {
 			break
 		}
 	}
@@ -115,30 +131,14 @@ func (g *Game) RandomPriceChange(product ProductType) Effect {
 
 // blank event
 
-func (g *Game) BlankEvent() Event {
-	result := Event{
-		Name:        "Nothing",
-		Description: "Add a new field",
-		OnTrigger:   BlankEventOnTrigger,
-	}
-	return result
-
-}
-
 func BlankEventOnTrigger(g *Game) {
 
 }
+func BlankEventCanUse(g *Game) bool {
+	return true
+}
 
 // specific events
-
-func (g *Game) LandClearageEvent() Event {
-	result := Event{
-		Name:        "Land Clearage",
-		Description: "Add a new field",
-		OnTrigger:   LandClearageOnTrigger,
-	}
-	return result
-}
 
 func LandClearageOnTrigger(g *Game) {
 	for _, space := range g.Run.TechnologySpaces {
@@ -150,24 +150,6 @@ func LandClearageOnTrigger(g *Game) {
 	}
 	// g.Run.EventTracker.LandClearageTriggered = true
 }
-
-func (g *Game) CellTowerEvent() Event {
-	effects := []Effect{
-		{
-			IsPriceChange: false,
-			EventTrigger:  CellTowerOnTrigger,
-		},
-	}
-	result := Event{
-		Name:        "Cell Tower",
-		Description: "A major telecom company has approached you about building a cell tower on your property.",
-		OnTrigger:   CellTowerOnTrigger,
-
-		Effects: effects,
-	}
-	return result
-}
-
 func CellTowerOnTrigger(g *Game) {
 	for _, space := range g.Run.TechnologySpaces {
 		if space.TechnologyType != CellTowerSpace {
@@ -176,5 +158,25 @@ func CellTowerOnTrigger(g *Game) {
 		g.PlaceTech(g.Technology["CellTower"], space)
 
 	}
+	g.Run.EventTracker.CellTowerTriggered = true
 
+}
+func CellTowerCanUse(g *Game) bool {
+	if !g.Run.EventTracker.CellTowerTriggered {
+		return true
+	}
+	return false
+}
+
+func HireHelpOnTrigger(g *Game) {
+	g.Run.ActionsMaximum += 1
+	g.Run.ActionsRemaining += 1
+	g.Run.EventTracker.HireHelpTriggered = true
+}
+
+func HireHelpCanUse(g *Game) bool {
+	if !g.Run.EventTracker.HireHelpTriggered {
+		return true
+	}
+	return false
 }

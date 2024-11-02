@@ -10,5 +10,9 @@
   {
     "name": "Cell Tower",
     "description": "A major telecom company has approached you about building a cell tower on your property."
+  },
+  {
+    "name": "Hire Help",
+    "description": "Getting some extra hands for the harvest"
   }
 ]

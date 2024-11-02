@@ -119,6 +119,8 @@ type Person struct {
 type EventTracker struct {
 	LandClearageTriggered bool
 	LandClearageFinished  bool
+	HireHelpTriggered     bool
+	CellTowerTriggered    bool
 }
 
 type EventJSON struct {
@@ -133,6 +135,7 @@ type Event struct {
 	Effects     []Effect
 	BlankEvent  bool
 	OnTrigger   func(*Game)
+	CanUse      func(*Game) bool
 }
 type Effect struct {
 	ProductImpacted ProductType
