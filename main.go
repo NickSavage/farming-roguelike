@@ -7,127 +7,56 @@ import (
 func (g *Game) LoadAssets() {
 	image := rl.LoadImage("assets/grass.png")
 	rl.ImageResize(image, 264, 168)
+	g.Data["GrassTile"] = LoadImage(image, 0, 120, 1, 1)
 
-	g.Data["GrassTile"] = Tile{
-		Texture: rl.LoadTextureFromImage(image),
-		TileFrame: rl.Rectangle{
-			X:      0,
-			Y:      120,
-			Width:  45,
-			Height: 45,
-		},
-		Color: rl.White,
-	}
 	image = rl.LoadImage("assets/dirt.png")
+
 	rl.ImageResize(image, 264, 168)
+	g.Data["DirtTile"] = LoadImage(image, 22, 120, 1, 1)
 
-	g.Data["DirtTile"] = Tile{
-		Texture: rl.LoadTextureFromImage(image),
-		TileFrame: rl.Rectangle{
-			X:      22,
-			Y:      120,
-			Width:  45,
-			Height: 45,
-		},
-		Color: rl.White,
-	}
 	image = rl.LoadImage("assets/tech/chicken_coop.png")
-	rl.ImageResize(image, 90, 90)
 
-	g.Data["ChickenCoopTile"] = Tile{
-		Texture: rl.LoadTextureFromImage(image),
-		TileFrame: rl.Rectangle{
-			X:      0,
-			Y:      0,
-			Width:  90,
-			Height: 90,
-		},
-		Color: rl.White,
-	}
+	rl.ImageResize(image, 90, 90)
+	g.Data["ChickenCoopTile"] = LoadImage(image, 0, 0, 2, 2)
 	rl.ImageResize(image, 45, 45)
-	g.Data["ChickenCoopShopTile"] = Tile{
-		Texture: rl.LoadTextureFromImage(image),
-		TileFrame: rl.Rectangle{
-			X:      0,
-			Y:      0,
-			Width:  45,
-			Height: 45,
-		},
-		Color: rl.White,
-	}
+	g.Data["ChickenCoopShopTile"] = LoadImage(image, 0, 0, 1, 1)
 
 	image = rl.LoadImage("assets/trees.png")
 	rl.ImageResize(image, 432, 240)
 
-	g.Data["TreeTile"] = Tile{
-
-		Texture: rl.LoadTextureFromImage(image),
-		TileFrame: rl.Rectangle{
-			X:      54,
-			Y:      0,
-			Width:  90,
-			Height: 90,
-		},
-		Color: rl.White,
-	}
+	g.Data["TreeTile"] = LoadImage(image, 54, 0, 2, 2)
 
 	image = rl.LoadImage("assets/plants.png")
 	rl.ImageResize(image, 225, 675)
-	g.Data["WheatTile"] = Tile{
-		Texture: rl.LoadTextureFromImage(image),
-		TileFrame: rl.Rectangle{
-			X:      0,
-			Y:      357,
-			Width:  45,
-			Height: 45,
-		},
-		Color: rl.White,
-	}
-	g.Data["PotatoTile"] = Tile{
-		Texture: rl.LoadTextureFromImage(image),
-		TileFrame: rl.Rectangle{
-			X:      0,
-			Y:      92,
-			Width:  45,
-			Height: 45,
-		},
-		Color: rl.White,
-	}
+	g.Data["WheatTile"] = LoadImage(image, 0, 357, 1, 1)
+	g.Data["PotatoTile"] = LoadImage(image, 0, 92, 1, 1)
 
 	image = rl.LoadImage("assets/tech/workstation.png")
 	rl.ImageResize(image, 45, 45)
-	g.Data["WorkstationTile"] = Tile{
-		Texture: rl.LoadTextureFromImage(image),
-		TileFrame: rl.Rectangle{
-			X:      0,
-			Y:      0,
-			Width:  45,
-			Height: 45,
-		},
-		Color: rl.White,
-	}
+	g.Data["WorkstationTile"] = LoadImage(image, 0, 0, 1, 1)
+
 	image = rl.LoadImage("assets/tech/chicken_egg_warmer.png")
 	//	rl.ImageResize(image, 45, 45)
-	g.Data["ChickenEggWarmerTile"] = LoadImage(image, 0, 0, 90, 90)
+	g.Data["ChickenEggWarmerTile"] = LoadImage(image, 0, 0, 2, 2)
 	rl.ImageResize(image, 45, 45)
-	g.Data["ChickenEggWarmerShopTile"] = LoadImage(image, 0, 0, 45, 45)
+	g.Data["ChickenEggWarmerShopTile"] = LoadImage(image, 0, 0, 1, 1)
 
 	image = rl.LoadImage("assets/icons/wheat.png")
-	g.Data["WheatIcon"] = LoadImage(image, 0, 0, 90, 90)
+	g.Data["WheatIcon"] = LoadImage(image, 0, 0, 2, 2)
 	image = rl.LoadImage("assets/icons/potato.png")
-	g.Data["PotatoIcon"] = LoadImage(image, 0, 0, 90, 90)
+	g.Data["PotatoIcon"] = LoadImage(image, 0, 0, 2, 2)
 	image = rl.LoadImage("assets/icons/carrots.png")
-	g.Data["CarrotShopIcon"] = LoadImage(image, 0, 0, 90, 90)
+	g.Data["CarrotShopIcon"] = LoadImage(image, 0, 0, 2, 2)
 	rl.ImageResize(image, 45, 45)
-	g.Data["CarrotIcon"] = LoadImage(image, 0, 0, 45, 45)
+	g.Data["CarrotIcon"] = LoadImage(image, 0, 0, 1, 1)
 
 	image = rl.LoadImage("assets/icons/apples.png")
-	g.Data["AppleShopIcon"] = LoadImage(image, 0, 0, 90, 90)
+	g.Data["AppleShopIcon"] = LoadImage(image, 0, 0, 2, 2)
 	rl.ImageResize(image, 45, 45)
-	g.Data["AppleIcon"] = LoadImage(image, 0, 0, 45, 45)
+	g.Data["AppleIcon"] = LoadImage(image, 0, 0, 1, 1)
 
 	image = rl.LoadImage("assets/icons/cell_tower.png")
-	g.Data["CellTowerTile"] = LoadImage(image, 0, 0, 90, 90)
+	g.Data["CellTowerTile"] = LoadImage(image, 0, 0, 2, 2)
 
 }
 
@@ -148,18 +77,25 @@ func (g *Game) LoadScenes() {
 		Data:        make(map[string]interface{}),
 		Buttons:     make([]Button, 1),
 	}
+	g.Scenes["Settings"] = &Scene{
+		Active:      true,
+		AutoDisable: true,
+		DrawScene:   DrawSettings,
+		UpdateScene: UpdateSettings,
+		Data:        make(map[string]interface{}),
+		Buttons:     make([]Button, 1),
+	}
 	g.InitHUD()
 
 }
 
 func main() {
 	g := Game{
-		Scenes:       map[string]*Scene{},
-		Data:         make(map[string]interface{}),
-		screenWidth:  int32(1280),
-		screenHeight: int32(800),
-		Counter:      0,
+		Scenes:  map[string]*Scene{},
+		Data:    make(map[string]interface{}),
+		Counter: 0,
 	}
+	g.InitSettings()
 
 	g.Data["Message"] = ""
 
