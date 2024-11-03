@@ -41,6 +41,13 @@ func OnClickEndRoundConfirmButton(g *Game) {
 func OpenSellWindow(g *Game, product *Product) {
 	scene := g.Scenes["HUD"]
 	g.ActivateWindow(scene.Windows, scene.Windows["Sell"])
+}
+
+func CloseAllWindows(g *Game) {
+	scene := g.Scenes["HUD"]
+	for _, window := range scene.Windows {
+		window.Display = false
+	}
 
 }
 
@@ -90,6 +97,11 @@ func (g *Game) InitHUD() {
 
 	scene.Data["SellAllConfirm"] = ""
 
+	scene.KeyBindings[rl.KeyEscape] = &KeyBinding{
+		Current: rl.KeyEscape,
+		Default: rl.KeyEscape,
+		OnPress: CloseAllWindows,
+	}
 }
 
 func UpdateHUD(g *Game) {

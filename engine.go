@@ -39,6 +39,13 @@ type Scene struct {
 	Menu        *BoardRightClickMenu
 	RenderMenu  bool
 	Messages    []Message
+	KeyBindings map[int32]*KeyBinding
+}
+
+type KeyBinding struct {
+	Current int32
+	Default int32
+	OnPress func(*Game)
 }
 
 type Message struct {
@@ -169,6 +176,12 @@ func (g *Game) Update() {
 	for _, scene := range g.Scenes {
 		if !scene.Active {
 			continue
+		}
+		for key, binding := range scene.KeyBindings {
+			if rl.IsKeyPressed(key) {
+				binding.OnPress(g)
+			}
+
 		}
 		scene.UpdateScene(g)
 	}
