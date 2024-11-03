@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	//	"github.com/gen2brain/raylib-go/raylib"
 )
 
 const SETTINGS_PATH = "settings.json"
@@ -79,6 +78,20 @@ func (g *Game) LoadSettingsFromDisk() error {
 
 }
 
-func DrawSettings(g *Game) {}
+func SaveButtonOnClick(g *Game) {
+	log.Printf("asds")
+	g.ActivateScene("Board")
 
-func UpdateSettings(g *Game) {}
+}
+
+func DrawSettings(g *Game) {
+	button := g.Button("Save", 100, 100, SaveButtonOnClick)
+	g.DrawButton(button)
+	if g.WasButtonClicked(&button) {
+		button.OnClick(g)
+
+	}
+}
+
+func UpdateSettings(g *Game) {
+}

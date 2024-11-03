@@ -363,4 +363,5 @@ func (g *Game) HandleHover() {
 }
 
 func UpdateBoard(g *Game) {
+	UpdateHUD(g)
 }

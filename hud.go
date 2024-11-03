@@ -25,6 +25,11 @@ func OnClickOpenMarketWindow(g *Game) {
 	g.ActivateWindow(scene.Windows, scene.Windows["Prices"])
 }
 
+func OnClickOpenSettings(g *Game) {
+	g.ActivateScene("Settings")
+
+}
+
 func OnClickEndRoundPageTwoButton(g *Game) {
 
 }
@@ -159,6 +164,8 @@ func DrawSidebar(g *Game) {
 	buttons = append(buttons, &priceButton)
 	viewEndRoundButton := g.Button("End Round", 10, 340, OnClickOpenEndRoundPage1Window)
 	buttons = append(buttons, &viewEndRoundButton)
+	settingsButton := g.Button("Settings", 10, 390, OnClickOpenSettings)
+	buttons = append(buttons, &settingsButton)
 
 	for _, button := range buttons {
 		g.DrawButton(*button)

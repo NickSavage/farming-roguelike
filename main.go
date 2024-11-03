@@ -70,8 +70,8 @@ func (g *Game) LoadScenes() {
 	}
 
 	g.Scenes["HUD"] = &Scene{
-		Active:      true,
-		AutoDisable: false,
+		Active:      false,
+		AutoDisable: true,
 		DrawScene:   DrawHUD,
 		UpdateScene: UpdateHUD,
 		Data:        make(map[string]interface{}),
@@ -111,6 +111,7 @@ func main() {
 
 	rl.SetTargetFPS(60)
 
+	g.ActivateScene("Settings")
 	//	g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["ShopWindow"])
 	for !rl.WindowShouldClose() {
 		g.Counter += 1
