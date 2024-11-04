@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Close All Windows",
+    "functionName": "CloseAllWindows",
+    "scene": "HUD",
+    "default": 256,
+    "configurable": false
+  },
+  {
+    "name": "Close Menu",
+    "functionName": "CloseMenu",
+    "scene": "Settings",
+    "default": 256,
+    "configurable": false
+  },
+  {
+    "name": "Shop",
+    "functionName": "OpenShop",
+    "scene": "HUD",
+    "default": 83,
+    "configurable": false
+  }
+]
