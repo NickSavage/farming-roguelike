@@ -61,8 +61,16 @@ func (g *Game) LoadAssets() {
 }
 
 func (g *Game) LoadScenes() {
-	g.Scenes["Board"] = &Scene{
+	g.Scenes["GameMenu"] = &Scene{
 		Active:      true,
+		AutoDisable: true,
+		DrawScene:   DrawGameMenu,
+		UpdateScene: UpdateGameMenu,
+		Data:        make(map[string]interface{}),
+		KeyBindings: make(map[int32]*KeyBinding),
+	}
+	g.Scenes["Board"] = &Scene{
+		Active:      false,
 		AutoDisable: true,
 		DrawScene:   DrawBoard,
 		UpdateScene: UpdateBoard,
@@ -71,7 +79,7 @@ func (g *Game) LoadScenes() {
 	}
 
 	g.Scenes["HUD"] = &Scene{
-		Active:      true,
+		Active:      false,
 		AutoDisable: true,
 		DrawScene:   DrawHUD,
 		UpdateScene: UpdateHUD,
@@ -109,8 +117,8 @@ func main() {
 
 	g.InitTechnology()
 	g.InitBoard()
-	g.InitRun()
 	g.InitShopWindow()
+	g.InitGameMenu()
 
 	rl.SetTargetFPS(60)
 	rl.SetExitKey(0)

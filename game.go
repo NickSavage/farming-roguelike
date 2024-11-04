@@ -12,7 +12,7 @@ import (
 const YEARS int = 8
 const ROUNDS int = YEARS * 4
 
-func (g *Game) InitRun() {
+func (g *Game) InitRun(loadSave bool) {
 
 	run := &Run{
 		Money:                 100,
@@ -39,20 +39,23 @@ func (g *Game) InitRun() {
 	}
 
 	g.Run.PossibleEvents = events
-	save, err := LoadRun()
-	if err == nil {
-		run.Money = save.Money
-		run.Yield = save.Yield
-		run.Productivity = save.Productivity
-		run.CurrentRound = save.CurrentRound
-		run.CurrentYear = save.CurrentYear
-		run.CurrentSeason = save.CurrentSeason
-		run.ActionsRemaining = save.ActionsRemaining
-		run.ActionsMaximum = save.ActionsMaximum
-		run.Products = save.Products
-		run.Technology = g.UnpackTechnology(save.Technology)
-		run.Events = g.Run.UnpackEvents(save.Events)
-		// todo: place tech
+	if loadSave {
+		save, err := LoadRun()
+		if err == nil {
+			run.Money = save.Money
+			run.Yield = save.Yield
+			run.Productivity = save.Productivity
+			run.CurrentRound = save.CurrentRound
+			run.CurrentYear = save.CurrentYear
+			run.CurrentSeason = save.CurrentSeason
+			run.ActionsRemaining = save.ActionsRemaining
+			run.ActionsMaximum = save.ActionsMaximum
+			run.Products = save.Products
+			run.Technology = g.UnpackTechnology(save.Technology)
+			run.Events = g.Run.UnpackEvents(save.Events)
+			// todo: place tech
+		}
+
 	}
 
 	g.Run.MoneyRequirement = g.Run.calculateMoneyRequirement()
