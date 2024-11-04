@@ -33,6 +33,12 @@ func (g *Game) InitRun() {
 
 	g.Run = run
 	g.InitTechSpaces()
+	events, err := g.Run.InitEvents()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	g.Run.PossibleEvents = events
 	save, err := LoadRun()
 	if err == nil {
 		run.Money = save.Money
@@ -45,14 +51,9 @@ func (g *Game) InitRun() {
 		run.ActionsMaximum = save.ActionsMaximum
 		run.Products = save.Products
 		run.Technology = g.UnpackTechnology(save.Technology)
+		run.Events = g.Run.UnpackEvents(save.Events)
 		// todo: place tech
 	}
-
-	events, err := InitEvents()
-	if err != nil {
-		log.Fatal(err)
-	}
-	g.Run.PossibleEvents = events
 
 	g.Run.MoneyRequirement = g.Run.calculateMoneyRequirement()
 
@@ -433,6 +434,40 @@ func (g *Game) UnpackTechnology(saved []TechnologySave) []*Technology {
 
 }
 
+func (r *Run) PackEvents() []EventSave {
+	results := []EventSave{}
+	for _, event := range r.Events {
+		save := EventSave{
+			RoundIndex:  event.RoundIndex,
+			Name:        event.Name,
+			Description: event.Description,
+			Effects:     event.Effects,
+			BlankEvent:  event.BlankEvent,
+			Repeatable:  event.Repeatable,
+		}
+		results = append(results, save)
+	}
+	return results
+}
+
+func (r *Run) UnpackEvents(saved []EventSave) []Event {
+	results := []Event{}
+
+	for _, save := range saved {
+		new := Event{
+			RoundIndex:  save.RoundIndex,
+			Name:        save.Name,
+			Description: save.Description,
+			Effects:     save.Effects,
+			BlankEvent:  save.BlankEvent,
+			Repeatable:  save.Repeatable,
+			OnTrigger:   r.triggerFunctions[save.Name],
+		}
+		results = append(results, new)
+	}
+	return results
+}
+
 func (r *Run) SaveRun() {
 
 	saveFile := SaveFile{
@@ -449,6 +484,7 @@ func (r *Run) SaveRun() {
 		EventTracker:          r.EventTracker,
 		Technology:            r.PackTechnology(),
 		Products:              r.Products,
+		Events:                r.PackEvents(),
 	}
 	SaveRun(saveFile)
 }

@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func InitEvents() ([]Event, error) {
+func (r *Run) InitEvents() ([]Event, error) {
 	log.Printf("init")
 
 	events := []Event{}
@@ -19,6 +19,7 @@ func InitEvents() ([]Event, error) {
 	triggerFunctions["Cell Tower"] = CellTowerOnTrigger
 	triggerFunctions["Land Clearage"] = LandClearageOnTrigger
 	triggerFunctions["Hire Help"] = HireHelpOnTrigger
+	r.triggerFunctions = triggerFunctions
 
 	file, err := os.Open("./assets/events.json")
 	if err != nil {
@@ -162,7 +163,7 @@ func CellTowerOnTrigger(g *Game) {
 		if space.TechnologyType != CellTowerSpace {
 			continue
 		}
-		g.PlaceTech(g.Technology["CellTower"], space)
+		g.PlaceTech(g.Technology["Cell Tower"], space)
 
 	}
 

@@ -42,6 +42,7 @@ type Run struct {
 	EventChoices           []Event
 	Events                 []Event
 	PossibleEvents         []Event
+	triggerFunctions       map[string]func(*Game)
 	EventTracker           map[string]bool // track if its been called or not
 	TechnologySpaces       []*TechnologySpace
 	ActionsRemaining       int
@@ -62,6 +63,7 @@ type SaveFile struct {
 	EventTracker          map[string]bool          `json:"event_tracker"`
 	Technology            []TechnologySave         `json:"technology_save"`
 	Products              map[ProductType]*Product `json:"products"`
+	Events                []EventSave              `json:"event_save"`
 }
 
 type BoardSquare struct {
@@ -161,11 +163,20 @@ type Event struct {
 	OnTrigger   func(*Game)
 	Repeatable  bool
 }
+
+type EventSave struct {
+	RoundIndex  int
+	Name        string
+	Description string
+	Effects     []Effect
+	BlankEvent  bool
+	Repeatable  bool
+}
+
 type Effect struct {
 	ProductImpacted ProductType
 	IsPriceChange   bool
 	PriceChange     float32 // percentage
-	EventTrigger    func(*Game)
 }
 
 type Product struct {
