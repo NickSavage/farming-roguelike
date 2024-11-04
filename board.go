@@ -137,6 +137,11 @@ func (g *Game) InitBoard() {
 	//	g.InitPlaceRandomTrees(215)
 	//	g.InitPlaceTech()
 
+	scene.KeyBindingFunctions = make(map[string]func(*Game))
+	scene.KeyBindingFunctions["MoveCursorLeft"] = MoveCursorLeft
+	scene.KeyBindingFunctions["MoveCursorRight"] = MoveCursorLeft
+	scene.KeyBindingFunctions["MoveCursorDown"] = MoveCursorLeft
+	scene.KeyBindingFunctions["MoveCursorUp"] = MoveCursorLeft
 }
 
 func (g *Game) drawTiles() {
@@ -365,3 +370,10 @@ func (g *Game) HandleHover() {
 func UpdateBoard(g *Game) {
 	UpdateHUD(g)
 }
+
+// cursor
+
+func MoveCursorLeft(g *Game)  {}
+func MoveCursorRight(g *Game) {}
+func MoveCursorUp(g *Game)    {}
+func MoveCursorDown(g *Game)  {}
