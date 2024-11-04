@@ -1,6 +1,9 @@
 package main
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	rl "github.com/gen2brain/raylib-go/raylib"
+	"os"
+)
 
 func OnClickContinueRun(g *Game) {
 
@@ -16,10 +19,16 @@ func OnClickNewRun(g *Game) {
 	g.Scenes["HUD"].Active = true
 }
 
-func OnClickSettings(g *Game) {}
-func OnClickStats(g *Game)    {}
-func OnClickAbout(g *Game)    {}
-func OnClickExit(g *Game)     {}
+func OnClickSettings(g *Game) {
+	g.ActivateScene("Settings")
+	g.Scenes["Settings"].Data["Return"] = "GameMenu"
+}
+func OnClickStats(g *Game) {}
+func OnClickAbout(g *Game) {}
+
+func OnClickExit(g *Game) {
+	os.Exit(0)
+}
 
 func (g *Game) InitGameMenu() {
 
@@ -36,6 +45,7 @@ func (g *Game) InitGameMenu() {
 		Text:       "New Run",
 		TextColor:  rl.Black,
 		OnClick:    OnClickNewRun,
+		Active:     true,
 	}
 	scene.Buttons = append(scene.Buttons, newButton)
 	continueButton := Button{
@@ -50,6 +60,7 @@ func (g *Game) InitGameMenu() {
 		Text:       "Continue Run",
 		TextColor:  rl.Black,
 		OnClick:    OnClickContinueRun,
+		Active:     g.ExistingSave,
 	}
 	scene.Buttons = append(scene.Buttons, continueButton)
 	settingsButton := Button{
@@ -64,6 +75,7 @@ func (g *Game) InitGameMenu() {
 		Text:       "Settings",
 		TextColor:  rl.Black,
 		OnClick:    OnClickSettings,
+		Active:     true,
 	}
 	scene.Buttons = append(scene.Buttons, settingsButton)
 	statsButton := Button{
@@ -78,6 +90,7 @@ func (g *Game) InitGameMenu() {
 		Text:       "Statistics",
 		TextColor:  rl.Black,
 		OnClick:    OnClickStats,
+		Active:     true,
 	}
 	scene.Buttons = append(scene.Buttons, statsButton)
 	aboutButton := Button{
@@ -92,6 +105,7 @@ func (g *Game) InitGameMenu() {
 		Text:       "About",
 		TextColor:  rl.Black,
 		OnClick:    OnClickAbout,
+		Active:     true,
 	}
 	scene.Buttons = append(scene.Buttons, aboutButton)
 	exitButton := Button{
@@ -106,6 +120,7 @@ func (g *Game) InitGameMenu() {
 		Text:       "Exit",
 		TextColor:  rl.Black,
 		OnClick:    OnClickExit,
+		Active:     true,
 	}
 	scene.Buttons = append(scene.Buttons, exitButton)
 
@@ -116,5 +131,4 @@ func DrawGameMenu(g *Game) {
 }
 
 func UpdateGameMenu(g *Game) {
-
 }

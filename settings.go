@@ -134,6 +134,13 @@ func UpdateSettings(g *Game) {
 }
 
 func CloseMenu(g *Game) {
-	g.ActivateScene("Board")
-	g.Scenes["HUD"].Active = true
+	returnScene := g.Scenes["Settings"].Data["Return"].(string)
+	if returnScene == "" {
+		g.ActivateScene("GameMenu")
+	} else {
+		g.ActivateScene(returnScene)
+		if returnScene == "Board" {
+			g.Scenes["HUD"].Active = true
+		}
+	}
 }

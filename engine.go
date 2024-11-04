@@ -17,6 +17,7 @@ type Button struct {
 	TextColor  rl.Color
 	TextSize   int32
 	OnClick    func(*Game)
+	Active     bool
 }
 type ShopButton struct {
 	X               float32
@@ -145,7 +146,6 @@ func (g *Game) Button(text string, x, y float32, onClick func(*Game)) Button {
 }
 
 func (g *Game) DrawButton(button Button) {
-
 	var boxColor rl.Color
 	mousePosition := rl.GetMousePosition()
 	if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {
@@ -198,7 +198,9 @@ func (g *Game) Draw() {
 		}
 		scene.DrawScene(g)
 		for _, button := range scene.Buttons {
-			g.DrawButton(button)
+			if button.Active {
+				g.DrawButton(button)
+			}
 		}
 	}
 	rl.EndDrawing()

@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/gen2brain/raylib-go/raylib"
+	"log"
+	"os"
 )
 
 func (g *Game) LoadAssets() {
@@ -67,7 +69,7 @@ func (g *Game) LoadScenes() {
 		DrawScene:   DrawGameMenu,
 		UpdateScene: UpdateGameMenu,
 		Data:        make(map[string]interface{}),
-		KeyBindings: make(map[int32]*KeyBinding),
+		KeyBindings: make(map[string]*KeyBinding),
 	}
 	g.Scenes["Board"] = &Scene{
 		Active:      false,
@@ -110,6 +112,15 @@ func main() {
 
 	g.Data["Message"] = ""
 
+	file, err := os.Open("./save.json")
+	log.Printf("file % err %v", file, err)
+	if err != nil {
+		g.ExistingSave = false
+	} else {
+		g.ExistingSave = true
+	}
+	file.Close()
+
 	rl.InitWindow(g.screenWidth, g.screenHeight, "Farming Roguelike")
 
 	g.LoadAssets()
@@ -124,8 +135,12 @@ func main() {
 	rl.SetTargetFPS(60)
 	rl.SetExitKey(0)
 
-	//	g.ActivateScene("Settings")
-	//	g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["ShopWindow"])
+	// dev shit
+
+	// g.InitRun(false)
+	// g.ActivateScene("Board")
+	// g.Scenes["HUD"].Active = true
+
 	for !rl.WindowShouldClose() {
 		g.Counter += 1
 		if g.Counter == 60 {

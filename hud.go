@@ -26,6 +26,8 @@ func OnClickOpenMarketWindow(g *Game) {
 }
 
 func OnClickOpenSettings(g *Game) {
+
+	g.Scenes["Settings"].Data["Return"] = "Board"
 	g.ActivateScene("Settings")
 
 }
@@ -56,6 +58,7 @@ func CloseAllWindows(g *Game) {
 	if !found {
 		log.Printf("activate")
 		OnClickOpenSettings(g)
+		g.Scenes["Settings"].Data["Return"] = "Board"
 		g.ActivateScene("Settings")
 
 	}
@@ -186,7 +189,7 @@ func DrawSidebar(g *Game) {
 	buttons = append(buttons, &priceButton)
 	viewEndRoundButton := g.Button("End Round", 10, 340, OnClickOpenEndRoundPage1Window)
 	buttons = append(buttons, &viewEndRoundButton)
-	settingsButton := g.Button("Settings", 10, 390, OnClickOpenSettings)
+	settingsButton := g.Button("Settings", 10, float32(g.screenHeight)-60, OnClickOpenSettings)
 	buttons = append(buttons, &settingsButton)
 
 	for _, button := range buttons {
