@@ -153,7 +153,7 @@ func (g *Game) InitShopWindow() {
 			Height:     300,
 			Image:      g.Data["ChickenCoopShopTile"].(Tile),
 			OnClick:    ShopClickChickenCoop,
-			Technology: tech["ChickenCoop"],
+			Technology: tech["Chicken Coop"],
 		},
 		ShopButton{
 			Width:      150,
@@ -167,7 +167,7 @@ func (g *Game) InitShopWindow() {
 			Height:     300,
 			Image:      g.Data["ChickenEggWarmerShopTile"].(Tile),
 			OnClick:    ShopClickChickenEggWarmer,
-			Technology: tech["ChickenEggWarmer"],
+			Technology: tech["Chicken Egg Warmer"],
 		},
 	}
 	scene.Data["ShopButtons"] = buttons

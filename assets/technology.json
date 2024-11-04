@@ -17,7 +17,7 @@
     }
   },
   {
-    "name": "Wheat",
+    "name": "Wheat Field",
     "productType": "Wheat",
     "technologyType": "PlantSpace",
     "price": 1,
@@ -34,7 +34,7 @@
     }
   },
   {
-    "name": "Potato",
+    "name": "Potato Field",
     "rarity": "Common",
     "price": 2,
     "costMoney": 50,
@@ -51,7 +51,7 @@
     }
   },
   {
-    "name": "Carrot",
+    "name": "Carrot Field",
     "rarity": "Common",
     "price": 3,
     "costMoney": 100,

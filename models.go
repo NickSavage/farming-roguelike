@@ -26,7 +26,6 @@ type Game struct {
 
 type Run struct {
 	Technology             []*Technology
-	People                 []Person
 	Products               map[ProductType]*Product
 	Money                  float32
 	Yield                  float32
@@ -49,6 +48,22 @@ type Run struct {
 	ActionsMaximum         int
 }
 
+type SaveFile struct {
+	Money                 float32                  `json:"money"`
+	MoneyRequirementStart float32                  `json:"money_requirement_start"`
+	MoneyRequirementRate  float32                  `json:"money_requirement_rate"`
+	Yield                 float32                  `json:"yield"`
+	Productivity          float32                  `json:"productivity"`
+	CurrentRound          int                      `json:"current_round"`
+	CurrentYear           int                      `json:"current_year"`
+	CurrentSeason         Season                   `json:"current_season"`
+	ActionsRemaining      int                      `json:"actions_remaining"`
+	ActionsMaximum        int                      `json:"actions_maximum"`
+	EventTracker          map[string]bool          `json:"event_tracker"`
+	Technology            []TechnologySave         `json:"technology_save"`
+	Products              map[ProductType]*Product `json:"products"`
+}
+
 type BoardSquare struct {
 	Tile              Tile
 	TileType          string
@@ -66,6 +81,7 @@ type BoardSquare struct {
 }
 
 type TechnologySpace struct {
+	ID             int
 	Technology     *Technology
 	TechnologyType TechnologyType
 	Row            int
@@ -103,6 +119,14 @@ type Technology struct {
 	ReadyToHarvest  bool
 	ReadyToTouch    bool
 	TempYield       float32
+}
+
+type TechnologySave struct {
+	Name           string
+	ReadyToHarvest bool
+	ReadyToTouch   bool
+	TempYield      float32
+	SpaceID        int
 }
 
 type TechnologyType = string

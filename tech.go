@@ -16,15 +16,15 @@ func (g *Game) InitTechnology() {
 	g.LoadInitialData()
 	tech := make(map[string]*Technology)
 
-	tech["ChickenCoop"] = g.CreateChickenCoopTech()
-	tech["WheatField"] = g.CreateWheatTech()
-	tech["PotatoField"] = g.CreatePotatoTech()
-	tech["CarrotField"] = g.CreateCarrotTech()
+	tech["Chicken Coop"] = g.CreateChickenCoopTech()
+	tech["Wheat Field"] = g.CreateWheatTech()
+	tech["Potato Field"] = g.CreatePotatoTech()
+	tech["Carrot Field"] = g.CreateCarrotTech()
 
 	tech["Workstation"] = g.CreateWorkstationTech()
-	tech["ChickenEggWarmer"] = g.CreateChickenEggWarmer()
+	tech["Chicken Egg Warmer"] = g.CreateChickenEggWarmer()
 
-	tech["CellTower"] = g.CreateCellTowerTech()
+	tech["Cell Tower"] = g.CreateCellTowerTech()
 
 	g.Technology = tech
 }
@@ -208,7 +208,7 @@ func ChickenCoopRoundEnd(g *Game, tech *Technology) {
 
 func (g *Game) CreateWheatTech() *Technology {
 
-	tech := g.CreateTechFromInitialData(g.InitialData["Wheat"])
+	tech := g.CreateTechFromInitialData(g.InitialData["Wheat Field"])
 	tech.CanBuild = WheatFieldCanBuild
 	tech.OnBuild = WheatFieldOnBuild
 	tech.OnClick = WheatFieldOnClick
@@ -261,7 +261,7 @@ func WheatFieldOnClick(g *Game, tech *Technology) string {
 // potato
 
 func (g *Game) CreatePotatoTech() *Technology {
-	tech := g.CreateTechFromInitialData(g.InitialData["Potato"])
+	tech := g.CreateTechFromInitialData(g.InitialData["Potato Field"])
 	tech.CanBuild = PotatoFieldCanBuild
 	tech.OnBuild = PotatoFieldOnBuild
 	tech.OnClick = PotatoFieldOnClick
@@ -277,8 +277,10 @@ func PotatoFieldCanBuild(g *Game, tech *Technology) bool {
 }
 
 func PotatoFieldOnBuild(g *Game, tech *Technology) error {
-	g.InitProduct(tech.ProductType, g.InitialData["Potato"].Price)
+	// prob shouldn't be using initial data here
+	g.InitProduct(tech.ProductType, g.InitialData["Potato Field"].Price)
 	return nil
+
 }
 
 func PotatoFieldRoundEnd(g *Game, tech *Technology) {
@@ -314,7 +316,7 @@ func PotatoFieldOnClick(g *Game, tech *Technology) string {
 // carrot
 
 func (g *Game) CreateCarrotTech() *Technology {
-	tech := g.CreateTechFromInitialData(g.InitialData["Carrot"])
+	tech := g.CreateTechFromInitialData(g.InitialData["Carrot Field"])
 	tech.CanBuild = CarrotFieldCanBuild
 	tech.OnBuild = CarrotFieldOnBuild
 	tech.OnClick = CarrotFieldOnClick

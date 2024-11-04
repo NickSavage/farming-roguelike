@@ -1,8 +1,12 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
+	"encoding/json"
+	"fmt"
 	"log"
+	"os"
+
+	"github.com/gen2brain/raylib-go/raylib"
 )
 
 type Button struct {
@@ -281,4 +285,36 @@ func (g *Game) DrawContextMenu(scene *Scene) {
 		}
 	}
 
+}
+
+// save files
+
+func SaveRun(saveFile SaveFile) error {
+	json, err := json.Marshal(saveFile)
+	if err != nil {
+		log.Printf("save marshalling error %v", err)
+		return err
+	}
+	err = os.WriteFile("save.json", json, 0644)
+	log.Printf("save write error %v", err)
+	return err
+}
+
+func LoadRun() (SaveFile, error) {
+	var save SaveFile
+	file, err := os.Open("./save.json")
+	if err != nil {
+		fmt.Println(err)
+		return save, err
+	}
+	defer file.Close()
+
+	jsonDecoder := json.NewDecoder(file)
+
+	err = jsonDecoder.Decode(&save)
+	if err != nil {
+		fmt.Println(err)
+		return save, err
+	}
+	return save, nil
 }

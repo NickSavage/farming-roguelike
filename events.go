@@ -103,8 +103,10 @@ func (g *Game) ApplyEvent(event Event) {
 	g.ApplyPriceChanges(event)
 	event.OnTrigger(g)
 	if !event.Repeatable {
+		log.Printf("save event")
 		g.Run.EventTracker[event.Name] = true
 	}
+	log.Printf("tracker %v", g.Run.EventTracker)
 }
 
 func (g *Game) ApplyPriceChanges(event Event) {

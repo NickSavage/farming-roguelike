@@ -14,12 +14,7 @@ const ROUNDS int = YEARS * 4
 
 func (g *Game) InitRun() {
 
-	events, err := InitEvents()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	g.Run = &Run{
+	run := &Run{
 		Money:                 100,
 		MoneyRequirementStart: 200,
 		MoneyRequirementRate:  2,
@@ -29,16 +24,37 @@ func (g *Game) InitRun() {
 		CurrentSeason:         Spring,
 		NextSeason:            Summer,
 		Technology:            make([]*Technology, 0),
-		People:                make([]Person, 1),
-		PossibleEvents:        events,
 		Events:                []Event{{BlankEvent: true}},
 		EventTracker:          make(map[string]bool),
 		Products:              make(map[ProductType]*Product),
 		ActionsMaximum:        5,
 		ActionsRemaining:      5,
 	}
-	g.Run.MoneyRequirement = g.Run.calculateMoneyRequirement()
+
+	g.Run = run
 	g.InitTechSpaces()
+	save, err := LoadRun()
+	if err == nil {
+		run.Money = save.Money
+		run.Yield = save.Yield
+		run.Productivity = save.Productivity
+		run.CurrentRound = save.CurrentRound
+		run.CurrentYear = save.CurrentYear
+		run.CurrentSeason = save.CurrentSeason
+		run.ActionsRemaining = save.ActionsRemaining
+		run.ActionsMaximum = save.ActionsMaximum
+		run.Products = save.Products
+		run.Technology = g.UnpackTechnology(save.Technology)
+		// todo: place tech
+	}
+
+	events, err := InitEvents()
+	if err != nil {
+		log.Fatal(err)
+	}
+	g.Run.PossibleEvents = events
+
+	g.Run.MoneyRequirement = g.Run.calculateMoneyRequirement()
 
 	g.Run.CurrentRoundShopPlants = g.ShopRandomPlants(2)
 }
@@ -46,6 +62,7 @@ func (g *Game) InitRun() {
 func (g *Game) InitTechSpaces() {
 	spaces := []*TechnologySpace{
 		{
+			ID:             0,
 			TechnologyType: PlantSpace,
 			Row:            7,
 			Column:         1,
@@ -55,6 +72,7 @@ func (g *Game) InitTechSpaces() {
 			Active:         true,
 		},
 		{
+			ID:             1,
 			TechnologyType: PlantSpace,
 			Row:            7,
 			Column:         7,
@@ -64,6 +82,7 @@ func (g *Game) InitTechSpaces() {
 			Active:         true,
 		},
 		{
+			ID:             2,
 			TechnologyType: PlantSpace,
 			Row:            7,
 			Column:         13,
@@ -73,6 +92,7 @@ func (g *Game) InitTechSpaces() {
 			Active:         true,
 		},
 		{
+			ID:             3,
 			TechnologyType: PlantSpace,
 			Row:            19,
 			Column:         1,
@@ -82,6 +102,7 @@ func (g *Game) InitTechSpaces() {
 			Active:         false,
 		},
 		{
+			ID:             4,
 			TechnologyType: PlantSpace,
 			Row:            19,
 			Column:         7,
@@ -91,6 +112,7 @@ func (g *Game) InitTechSpaces() {
 			Active:         false,
 		},
 		{
+			ID:             5,
 			TechnologyType: PlantSpace,
 			Row:            19,
 			Column:         13,
@@ -100,6 +122,7 @@ func (g *Game) InitTechSpaces() {
 			Active:         false,
 		},
 		{
+			ID:             6,
 			TechnologyType: BuildingSpace,
 			Row:            13,
 			Column:         1,
@@ -109,6 +132,7 @@ func (g *Game) InitTechSpaces() {
 			Active:         true,
 		},
 		{
+			ID:             7,
 			TechnologyType: BuildingSpace,
 			Row:            13,
 			Column:         4,
@@ -118,6 +142,7 @@ func (g *Game) InitTechSpaces() {
 			Active:         true,
 		},
 		{
+			ID:             8,
 			TechnologyType: BuildingSpace,
 			Row:            13,
 			Column:         7,
@@ -127,6 +152,7 @@ func (g *Game) InitTechSpaces() {
 			Active:         true,
 		},
 		{
+			ID:             9,
 			TechnologyType: CellTowerSpace,
 			Row:            16,
 			Column:         2,
@@ -188,6 +214,7 @@ func OnClickEndRound(g *Game) {
 		g.Run.MoneyRequirement = g.Run.calculateMoneyRequirement()
 		g.Run.CurrentRoundShopPlants = g.ShopRandomPlants(2)
 	}
+	g.Run.SaveRun()
 }
 
 func (g *Game) CheckGameOver() bool {
@@ -362,4 +389,66 @@ func findPlantSpaceTech(techMap map[string]*Technology, key string) (bool, bool)
 		return true, true
 	}
 	return false, false
+}
+
+// save files
+
+func (r *Run) PackTechnology() []TechnologySave {
+	results := []TechnologySave{}
+	for _, tech := range r.Technology {
+		saved := TechnologySave{
+			Name:           tech.Name,
+			ReadyToHarvest: tech.ReadyToHarvest,
+			ReadyToTouch:   tech.ReadyToTouch,
+			TempYield:      tech.TempYield,
+			SpaceID:        tech.Space.ID,
+		}
+		results = append(results, saved)
+	}
+	return results
+}
+
+func (g *Game) UnpackTechnology(saved []TechnologySave) []*Technology {
+	results := []*Technology{}
+	for _, save := range saved {
+		log.Printf("tech %v", save.Name)
+
+		new := *g.Technology[save.Name]
+		copy := &new
+		copy.ReadyToHarvest = save.ReadyToHarvest
+		copy.ReadyToTouch = save.ReadyToTouch
+		copy.TempYield = save.TempYield
+		for _, space := range g.Run.TechnologySpaces {
+			if space.ID != save.SpaceID {
+				continue
+			}
+			space.Technology = copy
+			space.IsFilled = true
+			copy.Space = space
+		}
+		results = append(results, copy)
+	}
+	log.Printf("unpacked %v", results)
+	return results
+
+}
+
+func (r *Run) SaveRun() {
+
+	saveFile := SaveFile{
+		Money:                 r.Money,
+		MoneyRequirementStart: r.MoneyRequirementStart,
+		MoneyRequirementRate:  r.MoneyRequirementRate,
+		Yield:                 r.Yield,
+		Productivity:          r.Productivity,
+		CurrentRound:          r.CurrentRound,
+		CurrentYear:           r.CurrentYear,
+		CurrentSeason:         r.CurrentSeason,
+		ActionsRemaining:      r.ActionsRemaining,
+		ActionsMaximum:        r.ActionsMaximum,
+		EventTracker:          r.EventTracker,
+		Technology:            r.PackTechnology(),
+		Products:              r.Products,
+	}
+	SaveRun(saveFile)
 }
