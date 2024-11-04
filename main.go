@@ -75,7 +75,7 @@ func (g *Game) LoadScenes() {
 		DrawScene:   DrawBoard,
 		UpdateScene: UpdateBoard,
 		Data:        make(map[string]interface{}),
-		KeyBindings: make(map[int32]*KeyBinding),
+		KeyBindings: make(map[string]*KeyBinding),
 	}
 
 	g.Scenes["HUD"] = &Scene{
@@ -85,7 +85,7 @@ func (g *Game) LoadScenes() {
 		UpdateScene: UpdateHUD,
 		Data:        make(map[string]interface{}),
 		Buttons:     make([]Button, 1),
-		KeyBindings: make(map[int32]*KeyBinding),
+		KeyBindings: make(map[string]*KeyBinding),
 	}
 	g.Scenes["Settings"] = &Scene{
 		Active:      false,
@@ -94,7 +94,7 @@ func (g *Game) LoadScenes() {
 		UpdateScene: UpdateSettings,
 		Data:        make(map[string]interface{}),
 		Buttons:     make([]Button, 1),
-		KeyBindings: make(map[int32]*KeyBinding),
+		KeyBindings: make(map[string]*KeyBinding),
 	}
 	g.InitHUD()
 
@@ -119,6 +119,7 @@ func main() {
 	g.InitBoard()
 	g.InitShopWindow()
 	g.InitGameMenu()
+	g.InitSettingsMenu()
 
 	rl.SetTargetFPS(60)
 	rl.SetExitKey(0)

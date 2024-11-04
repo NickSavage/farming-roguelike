@@ -17,11 +17,13 @@ type Game struct {
 	Counter           int32
 	Seconds           int32
 	ScreenSkip        bool
+	ButtonSkip        int32
 	WindowOpen        bool
 	Technology        map[string]*Technology
 	InitialData       map[string]InitialData
 	GameOver          bool
 	GameOverTriggered bool
+	KeyBindingJSONs   []KeyBindingJSON
 }
 
 type Run struct {

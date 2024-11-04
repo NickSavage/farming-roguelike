@@ -31,26 +31,39 @@ type ShopButton struct {
 	Technology      *Technology
 }
 type Scene struct {
-	Name        string
-	Active      bool
-	AutoDisable bool
-	DrawScene   func(*Game)
-	UpdateScene func(*Game)
-	Buttons     []Button
-	skip        bool
-	Data        map[string]interface{}
-	Camera      rl.Camera2D
-	Windows     map[string]*Window
-	Menu        *BoardRightClickMenu
-	RenderMenu  bool
-	Messages    []Message
-	KeyBindings map[int32]*KeyBinding
+	Name                string
+	Active              bool
+	AutoDisable         bool
+	DrawScene           func(*Game)
+	UpdateScene         func(*Game)
+	Buttons             []Button
+	skip                bool
+	Data                map[string]interface{}
+	Camera              rl.Camera2D
+	Windows             map[string]*Window
+	Menu                *BoardRightClickMenu
+	RenderMenu          bool
+	Messages            []Message
+	KeyBindingFunctions map[string]func(*Game)
+	KeyBindings         map[string]*KeyBinding
 }
 
 type KeyBinding struct {
-	Current int32
-	Default int32
-	OnPress func(*Game)
+	Current      int32
+	Default      int32
+	Name         string
+	FunctionName string
+	Scene        string
+	Configurable bool
+	OnPress      func(*Game)
+}
+
+type KeyBindingJSON struct {
+	Default      int32  `json:"default"`
+	Name         string `json:"name"`
+	FunctionName string `json:"functionName"`
+	Scene        string `json:"scene"`
+	Configurable bool   `json:"configurable"`
 }
 
 type Message struct {
@@ -196,9 +209,10 @@ func (g *Game) Update() {
 		if !scene.Active {
 			continue
 		}
-		for key, binding := range scene.KeyBindings {
-			if rl.IsKeyPressed(key) {
+		for _, binding := range scene.KeyBindings {
+			if rl.IsKeyPressed(binding.Current) && !(g.ButtonSkip == binding.Current) {
 				binding.OnPress(g)
+				g.ButtonSkip = binding.Current
 			}
 
 		}
@@ -216,6 +230,12 @@ func (g *Game) Update() {
 			g.ScreenSkip = false
 
 			//			log.Printf("remove screen skip: mouse down %v", rl.IsMouseButtonPressed(rl.MouseLeftButton))
+		}
+	}
+
+	if g.ButtonSkip != 0 {
+		if rl.IsKeyUp(g.ButtonSkip) {
+			g.ButtonSkip = 0
 		}
 	}
 }
@@ -337,5 +357,23 @@ func LoadRun() (SaveFile, error) {
 		fmt.Println(err)
 		return save, err
 	}
+
 	return save, nil
+}
+
+// key bindings
+
+func (g *Game) LoadSceneShortcuts(sceneName string) {
+	scene := g.Scenes[sceneName]
+	for _, binding := range g.KeyBindingJSONs {
+		if binding.Scene == sceneName {
+			scene.KeyBindings[binding.Name] = &KeyBinding{
+				Current: binding.Default,
+				Default: binding.Default,
+				OnPress: scene.KeyBindingFunctions[binding.FunctionName],
+			}
+
+		}
+	}
+
 }

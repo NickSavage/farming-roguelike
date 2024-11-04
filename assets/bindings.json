@@ -1,0 +1,51 @@
+[
+  {
+    "name": "Close All Windows",
+    "functionName": "CloseAllWindows",
+    "scene": "HUD",
+    "default": 256,
+    "configurable": false
+  },
+  {
+    "name": "Close Menu",
+    "functionName": "CloseMenu",
+    "scene": "Settings",
+    "default": 256,
+    "configurable": false
+  },
+  {
+    "name": "Shop",
+    "functionName": "OpenShop",
+    "scene": "HUD",
+    "default": 83,
+    "configurable": false
+  },
+  {
+    "name": "Move Cursor Left",
+    "functionName": "MoveCursorLeft",
+    "scene": "Board",
+    "default": 263,
+    "configurable": false
+  },
+  {
+    "name": "Move Cursor Right",
+    "functionName": "MoveCursorRight",
+    "scene": "Board",
+    "default": 262,
+    "configurable": false
+  },
+  {
+    "name": "Move Cursor Up",
+    "functionName": "MoveCursorUp",
+    "scene": "Board",
+    "default": 265,
+    "configurable": false
+  },
+  {
+    "name": "Move Cursor Down",
+    "functionName": "MoveCursorDown",
+    "scene": "Board",
+    "default": 264,
+    "configurable": false
+  }
+]

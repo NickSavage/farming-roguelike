@@ -10,8 +10,9 @@ import (
 const SETTINGS_PATH = "settings.json"
 
 type Settings struct {
-	ScreenWidth  int32 `json:"screenWidth"`
-	ScreenHeight int32 `json:"screenHeight"`
+	ScreenWidth  int32            `json:"screenWidth"`
+	ScreenHeight int32            `json:"screenHeight"`
+	KeyBindings  []KeyBindingJSON `json:"keyBindings"`
 }
 
 func (g *Game) InitSettings() {
@@ -34,11 +35,25 @@ func (g *Game) InitSettings() {
 
 }
 
+func (g *Game) InitSettingsMenu() {
+
+	scene := g.Scenes["Settings"]
+
+	scene.KeyBindingFunctions = make(map[string]func(*Game))
+	scene.KeyBindingFunctions["CloseMenu"] = CloseMenu
+
+	g.LoadSceneShortcuts("Settings")
+	log.Printf("settings shorcuts %v", scene.KeyBindings)
+}
+
 func (g *Game) CreateSettingsFirstLoad() error {
 	log.Printf("?")
+	bindings := g.LoadInitialBindings()
+	g.KeyBindingJSONs = bindings
 	settings := &Settings{
 		ScreenWidth:  800,
 		ScreenHeight: 600,
+		KeyBindings:  bindings,
 	}
 
 	g.screenWidth = settings.ScreenWidth
@@ -47,11 +62,32 @@ func (g *Game) CreateSettingsFirstLoad() error {
 	return g.WriteSettingsToDisk()
 }
 
+func (g *Game) LoadInitialBindings() []KeyBindingJSON {
+	var initialBindings []KeyBindingJSON
+
+	file, err := os.Open("./assets/bindings.json")
+	if err != nil {
+		fmt.Println(err)
+		return initialBindings
+	}
+	defer file.Close()
+
+	jsonDecoder := json.NewDecoder(file)
+
+	err = jsonDecoder.Decode(&initialBindings)
+	if err != nil {
+		fmt.Println(err)
+		return initialBindings
+	}
+	return initialBindings
+}
+
 func (g *Game) WriteSettingsToDisk() error {
 
 	settings := &Settings{
 		ScreenWidth:  g.screenWidth,
 		ScreenHeight: g.screenHeight,
+		KeyBindings:  g.KeyBindingJSONs,
 	}
 
 	jsonSettings, err := json.Marshal(settings)
@@ -74,13 +110,14 @@ func (g *Game) LoadSettingsFromDisk() error {
 	}
 	g.screenWidth = settings.ScreenWidth
 	g.screenHeight = settings.ScreenHeight
+	g.KeyBindingJSONs = settings.KeyBindings
 	return nil
 
 }
 
 func SaveButtonOnClick(g *Game) {
 	log.Printf("asds")
-	g.ActivateScene("Board")
+	CloseMenu(g)
 
 }
 
@@ -94,4 +131,9 @@ func DrawSettings(g *Game) {
 }
 
 func UpdateSettings(g *Game) {
+}
+
+func CloseMenu(g *Game) {
+	g.ActivateScene("Board")
+	g.Scenes["HUD"].Active = true
 }

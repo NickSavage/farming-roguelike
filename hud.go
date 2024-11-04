@@ -45,8 +45,19 @@ func OpenSellWindow(g *Game, product *Product) {
 
 func CloseAllWindows(g *Game) {
 	scene := g.Scenes["HUD"]
+	found := false
 	for _, window := range scene.Windows {
+		if window.Display {
+			log.Printf("found %v", window)
+			found = true
+		}
 		window.Display = false
+	}
+	if !found {
+		log.Printf("activate")
+		OnClickOpenSettings(g)
+		g.ActivateScene("Settings")
+
 	}
 
 }
@@ -95,13 +106,12 @@ func (g *Game) InitHUD() {
 		DrawWindow: DrawGameOverWindow,
 	}
 
-	scene.Data["SellAllConfirm"] = ""
+	scene.KeyBindingFunctions = make(map[string]func(*Game))
+	scene.KeyBindingFunctions["CloseAllWindows"] = CloseAllWindows
+	scene.KeyBindingFunctions["OpenShop"] = OnClickShopWindowButton
 
-	scene.KeyBindings[rl.KeyEscape] = &KeyBinding{
-		Current: rl.KeyEscape,
-		Default: rl.KeyEscape,
-		OnPress: CloseAllWindows,
-	}
+	g.LoadSceneShortcuts("HUD")
+	log.Printf("shorcuts %v", scene.KeyBindings)
 }
 
 func UpdateHUD(g *Game) {
