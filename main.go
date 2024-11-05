@@ -103,6 +103,7 @@ func (g *Game) LoadScenes() {
 }
 
 func main() {
+	log.Printf("hello world")
 	g := Game{
 		Scenes:  map[string]*Scene{},
 		Data:    make(map[string]interface{}),
@@ -113,7 +114,6 @@ func main() {
 	g.Data["Message"] = ""
 
 	file, err := os.Open("./save.json")
-	log.Printf("file % err %v", file, err)
 	if err != nil {
 		g.ExistingSave = false
 	} else {

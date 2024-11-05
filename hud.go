@@ -5,13 +5,15 @@ import (
 	"github.com/gen2brain/raylib-go/raylib"
 	"log"
 	"math"
+	"nsavage/farming-roguelike/engine"
 )
 
 func OnClickNull(g *Game) {}
 
-func OnClickShopWindowButton(g *Game) {
-	scene := g.Scenes["HUD"]
-	g.ActivateWindow(scene.Windows, scene.Windows["ShopWindow"])
+func OnClickShopWindowButton(g engine.GameInterface) {
+	scene := g.Scenes()["HUD"]
+	log.Printf("hey %v", scene)
+	//	g.ActivateWindow(scene.Windows, scene.Windows["ShopWindow"])
 }
 
 func OnClickOpenEndRoundPage1Window(g *Game) {
@@ -111,7 +113,7 @@ func (g *Game) InitHUD() {
 
 	scene.KeyBindingFunctions = make(map[string]func(*Game))
 	scene.KeyBindingFunctions["CloseAllWindows"] = CloseAllWindows
-	scene.KeyBindingFunctions["OpenShop"] = OnClickShopWindowButton
+	//	scene.KeyBindingFunctions["OpenShop"] = OnClickShopWindowButton
 
 	g.LoadSceneShortcuts("HUD")
 	log.Printf("shorcuts %v", scene.KeyBindings)
@@ -162,14 +164,6 @@ func DrawSidebar(g *Game) {
 
 	rl.DrawRectangle(0, 0, g.SidebarWidth, g.screenHeight, rl.Black)
 
-	// rl.DrawText(
-	// 	fmt.Sprintf("Net Worth: %v", g.Run.CalculateNetWorth()),
-	// 	30,
-	// 	30,
-	// 	20,
-	// 	rl.White,
-	// )
-
 	rl.DrawText(
 		fmt.Sprintf("Actions: %v/%v", g.Run.ActionsRemaining, g.Run.ActionsMaximum),
 		30, 30, 20, rl.White,
@@ -184,8 +178,19 @@ func DrawSidebar(g *Game) {
 	buttons := []*Button{}
 	// techButton := g.Button("Technology", 10, 190, OnClickTechWindowButton)
 	// buttons = append(buttons, &techButton)
-	shopButton := g.Button("Shop", 10, 240, OnClickShopWindowButton)
-	buttons = append(buttons, &shopButton)
+	shopButton := engine.Button{
+		Rectangle:       rl.NewRectangle(10, 240, 150, 40),
+		Color:           rl.SkyBlue,
+		HoverColor:      rl.LightGray,
+		Text:            "Shop",
+		TextColor:       rl.Black,
+		Active:          true,
+		OnClickFunction: OnClickShopWindowButton,
+	}
+	shopButton.Render()
+
+	//	"Shop", 10, 240, OnClickShopWindowButton)
+	// buttons = append(buttons, &shopButton)
 	priceButton := g.Button("Market", 10, 290, OnClickOpenMarketWindow)
 	buttons = append(buttons, &priceButton)
 	viewEndRoundButton := g.Button("End Round", 10, 340, OnClickOpenEndRoundPage1Window)

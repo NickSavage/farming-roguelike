@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"nsavage/farming-roguelike/engine"
 	"os"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -44,18 +45,18 @@ func (g *Game) InitSettingsMenu() {
 	button := g.Button("Save", 10, float32(g.screenHeight)-50, SaveButtonOnClick)
 	scene.Buttons = append(scene.Buttons, button)
 
-	scene.Components = make([]UIComponent, 0)
-	options := []*Option{
-		&Option{
+	scene.Components = make([]engine.UIComponent, 0)
+	options := []*engine.Option{
+		&engine.Option{
 			Text:     "hello",
-			OnChange: DefaultOptionOnChange,
+			OnChange: engine.DefaultOptionOnChange,
 		},
-		&Option{
+		&engine.Option{
 			Text:     "world",
-			OnChange: DefaultOptionOnChange,
+			OnChange: engine.DefaultOptionOnChange,
 		},
 	}
-	dropdown := &Dropdown{
+	dropdown := &engine.Dropdown{
 		Rectangle:     rl.NewRectangle(10, 10, 300, 40),
 		Color:         rl.White,
 		TextColor:     rl.Black,

@@ -4,16 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"nsavage/farming-roguelike/engine"
 	"os"
 
 	"github.com/gen2brain/raylib-go/raylib"
 )
-
-type UIComponent interface {
-	Render()
-	OnClick()
-	Rect() rl.Rectangle
-}
 
 type Button struct {
 	Rectangle  rl.Rectangle
@@ -24,21 +19,6 @@ type Button struct {
 	TextSize   int32
 	OnClick    func(*Game)
 	Active     bool
-}
-
-type Dropdown struct {
-	Rectangle     rl.Rectangle
-	Options       []*Option
-	CurrentOption *Option
-	Color         rl.Color
-	TextColor     rl.Color
-	TextSize      int32
-	IsOpen        bool
-}
-
-type Option struct {
-	Text     string
-	OnChange func(*Game, *Option)
 }
 
 type ShopButton struct {
@@ -66,10 +46,10 @@ type Scene struct {
 	Windows             map[string]*Window
 	Menu                *BoardRightClickMenu
 	RenderMenu          bool
-	Messages            []Message
+	Messages            []engine.Message
 	KeyBindingFunctions map[string]func(*Game)
 	KeyBindings         map[string]*KeyBinding
-	Components          []UIComponent
+	Components          []engine.UIComponent
 }
 
 type KeyBinding struct {
@@ -88,12 +68,6 @@ type KeyBindingJSON struct {
 	FunctionName string `json:"functionName"`
 	Scene        string `json:"scene"`
 	Configurable bool   `json:"configurable"`
-}
-
-type Message struct {
-	Text  string
-	Vec   rl.Vector2
-	Timer int
 }
 
 type Window struct {
@@ -314,14 +288,14 @@ func (g *Game) Update() {
 
 // tiles
 
-func (g *Game) GetBoardCoordAtPoint(vec rl.Vector2) BoardCoord {
+func (g *Game) GetBoardCoordAtPoint(vec rl.Vector2) engine.BoardCoord {
 
 	scene := g.Scenes["Board"]
 
 	//	mousePosition := rl.GetMousePosition()
 	X := int((vec.X + scene.Camera.Target.X) / scene.Camera.Zoom / float32(TILE_WIDTH))
 	Y := int((vec.Y + scene.Camera.Target.Y) / scene.Camera.Zoom / float32(TILE_HEIGHT))
-	return BoardCoord{
+	return engine.BoardCoord{
 		Row:    X,
 		Column: Y,
 	}
@@ -451,48 +425,3 @@ func (g *Game) LoadSceneShortcuts(sceneName string) {
 }
 
 // ui
-
-func DefaultOptionOnChange(g *Game, o *Option) {}
-
-func (dropdown *Dropdown) Render() {
-	log.Printf("adfadfad")
-	rl.DrawRectangleRec(dropdown.Rectangle, dropdown.Color)
-	rl.DrawRectangleLinesEx(dropdown.Rectangle, 1, rl.Black)
-	rl.DrawText(
-		dropdown.CurrentOption.Text,
-		dropdown.Rectangle.ToInt32().X+5,
-		dropdown.Rectangle.ToInt32().Y+5,
-		dropdown.TextSize,
-		dropdown.TextColor,
-	)
-	if dropdown.IsOpen {
-		for _, option := range dropdown.Options {
-			rect := dropdown.Rectangle
-			rect.Y += dropdown.Rectangle.Height
-
-			rl.DrawRectangleRec(rect, dropdown.Color)
-			rl.DrawRectangleLinesEx(rect, 1, rl.Black)
-			rl.DrawText(
-				option.Text,
-				int32(rect.X+5),
-				int32(rect.Y+5),
-				dropdown.TextSize,
-				dropdown.TextColor,
-			)
-		}
-	}
-}
-
-func (dropdown *Dropdown) OnClick() {
-	dropdown.IsOpen = !dropdown.IsOpen
-}
-
-func (dropdown *Dropdown) Rect() rl.Rectangle {
-	if dropdown.IsOpen {
-		rect := dropdown.Rectangle
-		rect.Height = rect.Height * float32(len(dropdown.Options))
-		return rect
-
-	}
-	return dropdown.Rectangle
-}

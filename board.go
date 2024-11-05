@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"math/rand"
+	"nsavage/farming-roguelike/engine"
 
 	"github.com/gen2brain/raylib-go/raylib"
 )
@@ -22,14 +23,14 @@ func CheckVecVisible(vec rl.Vector2) bool {
 	return true
 }
 
-func (g *Game) GetSquareFromCoords(input BoardCoord) *BoardSquare {
+func (g *Game) GetSquareFromCoords(input engine.BoardCoord) *BoardSquare {
 	scene := g.Scenes["Board"]
 	grid := scene.Data["Grid"].([][]BoardSquare)
 	return &grid[input.Row][input.Column]
 
 }
 
-func (g *Game) GetVecFromCoords(input BoardCoord) rl.Vector2 {
+func (g *Game) GetVecFromCoords(input engine.BoardCoord) rl.Vector2 {
 	return rl.Vector2{
 		X: float32(input.Row*TILE_WIDTH + int(g.SidebarWidth)),
 		Y: float32(input.Column * TILE_HEIGHT),
@@ -132,7 +133,7 @@ func (g *Game) InitBoard() {
 	}
 	g.Scenes["Board"].Data["Grid"] = grid
 
-	g.Scenes["Board"].Data["HoverVector"] = BoardCoord{}
+	g.Scenes["Board"].Data["HoverVector"] = engine.BoardCoord{}
 	g.Scenes["Board"].Data["HoverVectorCounter"] = 0
 	//	g.InitPlaceRandomTrees(215)
 	//	g.InitPlaceTech()
@@ -176,7 +177,7 @@ func (g *Game) DrawTechnologySpaces() {
 		if !space.Active {
 			continue
 		}
-		vec := g.GetVecFromCoords(BoardCoord{Row: space.Row, Column: space.Column})
+		vec := g.GetVecFromCoords(engine.BoardCoord{Row: space.Row, Column: space.Column})
 		x := vec.X
 		y := vec.Y
 		width := float32(space.Width * TILE_WIDTH)
@@ -193,7 +194,7 @@ func (g *Game) DrawTechnologySpaces() {
 			space.Technology.Tile.Color = rl.Green
 			if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 				result := g.HandleClickTech(space.Technology)
-				message := Message{
+				message := engine.Message{
 					Text:  result,
 					Vec:   rl.Vector2{X: x, Y: y},
 					Timer: 30,
@@ -285,7 +286,7 @@ func (g *Game) drawGrid() {
 
 func (g *Game) DrawMessages() {
 	scene := g.Scenes["Board"]
-	var results []Message
+	var results []engine.Message
 	for _, message := range scene.Messages {
 		rl.DrawText(message.Text, int32(message.Vec.X+50), int32(message.Vec.Y), 25, rl.Black)
 		message.Timer -= 1
@@ -320,7 +321,7 @@ func (g *Game) HandleHover() {
 	scene := g.Scenes["Board"]
 	mousePosition := rl.GetMousePosition()
 
-	oldVec := scene.Data["HoverVector"].(BoardCoord)
+	oldVec := scene.Data["HoverVector"].(engine.BoardCoord)
 	coords := g.GetBoardCoordAtPoint(mousePosition)
 	if coords.Row < 0 || coords.Row > TILE_ROWS-1 {
 		return
