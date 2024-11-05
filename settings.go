@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 const SETTINGS_PATH = "settings.json"
@@ -38,6 +40,32 @@ func (g *Game) InitSettings() {
 func (g *Game) InitSettingsMenu() {
 
 	scene := g.Scenes["Settings"]
+
+	button := g.Button("Save", 10, float32(g.screenHeight)-50, SaveButtonOnClick)
+	scene.Buttons = append(scene.Buttons, button)
+
+	scene.Components = make([]UIComponent, 0)
+	options := []*Option{
+		&Option{
+			Text:     "hello",
+			OnChange: DefaultOptionOnChange,
+		},
+		&Option{
+			Text:     "world",
+			OnChange: DefaultOptionOnChange,
+		},
+	}
+	dropdown := &Dropdown{
+		Rectangle:     rl.NewRectangle(10, 10, 300, 40),
+		Color:         rl.White,
+		TextColor:     rl.Black,
+		TextSize:      30,
+		IsOpen:        false,
+		Options:       options,
+		CurrentOption: options[0],
+	}
+	scene.Components = append(scene.Components, dropdown)
+	log.Printf("components %v", scene.Components)
 
 	scene.KeyBindingFunctions = make(map[string]func(*Game))
 	scene.KeyBindingFunctions["CloseMenu"] = CloseMenu
@@ -122,15 +150,27 @@ func SaveButtonOnClick(g *Game) {
 }
 
 func DrawSettings(g *Game) {
-	button := g.Button("Save", 100, 100, SaveButtonOnClick)
-	g.DrawButton(button)
-	if g.WasButtonClicked(&button) {
-		button.OnClick(g)
+	// scene := g.Scenes["Settings"]
 
-	}
+	// log.Printf("components %v", scene.Components)
+	// for _, component := range scene.Components {
+	// 	component.Render()
+	// }
 }
 
 func UpdateSettings(g *Game) {
+
+	// scene := g.Scenes["Settings"]
+	// mousePosition := rl.GetMousePosition()
+	// for _, component := range scene.Components {
+
+	// 	if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
+
+	// 		if rl.CheckCollisionPointRec(mousePosition, component.Rect()) {
+	// 			component.OnClick()
+	// 		}
+	// 	}
+	// }
 }
 
 func CloseMenu(g *Game) {
@@ -144,3 +184,5 @@ func CloseMenu(g *Game) {
 		}
 	}
 }
+
+// components

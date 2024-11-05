@@ -9,6 +9,12 @@ import (
 	"github.com/gen2brain/raylib-go/raylib"
 )
 
+type UIComponent interface {
+	Render()
+	OnClick()
+	Rect() rl.Rectangle
+}
+
 type Button struct {
 	Rectangle  rl.Rectangle
 	Color      rl.Color
@@ -19,6 +25,22 @@ type Button struct {
 	OnClick    func(*Game)
 	Active     bool
 }
+
+type Dropdown struct {
+	Rectangle     rl.Rectangle
+	Options       []*Option
+	CurrentOption *Option
+	Color         rl.Color
+	TextColor     rl.Color
+	TextSize      int32
+	IsOpen        bool
+}
+
+type Option struct {
+	Text     string
+	OnChange func(*Game, *Option)
+}
+
 type ShopButton struct {
 	X               float32
 	Y               float32
@@ -47,6 +69,7 @@ type Scene struct {
 	Messages            []Message
 	KeyBindingFunctions map[string]func(*Game)
 	KeyBindings         map[string]*KeyBinding
+	Components          []UIComponent
 }
 
 type KeyBinding struct {
@@ -138,11 +161,13 @@ func (g *Game) CloseButton(x, y float32, onClick func(*Game)) Button {
 
 func (g *Game) Button(text string, x, y float32, onClick func(*Game)) Button {
 	return Button{
-		Rectangle: rl.NewRectangle(x, y, 150, 40),
-		Color:     rl.SkyBlue,
-		Text:      text,
-		TextColor: rl.Black,
-		OnClick:   onClick,
+		Rectangle:  rl.NewRectangle(x, y, 150, 40),
+		Color:      rl.SkyBlue,
+		HoverColor: rl.LightGray,
+		Text:       text,
+		TextColor:  rl.Black,
+		OnClick:    onClick,
+		Active:     true,
 	}
 }
 
@@ -204,6 +229,10 @@ func (g *Game) Draw() {
 			}
 		}
 
+		for _, component := range scene.Components {
+			component.Render()
+		}
+
 		open := false
 		for _, window := range scene.Windows {
 			if window.Display {
@@ -213,6 +242,10 @@ func (g *Game) Draw() {
 					if button.Active {
 						g.DrawButton(button)
 					}
+				}
+
+				for _, component := range scene.Components {
+					component.Render()
 				}
 			}
 
@@ -237,6 +270,17 @@ func (g *Game) Update() {
 		for _, button := range scene.Buttons {
 			if g.WasButtonClicked(&button) {
 				button.OnClick(g)
+			}
+		}
+
+		for _, component := range scene.Components {
+
+			if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
+
+				mousePosition := rl.GetMousePosition()
+				if rl.CheckCollisionPointRec(mousePosition, component.Rect()) {
+					component.OnClick()
+				}
 			}
 		}
 		for _, window := range scene.Windows {
@@ -404,4 +448,51 @@ func (g *Game) LoadSceneShortcuts(sceneName string) {
 		}
 	}
 
+}
+
+// ui
+
+func DefaultOptionOnChange(g *Game, o *Option) {}
+
+func (dropdown *Dropdown) Render() {
+	log.Printf("adfadfad")
+	rl.DrawRectangleRec(dropdown.Rectangle, dropdown.Color)
+	rl.DrawRectangleLinesEx(dropdown.Rectangle, 1, rl.Black)
+	rl.DrawText(
+		dropdown.CurrentOption.Text,
+		dropdown.Rectangle.ToInt32().X+5,
+		dropdown.Rectangle.ToInt32().Y+5,
+		dropdown.TextSize,
+		dropdown.TextColor,
+	)
+	if dropdown.IsOpen {
+		for _, option := range dropdown.Options {
+			rect := dropdown.Rectangle
+			rect.Y += dropdown.Rectangle.Height
+
+			rl.DrawRectangleRec(rect, dropdown.Color)
+			rl.DrawRectangleLinesEx(rect, 1, rl.Black)
+			rl.DrawText(
+				option.Text,
+				int32(rect.X+5),
+				int32(rect.Y+5),
+				dropdown.TextSize,
+				dropdown.TextColor,
+			)
+		}
+	}
+}
+
+func (dropdown *Dropdown) OnClick() {
+	dropdown.IsOpen = !dropdown.IsOpen
+}
+
+func (dropdown *Dropdown) Rect() rl.Rectangle {
+	if dropdown.IsOpen {
+		rect := dropdown.Rectangle
+		rect.Height = rect.Height * float32(len(dropdown.Options))
+		return rect
+
+	}
+	return dropdown.Rectangle
 }
