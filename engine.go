@@ -77,6 +77,7 @@ type Window struct {
 	Name       string
 	DrawWindow func(*Game, *Window)
 	Display    bool
+	Buttons    []Button
 }
 
 type Tile struct {
@@ -202,6 +203,21 @@ func (g *Game) Draw() {
 				g.DrawButton(button)
 			}
 		}
+
+		open := false
+		for _, window := range scene.Windows {
+			if window.Display {
+				window.DrawWindow(g, window)
+				open = true
+				for _, button := range window.Buttons {
+					if button.Active {
+						g.DrawButton(button)
+					}
+				}
+			}
+
+		}
+		g.WindowOpen = open
 	}
 	rl.EndDrawing()
 }
@@ -222,6 +238,16 @@ func (g *Game) Update() {
 			if g.WasButtonClicked(&button) {
 				button.OnClick(g)
 			}
+		}
+		for _, window := range scene.Windows {
+			if window.Display {
+				for _, button := range window.Buttons {
+					if g.WasButtonClicked(&button) {
+						button.OnClick(g)
+					}
+				}
+			}
+
 		}
 
 		scene.UpdateScene(g)

@@ -23,8 +23,14 @@ func OnClickSettings(g *Game) {
 	g.ActivateScene("Settings")
 	g.Scenes["Settings"].Data["Return"] = "GameMenu"
 }
-func OnClickStats(g *Game) {}
-func OnClickAbout(g *Game) {}
+func OnClickStats(g *Game) {
+	scene := g.Scenes["GameMenu"]
+	g.ActivateWindow(scene.Windows, scene.Windows["Stats"])
+}
+func OnClickAbout(g *Game) {
+	scene := g.Scenes["GameMenu"]
+	g.ActivateWindow(scene.Windows, scene.Windows["About"])
+}
 
 func OnClickExit(g *Game) {
 	os.Exit(0)
@@ -124,11 +130,88 @@ func (g *Game) InitGameMenu() {
 	}
 	scene.Buttons = append(scene.Buttons, exitButton)
 
+	scene.KeyBindingFunctions = make(map[string]func(*Game))
+
+	scene.Windows = make(map[string]*Window)
+	scene.Windows["Stats"] = &Window{
+		Name:       "Stats",
+		Display:    false,
+		DrawWindow: DrawStatsWindow,
+		Buttons:    make([]Button, 1),
+	}
+	scene.Windows["Stats"].Buttons[0] = Button{
+		Rectangle: rl.NewRectangle(
+			50,
+			50,
+			200,
+			50,
+		),
+		Color:      rl.SkyBlue,
+		HoverColor: rl.LightGray,
+		Text:       "Close",
+		TextColor:  rl.Black,
+		OnClick:    CloseStatsWindow,
+		Active:     true,
+	}
+
+	scene.Windows["About"] = &Window{
+		Name:       "About",
+		Display:    false,
+		DrawWindow: DrawStatsWindow,
+		Buttons:    make([]Button, 1),
+	}
+	scene.Windows["About"].Buttons[0] = Button{
+		Rectangle: rl.NewRectangle(
+			50,
+			50,
+			200,
+			50,
+		),
+		Color:      rl.SkyBlue,
+		HoverColor: rl.LightGray,
+		Text:       "Close",
+		TextColor:  rl.Black,
+		OnClick:    CloseStatsWindow,
+		Active:     true,
+	}
 }
 
 func DrawGameMenu(g *Game) {
-
 }
 
 func UpdateGameMenu(g *Game) {
+}
+
+func DrawStatsWindow(g *Game, win *Window) {
+	rect := rl.Rectangle{
+		X:      20,
+		Y:      20,
+		Width:  float32(g.screenWidth) - 40,
+		Height: float32(g.screenHeight) - 40,
+	}
+	rl.DrawRectangleRec(rect, rl.White)
+	rl.DrawRectangleLinesEx(rect, 5, rl.Black)
+
+}
+
+func CloseStatsWindow(g *Game) {
+	scene := g.Scenes["GameMenu"]
+	g.ActivateWindow(scene.Windows, scene.Windows["About"])
+}
+
+func DrawAboutWindow(g *Game, win *Window) {
+	rect := rl.Rectangle{
+		X:      20,
+		Y:      20,
+		Width:  float32(g.screenWidth) - 40,
+		Height: float32(g.screenHeight) - 40,
+	}
+	rl.DrawRectangleRec(rect, rl.White)
+	rl.DrawRectangleLinesEx(rect, 5, rl.Black)
+
+}
+
+func CloseAboutWindow(g *Game) {
+	scene := g.Scenes["GameMenu"]
+	g.ActivateWindow(scene.Windows, scene.Windows["About"])
 }

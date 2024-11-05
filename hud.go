@@ -115,6 +115,7 @@ func (g *Game) InitHUD() {
 
 	g.LoadSceneShortcuts("HUD")
 	log.Printf("shorcuts %v", scene.KeyBindings)
+
 }
 
 func UpdateHUD(g *Game) {
