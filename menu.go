@@ -9,14 +9,12 @@ func OnClickContinueRun(g *Game) {
 
 	g.InitRun(true)
 	g.ActivateScene("Board")
-	g.Scenes["HUD"].Active = true
 }
 
 func OnClickNewRun(g *Game) {
 
 	g.InitRun(false)
 	g.ActivateScene("Board")
-	g.Scenes["HUD"].Active = true
 }
 
 func OnClickSettings(g *Game) {

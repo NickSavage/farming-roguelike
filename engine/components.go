@@ -104,9 +104,9 @@ func (button *Button) Render() {
 }
 
 func (button *Button) OnClick() {
-	if button.OnClickFunction != nil {
-		button.OnClickFunction()
-	}
+	// if button.OnClickFunction != nil {
+	// 	button.OnClickFunction()
+	// }
 }
 
 func (button *Button) Rect() rl.Rectangle {

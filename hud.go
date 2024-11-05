@@ -11,19 +11,19 @@ import (
 func OnClickNull(g *Game) {}
 
 func OnClickShopWindowButton(g engine.GameInterface) {
-	scene := g.Scenes()["HUD"]
+	scene := g.Scenes()["Board"]
 	log.Printf("hey %v", scene)
 	//	g.ActivateWindow(scene.Windows, scene.Windows["ShopWindow"])
 }
 
 func OnClickOpenEndRoundPage1Window(g *Game) {
-	scene := g.Scenes["HUD"]
+	scene := g.Scenes["Board"]
 	PreEndRound(g)
 	g.ActivateWindow(scene.Windows, scene.Windows["EndRound1"])
 }
 
 func OnClickOpenMarketWindow(g *Game) {
-	scene := g.Scenes["HUD"]
+	scene := g.Scenes["Board"]
 	g.ActivateWindow(scene.Windows, scene.Windows["Prices"])
 }
 
@@ -43,12 +43,12 @@ func OnClickEndRoundConfirmButton(g *Game) {
 }
 
 func OpenSellWindow(g *Game, product *Product) {
-	scene := g.Scenes["HUD"]
+	scene := g.Scenes["Board"]
 	g.ActivateWindow(scene.Windows, scene.Windows["Sell"])
 }
 
 func CloseAllWindows(g *Game) {
-	scene := g.Scenes["HUD"]
+	scene := g.Scenes["Board"]
 	found := false
 	for _, window := range scene.Windows {
 		if window.Display {
@@ -68,7 +68,7 @@ func CloseAllWindows(g *Game) {
 }
 
 func (g *Game) InitHUD() {
-	scene := g.Scenes["HUD"]
+	scene := g.Scenes["Board"]
 	log.Printf("init hud")
 
 	g.SidebarWidth = int32(200)
@@ -115,13 +115,13 @@ func (g *Game) InitHUD() {
 	scene.KeyBindingFunctions["CloseAllWindows"] = CloseAllWindows
 	//	scene.KeyBindingFunctions["OpenShop"] = OnClickShopWindowButton
 
-	g.LoadSceneShortcuts("HUD")
+	g.LoadSceneShortcuts("Board")
 	log.Printf("shorcuts %v", scene.KeyBindings)
 
 }
 
 func UpdateHUD(g *Game) {
-	scene := g.Scenes["HUD"]
+	scene := g.Scenes["Board"]
 	for _, button := range scene.Buttons {
 		if g.WasButtonClicked(&button) {
 			button.OnClick(g)
@@ -135,7 +135,7 @@ func UpdateHUD(g *Game) {
 }
 
 func DrawHUD(g *Game) {
-	scene := g.Scenes["HUD"]
+	scene := g.Scenes["Board"]
 	height := int32(150)
 	//	rl.DrawRectangle(0, g.screenHeight-height, g.screenWidth, height, rl.Black)
 
@@ -250,11 +250,11 @@ func DrawEndRoundWindowPage1(g *Game, window *Window) {
 
 	g.DrawButton(button)
 	// if g.WasButtonClicked(&button) {
-	// 	g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["EndRound2"])
+	// 	g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["EndRound2"])
 	// }
 	if g.WasButtonClicked(&button) {
 		OnClickEndRound(g)
-		g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["NextEvent"])
+		g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["NextEvent"])
 	}
 }
 
@@ -272,17 +272,17 @@ func DrawEndRoundWindowPage2(g *Game, win *Window) {
 	previousButton := g.Button("Previous", 300, 500, OnClickOpenEndRoundPage1Window)
 	g.DrawButton(previousButton)
 	if g.WasButtonClicked(&previousButton) {
-		g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["EndRound1"])
+		g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["EndRound1"])
 	}
 	if g.WasButtonClicked(&button) {
 		OnClickEndRound(g)
-		g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["NextEvent"])
+		g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["NextEvent"])
 	}
 
 }
 
 func (g *Game) HandleChooseEvent(event Event) {
-	g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["NextEvent"])
+	g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["NextEvent"])
 	g.ApplyEvent(event)
 	g.ApplyPriceChanges(event)
 	g.ScreenSkip = true
@@ -333,7 +333,7 @@ func DrawNextEventWindow(g *Game, win *Window) {
 }
 
 func OnClickConfirmNextEvent(g *Game) {
-	g.ActivateWindow(g.Scenes["HUD"].Windows, g.Scenes["HUD"].Windows["NextEvent"])
+	g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["NextEvent"])
 }
 
 func (g *Game) DrawSellButton(x, y float32) Button {
@@ -345,7 +345,7 @@ func (g *Game) DrawSellButton(x, y float32) Button {
 }
 
 func DrawMarketWindow(g *Game, win *Window) {
-	scene := g.Scenes["HUD"]
+	scene := g.Scenes["Board"]
 
 	window := rl.NewRectangle(220, 50, 900, 500)
 	rl.DrawRectangleRec(window, rl.White)
@@ -422,7 +422,7 @@ func DrawMarketWindow(g *Game, win *Window) {
 }
 
 func DrawSellWindow(g *Game, win *Window) {
-	scene := g.Scenes["HUD"]
+	scene := g.Scenes["Board"]
 
 	window := rl.NewRectangle(220, 50, 500, 500)
 	rl.DrawRectangleRec(window, rl.White)

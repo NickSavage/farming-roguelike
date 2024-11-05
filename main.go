@@ -80,15 +80,15 @@ func (g *Game) LoadScenes() {
 		KeyBindings: make(map[string]*KeyBinding),
 	}
 
-	g.Scenes["HUD"] = &Scene{
-		Active:      false,
-		AutoDisable: true,
-		DrawScene:   DrawHUD,
-		UpdateScene: UpdateHUD,
-		Data:        make(map[string]interface{}),
-		Buttons:     make([]Button, 1),
-		KeyBindings: make(map[string]*KeyBinding),
-	}
+	// g.Scenes["HUD"] = &Scene{
+	// 	Active:      false,
+	// 	AutoDisable: true,
+	// 	DrawScene:   DrawHUD,
+	// 	UpdateScene: UpdateHUD,
+	// 	Data:        make(map[string]interface{}),
+	// 	Buttons:     make([]Button, 1),
+	// 	KeyBindings: make(map[string]*KeyBinding),
+	// }
 	g.Scenes["Settings"] = &Scene{
 		Active:      false,
 		AutoDisable: true,
