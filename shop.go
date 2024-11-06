@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gen2brain/raylib-go/raylib"
 	"log"
+	"nsavage/farming-roguelike/engine"
 )
 
 func (g *Game) ShopChooseTech(tech *Technology) {
@@ -173,7 +174,8 @@ func (g *Game) InitShopWindow() {
 	scene.Data["ShopButtons"] = buttons
 }
 
-func DrawShopWindow(g *Game, window *Window) {
+func DrawShopWindow(gi engine.GameInterface, win *engine.Window) {
+	g := gi.(*Game)
 	scene := g.Scenes["Board"]
 
 	rl.DrawRectangle(200, 50, 900, 500, rl.White)

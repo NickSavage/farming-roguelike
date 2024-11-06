@@ -2,7 +2,7 @@ package engine
 
 import (
 	"github.com/gen2brain/raylib-go/raylib"
-	//	"log"
+	"log"
 )
 
 type Dropdown struct {
@@ -21,6 +21,7 @@ type Option struct {
 }
 
 type Button struct {
+	GameInterface
 	Rectangle       rl.Rectangle
 	Color           rl.Color
 	HoverColor      rl.Color
@@ -76,7 +77,7 @@ func (dropdown *Dropdown) Rect() rl.Rectangle {
 	return dropdown.Rectangle
 }
 
-func (button *Button) Render() {
+func (button Button) Render() {
 	var boxColor rl.Color
 	mousePosition := rl.GetMousePosition()
 	if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {
@@ -103,12 +104,24 @@ func (button *Button) Render() {
 
 }
 
-func (button *Button) OnClick() {
-	// if button.OnClickFunction != nil {
-	// 	button.OnClickFunction()
-	// }
+func (button Button) OnClick() {
+	log.Printf("???")
+	if button.OnClickFunction != nil {
+		button.OnClickFunction(button.GameInterface)
+	}
 }
 
-func (button *Button) Rect() rl.Rectangle {
+func (button Button) Rect() rl.Rectangle {
 	return button.Rectangle
+}
+
+func (button *Button) WasButtonClicked() bool {
+	// todo fix screenskip
+	if rl.IsMouseButtonPressed(rl.MouseLeftButton) { //&& !g.ScreenSkip {
+		mousePosition := rl.GetMousePosition()
+		if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {
+			return true
+		}
+	}
+	return false
 }

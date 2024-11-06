@@ -12,6 +12,10 @@ import (
 const YEARS int = 8
 const ROUNDS int = YEARS * 4
 
+func (g *Game) GetRun() interface{} {
+	return g.Run
+}
+
 func (g *Game) InitRun(loadSave bool) {
 
 	run := &Run{

@@ -43,7 +43,7 @@ type Scene struct {
 	skip                bool
 	Data                map[string]interface{}
 	Camera              rl.Camera2D
-	Windows             map[string]*Window
+	Windows             map[string]*engine.Window
 	Menu                *BoardRightClickMenu
 	RenderMenu          bool
 	Messages            []engine.Message
@@ -68,13 +68,6 @@ type KeyBindingJSON struct {
 	FunctionName string `json:"functionName"`
 	Scene        string `json:"scene"`
 	Configurable bool   `json:"configurable"`
-}
-
-type Window struct {
-	Name       string
-	DrawWindow func(*Game, *Window)
-	Display    bool
-	Buttons    []Button
 }
 
 type Tile struct {
@@ -214,7 +207,7 @@ func (g *Game) Draw() {
 				open = true
 				for _, button := range window.Buttons {
 					if button.Active {
-						g.DrawButton(button)
+						button.Render()
 					}
 				}
 
@@ -250,7 +243,6 @@ func (g *Game) Update() {
 		for _, component := range scene.Components {
 
 			if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
-
 				mousePosition := rl.GetMousePosition()
 				if rl.CheckCollisionPointRec(mousePosition, component.Rect()) {
 					component.OnClick()
@@ -260,8 +252,9 @@ func (g *Game) Update() {
 		for _, window := range scene.Windows {
 			if window.Display {
 				for _, button := range window.Buttons {
-					if g.WasButtonClicked(&button) {
-						button.OnClick(g)
+					if button.WasButtonClicked() {
+						// if g.WasButtonClicked(&button) {
+						button.OnClick()
 					}
 				}
 			}
@@ -302,13 +295,13 @@ func (g *Game) GetBoardCoordAtPoint(vec rl.Vector2) engine.BoardCoord {
 }
 
 // window handling
-func (g *Game) DisableAllWindows(windows map[string]*Window) {
+func (g *Game) DisableAllWindows(windows map[string]*engine.Window) {
 	for _, window := range windows {
 		window.Display = false
 	}
 }
 
-func (g *Game) ActivateWindow(windows map[string]*Window, window *Window) {
+func (g *Game) ActivateWindow(windows map[string]*engine.Window, window *engine.Window) {
 	g.ScreenSkip = true
 	if window.Display {
 		g.DisableAllWindows(windows)

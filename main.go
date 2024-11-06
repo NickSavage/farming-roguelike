@@ -1,9 +1,11 @@
 package main
 
 import (
-	"github.com/gen2brain/raylib-go/raylib"
 	"log"
+	"nsavage/farming-roguelike/engine"
 	"os"
+
+	"github.com/gen2brain/raylib-go/raylib"
 )
 
 func (g *Game) LoadAssets() {
@@ -78,6 +80,7 @@ func (g *Game) LoadScenes() {
 		UpdateScene: UpdateBoard,
 		Data:        make(map[string]interface{}),
 		KeyBindings: make(map[string]*KeyBinding),
+		Components:  make([]engine.UIComponent, 0),
 	}
 
 	// g.Scenes["HUD"] = &Scene{

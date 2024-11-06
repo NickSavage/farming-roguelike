@@ -6,11 +6,16 @@ import (
 )
 
 type GameInterface interface {
-	Scenes() map[string]*Scene
+	GetRun() interface{}
+	// Scenes() map[string]*Scene
 }
 
 type Game struct {
 	GameScenes map[string]*Scene
+}
+
+func (g Game) GetRun() interface{} {
+	return "not implemented"
 }
 
 func (g *Game) Scenes() map[string]*Scene {
@@ -43,7 +48,7 @@ type Scene struct {
 
 type Window struct {
 	Name       string
-	DrawWindow func(*Game, *Window)
+	DrawWindow func(GameInterface, *Window)
 	Display    bool
 	Buttons    []Button
 }

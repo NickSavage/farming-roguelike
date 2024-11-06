@@ -10,8 +10,9 @@ import (
 
 func OnClickNull(g *Game) {}
 
-func OnClickShopWindowButton(g engine.GameInterface) {
-	scene := g.Scenes()["Board"]
+func OnClickShopWindowButton(gi engine.GameInterface) {
+	g := gi.(*Game)
+	scene := g.Scenes["Board"]
 	log.Printf("hey %v", scene)
 	//	g.ActivateWindow(scene.Windows, scene.Windows["ShopWindow"])
 }
@@ -73,39 +74,39 @@ func (g *Game) InitHUD() {
 
 	g.SidebarWidth = int32(200)
 
-	scene.Windows = make(map[string]*Window)
-	scene.Windows["ShopWindow"] = &Window{
+	scene.Windows = make(map[string]*engine.Window)
+	scene.Windows["ShopWindow"] = &engine.Window{
 		Name:       "Shop Window",
 		Display:    false,
 		DrawWindow: DrawShopWindow,
 	}
 
-	scene.Windows["EndRound1"] = &Window{
+	scene.Windows["EndRound1"] = &engine.Window{
 		Name:       "End Round 1",
 		Display:    false,
 		DrawWindow: DrawEndRoundWindowPage1,
 	}
-	scene.Windows["EndRound2"] = &Window{
+	scene.Windows["EndRound2"] = &engine.Window{
 		Name:       "End Round 2",
 		Display:    false,
 		DrawWindow: DrawEndRoundWindowPage2,
 	}
-	scene.Windows["NextEvent"] = &Window{
+	scene.Windows["NextEvent"] = &engine.Window{
 		Name:       "Next Event",
 		Display:    false,
 		DrawWindow: DrawNextEventWindow,
 	}
-	scene.Windows["Prices"] = &Window{
+	scene.Windows["Prices"] = &engine.Window{
 		Name:       "Prices",
 		Display:    false,
 		DrawWindow: DrawMarketWindow,
 	}
-	scene.Windows["Sell"] = &Window{
+	scene.Windows["Sell"] = &engine.Window{
 		Name:       "Sell",
 		Display:    false,
 		DrawWindow: DrawSellWindow,
 	}
-	scene.Windows["GameOver"] = &Window{
+	scene.Windows["GameOver"] = &engine.Window{
 		Name:       "Game Over",
 		Display:    false,
 		DrawWindow: DrawGameOverWindow,
@@ -162,6 +163,7 @@ func DrawHUD(g *Game) {
 
 func DrawSidebar(g *Game) {
 
+	scene := g.Scenes["Board"]
 	rl.DrawRectangle(0, 0, g.SidebarWidth, g.screenHeight, rl.Black)
 
 	rl.DrawText(
@@ -187,7 +189,7 @@ func DrawSidebar(g *Game) {
 		Active:          true,
 		OnClickFunction: OnClickShopWindowButton,
 	}
-	shopButton.Render()
+	scene.Components = append(scene.Components, shopButton)
 
 	//	"Shop", 10, 240, OnClickShopWindowButton)
 	// buttons = append(buttons, &shopButton)
@@ -207,8 +209,9 @@ func DrawSidebar(g *Game) {
 
 }
 
-func DrawEndRoundWindowPage1(g *Game, window *Window) {
+func DrawEndRoundWindowPage1(gi engine.GameInterface, win *engine.Window) {
 
+	g := gi.(*Game)
 	windowRect := rl.NewRectangle(220, 50, 900, 500)
 	rl.DrawRectangleRec(windowRect, rl.White)
 	rl.DrawRectangleLinesEx(windowRect, 5, rl.Black)
@@ -258,8 +261,9 @@ func DrawEndRoundWindowPage1(g *Game, window *Window) {
 	}
 }
 
-func DrawEndRoundWindowPage2(g *Game, win *Window) {
+func DrawEndRoundWindowPage2(gi engine.GameInterface, win *engine.Window) {
 
+	g := gi.(*Game)
 	windowRect := rl.NewRectangle(220, 50, 900, 500)
 	rl.DrawRectangleRec(windowRect, rl.White)
 	rl.DrawRectangleLinesEx(windowRect, 5, rl.Black)
@@ -290,7 +294,8 @@ func (g *Game) HandleChooseEvent(event Event) {
 	//log.Printf("apply screen skip: mouse down %v", rl.IsMouseButtonPressed(rl.MouseLeftButton))
 }
 
-func DrawNextEventWindow(g *Game, win *Window) {
+func DrawNextEventWindow(gi engine.GameInterface, win *engine.Window) {
+	g := gi.(*Game)
 
 	window := rl.NewRectangle(220, 50, 900, 500)
 	rl.DrawRectangleRec(window, rl.White)
@@ -344,7 +349,8 @@ func (g *Game) DrawSellButton(x, y float32) Button {
 	return result
 }
 
-func DrawMarketWindow(g *Game, win *Window) {
+func DrawMarketWindow(gi engine.GameInterface, win *engine.Window) {
+	g := gi.(*Game)
 	scene := g.Scenes["Board"]
 
 	window := rl.NewRectangle(220, 50, 900, 500)
@@ -421,7 +427,8 @@ func DrawMarketWindow(g *Game, win *Window) {
 	}
 }
 
-func DrawSellWindow(g *Game, win *Window) {
+func DrawSellWindow(gi engine.GameInterface, win *engine.Window) {
+	g := gi.(*Game)
 	scene := g.Scenes["Board"]
 
 	window := rl.NewRectangle(220, 50, 500, 500)
@@ -438,7 +445,8 @@ func DrawSellWindow(g *Game, win *Window) {
 	}
 }
 
-func DrawGameOverWindow(g *Game, win *Window) {
+func DrawGameOverWindow(gi engine.GameInterface, win *engine.Window) {
+	//	g := gi.(*Game)
 	window := rl.NewRectangle(220, 50, 500, 500)
 	rl.DrawRectangleRec(window, rl.White)
 	rl.DrawRectangleLinesEx(window, 5, rl.Black)
