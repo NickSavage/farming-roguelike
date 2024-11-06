@@ -51,6 +51,7 @@ type Window struct {
 	DrawWindow func(GameInterface, *Window)
 	Display    bool
 	Buttons    []Button
+	Components []UIComponent
 }
 type Message struct {
 	Text  string

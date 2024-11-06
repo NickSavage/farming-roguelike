@@ -126,6 +126,20 @@ func (g *Game) CloseButton(x, y float32, onClick func(*Game)) Button {
 	return closeButton
 }
 
+func (g *Game) NewButton(text string, rect rl.Rectangle, onClick func(engine.GameInterface)) engine.Button {
+	button := engine.Button{
+		GameInterface:   g,
+		Rectangle:       rect,
+		Color:           rl.SkyBlue,
+		HoverColor:      rl.LightGray,
+		Text:            text,
+		TextColor:       rl.Black,
+		Active:          true,
+		OnClickFunction: onClick,
+	}
+	return button
+}
+
 func (g *Game) Button(text string, x, y float32, onClick func(*Game)) Button {
 	return Button{
 		Rectangle:  rl.NewRectangle(x, y, 150, 40),
@@ -211,7 +225,7 @@ func (g *Game) Draw() {
 					}
 				}
 
-				for _, component := range scene.Components {
+				for _, component := range window.Components {
 					component.Render()
 				}
 			}
@@ -241,10 +255,10 @@ func (g *Game) Update() {
 		}
 
 		for _, component := range scene.Components {
-
 			if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
 				mousePosition := rl.GetMousePosition()
 				if rl.CheckCollisionPointRec(mousePosition, component.Rect()) {
+					log.Printf("ads")
 					component.OnClick()
 				}
 			}
@@ -255,6 +269,14 @@ func (g *Game) Update() {
 					if button.WasButtonClicked() {
 						// if g.WasButtonClicked(&button) {
 						button.OnClick()
+					}
+				}
+				for _, component := range window.Components {
+					if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
+						mousePosition := rl.GetMousePosition()
+						if rl.CheckCollisionPointRec(mousePosition, component.Rect()) {
+							component.OnClick()
+						}
 					}
 				}
 			}

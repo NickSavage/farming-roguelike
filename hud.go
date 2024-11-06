@@ -13,39 +13,36 @@ func OnClickNull(g *Game) {}
 func OnClickShopWindowButton(gi engine.GameInterface) {
 	g := gi.(*Game)
 	scene := g.Scenes["Board"]
-	log.Printf("hey %v", scene)
-	//	g.ActivateWindow(scene.Windows, scene.Windows["ShopWindow"])
+	// log.Printf("hey %v", scene)
+	g.ActivateWindow(scene.Windows, scene.Windows["ShopWindow"])
 }
 
-func OnClickOpenEndRoundPage1Window(g *Game) {
+func OnClickOpenEndRoundPage1Window(gi engine.GameInterface) {
+	g := gi.(*Game)
 	scene := g.Scenes["Board"]
 	PreEndRound(g)
 	g.ActivateWindow(scene.Windows, scene.Windows["EndRound1"])
 }
 
-func OnClickOpenMarketWindow(g *Game) {
+func OnClickOpenMarketWindow(gi engine.GameInterface) {
+	g := gi.(*Game)
 	scene := g.Scenes["Board"]
 	g.ActivateWindow(scene.Windows, scene.Windows["Prices"])
 }
 
-func OnClickOpenSettings(g *Game) {
+func OnClickOpenSettings(gi engine.GameInterface) {
 
+	g := gi.(*Game)
 	g.Scenes["Settings"].Data["Return"] = "Board"
 	g.ActivateScene("Settings")
 
 }
 
-func OnClickEndRoundPageTwoButton(g *Game) {
+func OnClickEndRoundConfirmButton(gi engine.GameInterface) {
 
-}
-
-func OnClickEndRoundConfirmButton(g *Game) {
-
-}
-
-func OpenSellWindow(g *Game, product *Product) {
-	scene := g.Scenes["Board"]
-	g.ActivateWindow(scene.Windows, scene.Windows["Sell"])
+	g := gi.(*Game)
+	OnClickEndRound(g)
+	g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["NextEvent"])
 }
 
 func CloseAllWindows(g *Game) {
@@ -86,11 +83,6 @@ func (g *Game) InitHUD() {
 		Display:    false,
 		DrawWindow: DrawEndRoundWindowPage1,
 	}
-	scene.Windows["EndRound2"] = &engine.Window{
-		Name:       "End Round 2",
-		Display:    false,
-		DrawWindow: DrawEndRoundWindowPage2,
-	}
 	scene.Windows["NextEvent"] = &engine.Window{
 		Name:       "Next Event",
 		Display:    false,
@@ -100,11 +92,6 @@ func (g *Game) InitHUD() {
 		Name:       "Prices",
 		Display:    false,
 		DrawWindow: DrawMarketWindow,
-	}
-	scene.Windows["Sell"] = &engine.Window{
-		Name:       "Sell",
-		Display:    false,
-		DrawWindow: DrawSellWindow,
 	}
 	scene.Windows["GameOver"] = &engine.Window{
 		Name:       "Game Over",
@@ -177,35 +164,33 @@ func DrawSidebar(g *Game) {
 	rl.DrawText(fmt.Sprintf("Season: %v", g.Run.CurrentSeason.String()), 30, 130, 20, rl.White)
 	rl.DrawText(fmt.Sprintf("Yield: %v", g.Run.Yield), 30, 150, 20, rl.White)
 
-	buttons := []*Button{}
-	// techButton := g.Button("Technology", 10, 190, OnClickTechWindowButton)
-	// buttons = append(buttons, &techButton)
-	shopButton := engine.Button{
-		Rectangle:       rl.NewRectangle(10, 240, 150, 40),
-		Color:           rl.SkyBlue,
-		HoverColor:      rl.LightGray,
-		Text:            "Shop",
-		TextColor:       rl.Black,
-		Active:          true,
-		OnClickFunction: OnClickShopWindowButton,
-	}
+	shopButton := g.NewButton(
+		"Shop",
+		rl.NewRectangle(10, 240, 150, 40),
+		OnClickShopWindowButton,
+	)
 	scene.Components = append(scene.Components, shopButton)
 
-	//	"Shop", 10, 240, OnClickShopWindowButton)
-	// buttons = append(buttons, &shopButton)
-	priceButton := g.Button("Market", 10, 290, OnClickOpenMarketWindow)
-	buttons = append(buttons, &priceButton)
-	viewEndRoundButton := g.Button("End Round", 10, 340, OnClickOpenEndRoundPage1Window)
-	buttons = append(buttons, &viewEndRoundButton)
-	settingsButton := g.Button("Settings", 10, float32(g.screenHeight)-60, OnClickOpenSettings)
-	buttons = append(buttons, &settingsButton)
+	priceButton := g.NewButton(
+		"Market",
+		rl.NewRectangle(10, 290, 150, 40),
+		OnClickOpenMarketWindow,
+	)
+	scene.Components = append(scene.Components, priceButton)
 
-	for _, button := range buttons {
-		g.DrawButton(*button)
-		if g.WasButtonClicked(button) {
-			button.OnClick(g)
-		}
-	}
+	viewEndRoundButton := g.NewButton(
+		"End Round",
+		rl.NewRectangle(10, 340, 150, 40),
+		OnClickOpenEndRoundPage1Window,
+	)
+	scene.Components = append(scene.Components, viewEndRoundButton)
+
+	settingsButton := g.NewButton(
+		"Settings",
+		rl.NewRectangle(10, float32(g.screenHeight)-60, 150, 40),
+		OnClickOpenSettings,
+	)
+	scene.Components = append(scene.Components, settingsButton)
 
 }
 
@@ -249,40 +234,12 @@ func DrawEndRoundWindowPage1(gi engine.GameInterface, win *engine.Window) {
 	text = fmt.Sprintf("Total: %v", total)
 	rl.DrawText(text, x, y+70, 20, rl.Black)
 
-	button := g.Button("Next Page", 500, 500, OnClickEndRoundPageTwoButton)
-
-	g.DrawButton(button)
-	// if g.WasButtonClicked(&button) {
-	// 	g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["EndRound2"])
-	// }
-	if g.WasButtonClicked(&button) {
-		OnClickEndRound(g)
-		g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["NextEvent"])
-	}
-}
-
-func DrawEndRoundWindowPage2(gi engine.GameInterface, win *engine.Window) {
-
-	g := gi.(*Game)
-	windowRect := rl.NewRectangle(220, 50, 900, 500)
-	rl.DrawRectangleRec(windowRect, rl.White)
-	rl.DrawRectangleLinesEx(windowRect, 5, rl.Black)
-
-	rl.DrawText("Investments", int32(windowRect.X+5), int32(windowRect.Y+5), 30, rl.Black)
-	button := g.Button("End Round", 500, 500, OnClickEndRoundConfirmButton)
-
-	g.DrawButton(button)
-
-	previousButton := g.Button("Previous", 300, 500, OnClickOpenEndRoundPage1Window)
-	g.DrawButton(previousButton)
-	if g.WasButtonClicked(&previousButton) {
-		g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["EndRound1"])
-	}
-	if g.WasButtonClicked(&button) {
-		OnClickEndRound(g)
-		g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["NextEvent"])
-	}
-
+	button := g.NewButton(
+		"Next Page",
+		rl.NewRectangle(500, 500, 150, 40),
+		OnClickEndRoundConfirmButton,
+	)
+	win.Components = append(win.Components, button)
 }
 
 func (g *Game) HandleChooseEvent(event Event) {
@@ -351,7 +308,7 @@ func (g *Game) DrawSellButton(x, y float32) Button {
 
 func DrawMarketWindow(gi engine.GameInterface, win *engine.Window) {
 	g := gi.(*Game)
-	scene := g.Scenes["Board"]
+	//	scene := g.Scenes["Board"]
 
 	window := rl.NewRectangle(220, 50, 900, 500)
 	rl.DrawRectangleRec(window, rl.White)
@@ -420,29 +377,11 @@ func DrawMarketWindow(gi engine.GameInterface, win *engine.Window) {
 
 	}
 
-	closeButton := g.CloseButton(200+900-30, 60, OnClickOpenMarketWindow)
-	g.DrawButton(closeButton)
-	if g.WasButtonClicked(&closeButton) {
-		g.ActivateWindow(scene.Windows, scene.Windows["Prices"])
-	}
-}
-
-func DrawSellWindow(gi engine.GameInterface, win *engine.Window) {
-	g := gi.(*Game)
-	scene := g.Scenes["Board"]
-
-	window := rl.NewRectangle(220, 50, 500, 500)
-	rl.DrawRectangleRec(window, rl.White)
-	rl.DrawRectangleLinesEx(window, 5, rl.Black)
-
-	rl.DrawText("Sell", 225, 60, 30, rl.Black)
-
-	closeButton := g.CloseButton(200+500-30, 60, OnClickOpenMarketWindow)
-	g.DrawButton(closeButton)
-	if g.WasButtonClicked(&closeButton) {
-		g.ActivateWindow(scene.Windows, scene.Windows["Sell"])
-		g.ActivateWindow(scene.Windows, scene.Windows["Prices"])
-	}
+	// closeButton := g.CloseButton(200+900-30, 60, OnClickOpenMarketWindow)
+	// g.DrawButton(closeButton)
+	// if g.WasButtonClicked(&closeButton) {
+	// 	g.ActivateWindow(scene.Windows, scene.Windows["Prices"])
+	// }
 }
 
 func DrawGameOverWindow(gi engine.GameInterface, win *engine.Window) {

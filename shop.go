@@ -17,8 +17,9 @@ func (g *Game) ShopChooseTech(tech *Technology) {
 	if !tech.CanBuild(g, tech) {
 		return
 	}
-	g.Scenes["HUD"].Windows["ShopWindow"].Display = false
+	g.Scenes["Board"].Windows["ShopWindow"].Display = false
 	space, err := g.GetOpenSpace(tech)
+
 	if err == nil {
 		g.PlaceTech(tech, space)
 	}
@@ -190,7 +191,6 @@ func DrawShopWindow(gi engine.GameInterface, win *engine.Window) {
 
 	var x float32 = 215
 	for i, plant := range plants {
-		log.Printf("draw %v", plant)
 		g.DrawPlantPurchaseButton(g.ShopButton(plant), x+float32(i*100), 400)
 	}
 
