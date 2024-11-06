@@ -7,32 +7,42 @@ import (
 	"os"
 )
 
-func OnClickContinueRun(g *Game) {
+func OnClickContinueRun(gi engine.GameInterface) {
 
+	g := gi.(*Game)
 	g.InitRun(true)
 	g.ActivateScene("Board")
 }
 
-func OnClickNewRun(g *Game) {
+func OnClickNewRun(gi engine.GameInterface) {
+	g := gi.(*Game)
 
 	g.InitRun(false)
 	g.ActivateScene("Board")
 }
 
-func OnClickSettings(g *Game) {
+func OnClickSettings(gi engine.GameInterface) {
+
+	g := gi.(*Game)
 	g.ActivateScene("Settings")
 	g.Scenes["Settings"].Data["Return"] = "GameMenu"
 }
-func OnClickStats(g *Game) {
+func OnClickStats(gi engine.GameInterface) {
+
+	g := gi.(*Game)
 	scene := g.Scenes["GameMenu"]
 	g.ActivateWindow(scene.Windows, scene.Windows["Stats"])
 }
-func OnClickAbout(g *Game) {
+func OnClickAbout(gi engine.GameInterface) {
+
+	g := gi.(*Game)
 	scene := g.Scenes["GameMenu"]
 	g.ActivateWindow(scene.Windows, scene.Windows["About"])
 }
 
-func OnClickExit(g *Game) {
+func OnClickExit(gi engine.GameInterface) {
+
+	// g := gi.(*Game)
 	os.Exit(0)
 }
 
@@ -40,96 +50,51 @@ func (g *Game) InitGameMenu() {
 	log.Printf("init menu")
 
 	scene := g.Scenes["GameMenu"]
-	newButton := Button{
-		Rectangle: rl.NewRectangle(
+	newButton := g.NewButton(
+		"New Run",
+		rl.NewRectangle(
 			float32(g.screenWidth)/2-100,
 			float32(g.screenHeight)/2,
 			200,
 			50,
 		),
-		Color:      rl.SkyBlue,
-		HoverColor: rl.LightGray,
-		Text:       "New Run",
-		TextColor:  rl.Black,
-		OnClick:    OnClickNewRun,
-		Active:     true,
-	}
-	scene.Buttons = append(scene.Buttons, newButton)
-	continueButton := Button{
-		Rectangle: rl.NewRectangle(
-			float32(g.screenWidth)/2-100,
-			float32(g.screenHeight)/2-60,
-			200,
-			50,
-		),
-		Color:      rl.SkyBlue,
-		HoverColor: rl.LightGray,
-		Text:       "Continue Run",
-		TextColor:  rl.Black,
-		OnClick:    OnClickContinueRun,
-		Active:     g.ExistingSave,
-	}
-	scene.Buttons = append(scene.Buttons, continueButton)
-	settingsButton := Button{
-		Rectangle: rl.NewRectangle(
-			float32(g.screenWidth)/2-100,
-			float32(g.screenHeight)/2+60,
-			200,
-			50,
-		),
-		Color:      rl.SkyBlue,
-		HoverColor: rl.LightGray,
-		Text:       "Settings",
-		TextColor:  rl.Black,
-		OnClick:    OnClickSettings,
-		Active:     true,
-	}
-	scene.Buttons = append(scene.Buttons, settingsButton)
-	statsButton := Button{
-		Rectangle: rl.NewRectangle(
-			float32(g.screenWidth)/2-100,
-			float32(g.screenHeight)/2+120,
-			200,
-			50,
-		),
-		Color:      rl.SkyBlue,
-		HoverColor: rl.LightGray,
-		Text:       "Statistics",
-		TextColor:  rl.Black,
-		OnClick:    OnClickStats,
-		Active:     true,
-	}
-	scene.Buttons = append(scene.Buttons, statsButton)
-	aboutButton := Button{
-		Rectangle: rl.NewRectangle(
-			float32(g.screenWidth)/2-100,
-			float32(g.screenHeight)/2+180,
-			200,
-			50,
-		),
-		Color:      rl.SkyBlue,
-		HoverColor: rl.LightGray,
-		Text:       "About",
-		TextColor:  rl.Black,
-		OnClick:    OnClickAbout,
-		Active:     true,
-	}
-	scene.Buttons = append(scene.Buttons, aboutButton)
-	exitButton := Button{
-		Rectangle: rl.NewRectangle(
-			float32(g.screenWidth)/2-100,
-			float32(g.screenHeight)/2+240,
-			200,
-			50,
-		),
-		Color:      rl.SkyBlue,
-		HoverColor: rl.LightGray,
-		Text:       "Exit",
-		TextColor:  rl.Black,
-		OnClick:    OnClickExit,
-		Active:     true,
-	}
-	scene.Buttons = append(scene.Buttons, exitButton)
+		OnClickNewRun,
+	)
+	scene.Components = append(scene.Components, newButton)
+	continueButton := g.NewButton(
+		"Continue Run",
+		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2-60, 200, 50),
+		OnClickContinueRun,
+	)
+	scene.Components = append(scene.Components, continueButton)
+
+	settingsButton := g.NewButton(
+		"Settings",
+		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+60, 200, 50),
+		OnClickSettings,
+	)
+	scene.Components = append(scene.Components, settingsButton)
+
+	statsButton := g.NewButton(
+		"Statistics",
+		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+120, 200, 50),
+		OnClickStats,
+	)
+	scene.Components = append(scene.Components, statsButton)
+
+	aboutButton := g.NewButton(
+		"About",
+		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+180, 200, 50),
+		OnClickAbout,
+	)
+	scene.Components = append(scene.Components, aboutButton)
+
+	exitButton := g.NewButton(
+		"Exit",
+		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+240, 200, 50),
+		OnClickExit,
+	)
+	scene.Components = append(scene.Components, exitButton)
 
 	scene.KeyBindingFunctions = make(map[string]func(*Game))
 
@@ -140,20 +105,16 @@ func (g *Game) InitGameMenu() {
 		DrawWindow: DrawStatsWindow,
 		Buttons:    make([]engine.Button, 1),
 	}
-	// scene.Windows["Stats"].Buttons[0] = Button{
-	// 	Rectangle: rl.NewRectangle(
-	// 		50,
-	// 		50,
-	// 		200,
-	// 		50,
-	// 	),
-	// 	Color:      rl.SkyBlue,
-	// 	HoverColor: rl.LightGray,
-	// 	Text:       "Close",
-	// 	TextColor:  rl.Black,
-	// 	OnClick:    CloseStatsWindow,
-	// 	Active:     true,
-	// }
+	scene.Windows["Stats"].Components = append(scene.Windows["Stats"].Components, g.NewButton(
+		"Close",
+		rl.NewRectangle(
+			50,
+			50,
+			200,
+			50,
+		),
+		CloseStatsWindow,
+	))
 
 	scene.Windows["About"] = &engine.Window{
 		Name:       "About",
@@ -161,39 +122,21 @@ func (g *Game) InitGameMenu() {
 		DrawWindow: DrawStatsWindow,
 		Buttons:    make([]engine.Button, 1),
 	}
-	// scene.Windows["About"].Buttons[0] = Button{
-	// 	Rectangle: rl.NewRectangle(
-	// 		50,
-	// 		50,
-	// 		200,
-	// 		50,
-	// 	),
-	// 	Color:      rl.SkyBlue,
-	// 	HoverColor: rl.LightGray,
-	// 	Text:       "Close",
-	// 	TextColor:  rl.Black,
-	// 	OnClick:    CloseStatsWindow,
-	// 	Active:     true,
-	// }
+
+	scene.Windows["About"].Components = append(scene.Windows["About"].Components, g.NewButton(
+		"Close",
+		rl.NewRectangle(
+			50,
+			50,
+			200,
+			50,
+		),
+		CloseAboutWindow,
+	))
 }
 
 func DrawGameMenu(g *Game) {
-	shopButton := engine.Button{
-		GameInterface: g,
-		Rectangle:     rl.NewRectangle(10, 240, 150, 40),
-		Color:         rl.SkyBlue,
-		HoverColor:    rl.LightGray,
-		Text:          "Shop",
-		TextColor:     rl.Black,
-		Active:        true,
-		// OnClickFunction: OnClickTestWindowButton,
-		// OnClickFunction: func(gi engine.GameInterface) {
-		// 	// Use closure to capture `g` directly if needed
-		// 	log.Printf("Game specific run: %+v", g.Scenes)
-		// },
-	}
-	g.Scenes["GameMenu"].Components = append(g.Scenes["GameMenu"].Components, shopButton)
-	// shopButton.Render()
+
 }
 
 func UpdateGameMenu(g *Game) {
@@ -212,7 +155,8 @@ func DrawStatsWindow(gi engine.GameInterface, win *engine.Window) {
 
 }
 
-func CloseStatsWindow(g *Game) {
+func CloseStatsWindow(gi engine.GameInterface) {
+	g := gi.(*Game)
 	scene := g.Scenes["GameMenu"]
 	g.ActivateWindow(scene.Windows, scene.Windows["About"])
 }
@@ -229,7 +173,9 @@ func DrawAboutWindow(g *Game, win *engine.Window) {
 
 }
 
-func CloseAboutWindow(g *Game) {
+func CloseAboutWindow(gi engine.GameInterface) {
+
+	g := gi.(*Game)
 	scene := g.Scenes["GameMenu"]
 	g.ActivateWindow(scene.Windows, scene.Windows["About"])
 }

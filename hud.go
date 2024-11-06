@@ -110,11 +110,7 @@ func (g *Game) InitHUD() {
 
 func UpdateHUD(g *Game) {
 	scene := g.Scenes["Board"]
-	for _, button := range scene.Buttons {
-		if g.WasButtonClicked(&button) {
-			button.OnClick(g)
-		}
-	}
+
 	if g.GameOverTriggered {
 		g.ActivateWindow(scene.Windows, scene.Windows["GameOver"])
 		g.GameOverTriggered = false
@@ -298,14 +294,6 @@ func OnClickConfirmNextEvent(g *Game) {
 	g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["NextEvent"])
 }
 
-func (g *Game) DrawSellButton(x, y float32) Button {
-	result := g.Button("Sell", x, y, OnClickNull)
-	result.Rectangle.Width = 50
-	result.Rectangle.Height = 25
-	result.TextSize = 20
-	return result
-}
-
 func DrawMarketWindow(gi engine.GameInterface, win *engine.Window) {
 	g := gi.(*Game)
 	//	scene := g.Scenes["Board"]
@@ -341,47 +329,9 @@ func DrawMarketWindow(gi engine.GameInterface, win *engine.Window) {
 			i += 1
 			continue
 		}
-		// edge := window.X + window.Width
-		// sellButton := g.DrawSellButton(float32(edge-110), float32(y))
-		// sellButton.Text = "Sell Some"
-		// sellButton.Rectangle.Width = 100
-		// g.DrawButton(sellButton)
-
-		// if sellAllConfirm == productName {
-		// 	sellAllButton := g.DrawSellButton(float32(edge-110), float32(y))
-		// 	sellAllButton.Color = rl.Red
-		// 	sellAllButton.Text = "Confirm"
-		// 	sellAllButton.Rectangle.Width = 100
-		// 	g.DrawButton(sellAllButton)
-		// 	if g.WasButtonClicked(&sellAllButton) {
-		// 		scene.Data["SellAllConfirm"] = ""
-		// 		g.ScreenSkip = true
-		// 		g.SellProduct(g.Run.Products[product])
-		// 	}
-
-		// } else {
-		// 	sellAllButton := g.DrawSellButton(float32(edge-110), float32(y))
-		// 	sellAllButton.Text = "Sell All"
-		// 	sellAllButton.Rectangle.Width = 100
-		// 	g.DrawButton(sellAllButton)
-		// 	if g.WasButtonClicked(&sellAllButton) {
-		// 		scene.Data["SellAllConfirm"] = productName
-		// 		g.ScreenSkip = true
-		// 	}
-		// }
-
-		// if g.WasButtonClicked(&sellButton) {
-		// 	OpenSellWindow(g, g.Run.Products[productName])
-		// }
 		i += 1
 
 	}
-
-	// closeButton := g.CloseButton(200+900-30, 60, OnClickOpenMarketWindow)
-	// g.DrawButton(closeButton)
-	// if g.WasButtonClicked(&closeButton) {
-	// 	g.ActivateWindow(scene.Windows, scene.Windows["Prices"])
-	// }
 }
 
 func DrawGameOverWindow(gi engine.GameInterface, win *engine.Window) {

@@ -42,8 +42,10 @@ func (g *Game) InitSettingsMenu() {
 
 	scene := g.Scenes["Settings"]
 
-	button := g.Button("Save", 10, float32(g.screenHeight)-50, SaveButtonOnClick)
-	scene.Buttons = append(scene.Buttons, button)
+	rect := rl.NewRectangle(10, float32(g.screenHeight)-50, 150, 50)
+
+	button := g.NewButton("Save", rect, SaveButtonOnClick)
+	scene.Components = append(scene.Components, button)
 
 	scene.Components = make([]engine.UIComponent, 0)
 	options := []*engine.Option{
@@ -144,7 +146,8 @@ func (g *Game) LoadSettingsFromDisk() error {
 
 }
 
-func SaveButtonOnClick(g *Game) {
+func SaveButtonOnClick(gi engine.GameInterface) {
+	g := gi.(*Game)
 	log.Printf("asds")
 	CloseMenu(g)
 

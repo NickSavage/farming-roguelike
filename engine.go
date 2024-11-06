@@ -120,12 +120,6 @@ func (g *Game) ActivateScene(sceneName string) {
 	}
 }
 
-func (g *Game) CloseButton(x, y float32, onClick func(*Game)) Button {
-	closeButton := g.Button("X", x, y, onClick)
-	closeButton.Rectangle.Width = 40
-	return closeButton
-}
-
 func (g *Game) NewButton(text string, rect rl.Rectangle, onClick func(engine.GameInterface)) engine.Button {
 	button := engine.Button{
 		GameInterface:   g,
@@ -138,18 +132,6 @@ func (g *Game) NewButton(text string, rect rl.Rectangle, onClick func(engine.Gam
 		OnClickFunction: onClick,
 	}
 	return button
-}
-
-func (g *Game) Button(text string, x, y float32, onClick func(*Game)) Button {
-	return Button{
-		Rectangle:  rl.NewRectangle(x, y, 150, 40),
-		Color:      rl.SkyBlue,
-		HoverColor: rl.LightGray,
-		Text:       text,
-		TextColor:  rl.Black,
-		OnClick:    onClick,
-		Active:     true,
-	}
 }
 
 func (g *Game) DrawButton(button Button) {
@@ -183,16 +165,6 @@ func (g *Game) DrawButtons(buttons []Button) {
 		g.DrawButton(button)
 	}
 
-}
-
-func (g *Game) WasButtonClicked(button *Button) bool {
-	if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
-		mousePosition := rl.GetMousePosition()
-		if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {
-			return true
-		}
-	}
-	return false
 }
 
 func (g *Game) Draw() {
@@ -248,29 +220,17 @@ func (g *Game) Update() {
 			}
 
 		}
-		for _, button := range scene.Buttons {
-			if g.WasButtonClicked(&button) {
-				button.OnClick(g)
-			}
-		}
 
 		for _, component := range scene.Components {
 			if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
 				mousePosition := rl.GetMousePosition()
 				if rl.CheckCollisionPointRec(mousePosition, component.Rect()) {
-					log.Printf("ads")
 					component.OnClick()
 				}
 			}
 		}
 		for _, window := range scene.Windows {
 			if window.Display {
-				for _, button := range window.Buttons {
-					if button.WasButtonClicked() {
-						// if g.WasButtonClicked(&button) {
-						button.OnClick()
-					}
-				}
 				for _, component := range window.Components {
 					if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
 						mousePosition := rl.GetMousePosition()
@@ -289,8 +249,6 @@ func (g *Game) Update() {
 	if g.ScreenSkip {
 		if rl.IsMouseButtonUp(rl.MouseButtonLeft) {
 			g.ScreenSkip = false
-
-			//			log.Printf("remove screen skip: mouse down %v", rl.IsMouseButtonPressed(rl.MouseLeftButton))
 		}
 	}
 
