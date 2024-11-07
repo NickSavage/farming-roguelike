@@ -70,7 +70,7 @@ func (g *Game) InitSettingsMenu() {
 	scene.Components = append(scene.Components, dropdown)
 	log.Printf("components %v", scene.Components)
 
-	scene.KeyBindingFunctions = make(map[string]func(*Game))
+	scene.KeyBindingFunctions = make(map[string]func(engine.GameInterface))
 	scene.KeyBindingFunctions["CloseMenu"] = CloseMenu
 
 	g.LoadSceneShortcuts("Settings")
@@ -153,31 +153,18 @@ func SaveButtonOnClick(gi engine.GameInterface) {
 
 }
 
-func DrawSettings(g *Game) {
-	// scene := g.Scenes["Settings"]
+func DrawSettings(gi engine.GameInterface) {
 
-	// log.Printf("components %v", scene.Components)
-	// for _, component := range scene.Components {
-	// 	component.Render()
-	// }
+	//g := gi.(*Game)
 }
 
-func UpdateSettings(g *Game) {
+func UpdateSettings(gi engine.GameInterface) {
 
-	// scene := g.Scenes["Settings"]
-	// mousePosition := rl.GetMousePosition()
-	// for _, component := range scene.Components {
-
-	// 	if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
-
-	// 		if rl.CheckCollisionPointRec(mousePosition, component.Rect()) {
-	// 			component.OnClick()
-	// 		}
-	// 	}
-	// }
+	//g := gi.(*Game)
 }
 
-func CloseMenu(g *Game) {
+func CloseMenu(gi engine.GameInterface) {
+	g := gi.(*Game)
 	returnScene := g.Scenes["Settings"].Data["Return"].(string)
 	if returnScene == "" {
 		g.ActivateScene("GameMenu")

@@ -96,7 +96,7 @@ func (g *Game) InitGameMenu() {
 	)
 	scene.Components = append(scene.Components, exitButton)
 
-	scene.KeyBindingFunctions = make(map[string]func(*Game))
+	scene.KeyBindingFunctions = make(map[string]func(engine.GameInterface))
 
 	scene.Windows = make(map[string]*engine.Window)
 	scene.Windows["Stats"] = &engine.Window{
@@ -135,11 +135,11 @@ func (g *Game) InitGameMenu() {
 	))
 }
 
-func DrawGameMenu(g *Game) {
+func DrawGameMenu(gi engine.GameInterface) {
 
 }
 
-func UpdateGameMenu(g *Game) {
+func UpdateGameMenu(gi engine.GameInterface) {
 }
 
 func DrawStatsWindow(gi engine.GameInterface, win *engine.Window) {

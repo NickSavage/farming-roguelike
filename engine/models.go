@@ -7,7 +7,7 @@ import (
 
 type GameInterface interface {
 	GetRun() interface{}
-	// Scenes() map[string]*Scene
+	GetScenes() map[string]*Scene
 }
 
 type Game struct {
@@ -32,8 +32,8 @@ type Scene struct {
 	Name                string
 	Active              bool
 	AutoDisable         bool
-	DrawScene           func(*Game)
-	UpdateScene         func(*Game)
+	DrawScene           func(GameInterface)
+	UpdateScene         func(GameInterface)
 	Buttons             []Button
 	skip                bool
 	Data                map[string]interface{}
@@ -41,7 +41,7 @@ type Scene struct {
 	Windows             map[string]*Window
 	RenderMenu          bool
 	Messages            []Message
-	KeyBindingFunctions map[string]func(*Game)
+	KeyBindingFunctions map[string]func(GameInterface)
 	KeyBindings         map[string]*KeyBinding
 	Components          []UIComponent
 }
@@ -65,7 +65,7 @@ type KeyBinding struct {
 	FunctionName string
 	Scene        string
 	Configurable bool
-	OnPress      func(*Game)
+	OnPress      func(GameInterface)
 }
 
 type KeyBindingJSON struct {

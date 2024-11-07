@@ -138,7 +138,7 @@ func (g *Game) InitBoard() {
 	//	g.InitPlaceRandomTrees(215)
 	//	g.InitPlaceTech()
 
-	scene.KeyBindingFunctions = make(map[string]func(*Game))
+	scene.KeyBindingFunctions = make(map[string]func(engine.GameInterface))
 	scene.KeyBindingFunctions["MoveCursorLeft"] = MoveCursorLeft
 	scene.KeyBindingFunctions["MoveCursorRight"] = MoveCursorLeft
 	scene.KeyBindingFunctions["MoveCursorDown"] = MoveCursorLeft
@@ -301,7 +301,8 @@ func (g *Game) DrawMessages() {
 
 // main draw function
 
-func DrawBoard(g *Game) {
+func DrawBoard(gi engine.GameInterface) {
+	g := gi.(*Game)
 
 	//	scene := g.Scenes["Board"]
 	//	rl.BeginMode2D(g.Scenes["Board"].Camera)
@@ -368,13 +369,14 @@ func (g *Game) HandleHover() {
 
 }
 
-func UpdateBoard(g *Game) {
+func UpdateBoard(gi engine.GameInterface) {
+	g := gi.(*Game)
 	UpdateHUD(g)
 }
 
 // cursor
 
-func MoveCursorLeft(g *Game)  {}
-func MoveCursorRight(g *Game) {}
-func MoveCursorUp(g *Game)    {}
-func MoveCursorDown(g *Game)  {}
+func MoveCursorLeft(gi engine.GameInterface)  {}
+func MoveCursorRight(gi engine.GameInterface) {}
+func MoveCursorUp(gi engine.GameInterface)    {}
+func MoveCursorDown(gi engine.GameInterface)  {}

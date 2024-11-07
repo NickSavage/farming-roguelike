@@ -7,6 +7,7 @@ import (
 	"log"
 	"math"
 	"math/rand"
+	"nsavage/farming-roguelike/engine"
 )
 
 const YEARS int = 8
@@ -14,6 +15,10 @@ const ROUNDS int = YEARS * 4
 
 func (g *Game) GetRun() interface{} {
 	return g.Run
+}
+
+func (g *Game) GetScenes() map[string]*engine.Scene {
+	return g.Scenes
 }
 
 func (g *Game) InitRun(loadSave bool) {

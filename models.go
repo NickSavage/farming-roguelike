@@ -1,9 +1,13 @@
 package main
 
+import (
+	"nsavage/farming-roguelike/engine"
+)
+
 //import rl "github.com/gen2brain/raylib-go/raylib"
 
 type Game struct {
-	Scenes            map[string]*Scene
+	Scenes            map[string]*engine.Scene
 	Data              map[string]interface{}
 	screenWidth       int32
 	screenHeight      int32

@@ -65,21 +65,21 @@ func (g *Game) LoadAssets() {
 }
 
 func (g *Game) LoadScenes() {
-	g.Scenes["GameMenu"] = &Scene{
+	g.Scenes["GameMenu"] = &engine.Scene{
 		Active:      true,
 		AutoDisable: true,
 		DrawScene:   DrawGameMenu,
 		UpdateScene: UpdateGameMenu,
 		Data:        make(map[string]interface{}),
-		KeyBindings: make(map[string]*KeyBinding),
+		KeyBindings: make(map[string]*engine.KeyBinding),
 	}
-	g.Scenes["Board"] = &Scene{
+	g.Scenes["Board"] = &engine.Scene{
 		Active:      false,
 		AutoDisable: true,
 		DrawScene:   DrawBoard,
 		UpdateScene: UpdateBoard,
 		Data:        make(map[string]interface{}),
-		KeyBindings: make(map[string]*KeyBinding),
+		KeyBindings: make(map[string]*engine.KeyBinding),
 		Components:  make([]engine.UIComponent, 0),
 	}
 
@@ -92,14 +92,13 @@ func (g *Game) LoadScenes() {
 	// 	Buttons:     make([]Button, 1),
 	// 	KeyBindings: make(map[string]*KeyBinding),
 	// }
-	g.Scenes["Settings"] = &Scene{
+	g.Scenes["Settings"] = &engine.Scene{
 		Active:      false,
 		AutoDisable: true,
 		DrawScene:   DrawSettings,
 		UpdateScene: UpdateSettings,
 		Data:        make(map[string]interface{}),
-		Buttons:     make([]Button, 1),
-		KeyBindings: make(map[string]*KeyBinding),
+		KeyBindings: make(map[string]*engine.KeyBinding),
 	}
 	g.InitHUD()
 
@@ -108,7 +107,7 @@ func (g *Game) LoadScenes() {
 func main() {
 	log.Printf("hello world")
 	g := Game{
-		Scenes:  map[string]*Scene{},
+		Scenes:  map[string]*engine.Scene{},
 		Data:    make(map[string]interface{}),
 		Counter: 0,
 	}

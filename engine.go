@@ -176,11 +176,6 @@ func (g *Game) Draw() {
 			continue
 		}
 		scene.DrawScene(g)
-		for _, button := range scene.Buttons {
-			if button.Active {
-				g.DrawButton(button)
-			}
-		}
 
 		for _, component := range scene.Components {
 			component.Render()
@@ -386,7 +381,7 @@ func (g *Game) LoadSceneShortcuts(sceneName string) {
 	scene := g.Scenes[sceneName]
 	for _, binding := range g.KeyBindingJSONs {
 		if binding.Scene == sceneName {
-			scene.KeyBindings[binding.Name] = &KeyBinding{
+			scene.KeyBindings[binding.Name] = &engine.KeyBinding{
 				Current: binding.Default,
 				Default: binding.Default,
 				OnPress: scene.KeyBindingFunctions[binding.FunctionName],

@@ -45,7 +45,8 @@ func OnClickEndRoundConfirmButton(gi engine.GameInterface) {
 	g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["NextEvent"])
 }
 
-func CloseAllWindows(g *Game) {
+func CloseAllWindows(gi engine.GameInterface) {
+	g := gi.(*Game)
 	scene := g.Scenes["Board"]
 	found := false
 	for _, window := range scene.Windows {
@@ -99,7 +100,7 @@ func (g *Game) InitHUD() {
 		DrawWindow: DrawGameOverWindow,
 	}
 
-	scene.KeyBindingFunctions = make(map[string]func(*Game))
+	scene.KeyBindingFunctions = make(map[string]func(engine.GameInterface))
 	scene.KeyBindingFunctions["CloseAllWindows"] = CloseAllWindows
 	//	scene.KeyBindingFunctions["OpenShop"] = OnClickShopWindowButton
 
@@ -124,7 +125,6 @@ func DrawHUD(g *Game) {
 	//	rl.DrawRectangle(0, g.screenHeight-height, g.screenWidth, height, rl.Black)
 
 	DrawSidebar(g)
-	g.DrawButtons(scene.Buttons)
 
 	if g.Data["Message"].(string) != "" {
 		rl.DrawText(g.Data["Message"].(string), 205, g.screenHeight-height+15, 20, rl.White)
