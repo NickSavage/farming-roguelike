@@ -1,13 +1,9 @@
 package main
 
 import (
-	"log"
 	"nsavage/farming-roguelike/engine"
-
-	rl "github.com/gen2brain/raylib-go/raylib"
+	// rl "github.com/gen2brain/raylib-go/raylib"
 )
-
-//import rl "github.com/gen2brain/raylib-go/raylib"
 
 type Game struct {
 	Scenes            map[string]*engine.Scene
@@ -240,32 +236,4 @@ type TechTileConfig struct {
 	Width     int    `json:"width"`
 	Height    int    `json:"height"`
 	FillSpace bool   `json:"fillSpace"`
-}
-
-type ShopBuildingButton struct {
-	g               *Game
-	rect            rl.Rectangle
-	onClickFunction func(*Game)
-	Technology      *Technology
-}
-
-func (b ShopBuildingButton) Render() {
-	rl.DrawRectangleRec(b.rect, rl.White)
-	rl.DrawRectangleLinesEx(b.rect, 1, rl.Black)
-
-	x := b.rect.X
-	y := b.rect.Y
-
-	textColor := rl.Black
-	rl.DrawText(b.Technology.Name, int32(x), int32(y+50), 20, textColor)
-	rl.DrawText(b.Technology.Description, int32(x), int32(y+70), 10, textColor)
-
-}
-func (b ShopBuildingButton) OnClick() {
-	b.onClickFunction(b.g)
-
-	log.Printf("wet fart")
-}
-func (b ShopBuildingButton) Rect() rl.Rectangle {
-	return b.rect
 }
