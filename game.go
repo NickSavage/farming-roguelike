@@ -70,6 +70,7 @@ func (g *Game) InitRun(loadSave bool) {
 	g.Run.MoneyRequirement = g.Run.calculateMoneyRequirement()
 
 	g.Run.CurrentRoundShopPlants = g.ShopRandomPlants(2)
+	g.Run.CurrentRoundShopBuildings = g.ShopRandomBuildings(3)
 }
 
 func (g *Game) InitTechSpaces() {
@@ -226,6 +227,7 @@ func OnClickEndRound(g *Game) {
 		// if game isn't over, increment this
 		g.Run.MoneyRequirement = g.Run.calculateMoneyRequirement()
 		g.Run.CurrentRoundShopPlants = g.ShopRandomPlants(2)
+		g.Run.CurrentRoundShopBuildings = g.ShopRandomBuildings(3)
 	}
 	g.Run.SaveRun()
 }
@@ -368,40 +370,43 @@ func (r *Run) GenerateYield() float32 {
 
 }
 
-func (g *Game) ShopRandomPlants(needed int) []*Technology {
-	// Filter technologies with Type == PlantSpace and collect their keys into a slice
-	plantSpaceTechnologies := make([]*Technology, 0)
-	for _, tech := range g.Technology {
-		if tech.TechnologyType == PlantSpace {
-			plantSpaceTechnologies = append(plantSpaceTechnologies, tech)
-		}
-	}
+func (g *Game) PickRandomTechnologies(needed int, keys []string) []*Technology {
 
-	// Select a slice of unique random technologies from the filtered list
-	result := []*Technology{}
-	keysToPickFrom := make([]string, 0)
-	for key, _ := range g.Technology {
-		if _, found := findPlantSpaceTech(g.Technology, key); found {
-			keysToPickFrom = append(keysToPickFrom, key)
-		}
+	results := []*Technology{}
+	for i := 0; i < needed && len(keys) > 0; i++ {
+		index := rand.Intn(len(keys))
+		selectedKey := keys[index]
+		keys = append(keys[:index], keys[index+1:]...)
+		results = append(results, g.Technology[selectedKey])
 	}
-
-	for i := 0; i < needed && len(keysToPickFrom) > 0; i++ {
-		index := rand.Intn(len(keysToPickFrom))
-		selectedKey := keysToPickFrom[index]
-		keysToPickFrom = append(keysToPickFrom[:index], keysToPickFrom[index+1:]...)
-		result = append(result, g.Technology[selectedKey])
-	}
-
-	return result
+	return results
 }
 
-func findPlantSpaceTech(techMap map[string]*Technology, key string) (bool, bool) {
-	_, found := techMap[key]
-	if found && techMap[key].TechnologyType == PlantSpace {
-		return true, true
+func (g *Game) ShopRandomPlants(needed int) []*Technology {
+	keysToPickFrom := make([]string, 0)
+	for key, tech := range g.Technology {
+		if tech.TechnologyType == PlantSpace {
+			keysToPickFrom = append(keysToPickFrom, key)
+
+		}
 	}
-	return false, false
+	results := g.PickRandomTechnologies(needed, keysToPickFrom)
+
+	return results
+}
+
+func (g *Game) ShopRandomBuildings(needed int) []*Technology {
+
+	keysToPickFrom := make([]string, 0)
+	for key, tech := range g.Technology {
+		if tech.TechnologyType == BuildingSpace {
+			keysToPickFrom = append(keysToPickFrom, key)
+
+		}
+	}
+	results := g.PickRandomTechnologies(needed, keysToPickFrom)
+
+	return results
 }
 
 // save files

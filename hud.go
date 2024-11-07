@@ -14,6 +14,7 @@ func OnClickShopWindowButton(gi engine.GameInterface) {
 	g := gi.(*Game)
 	scene := g.Scenes["Board"]
 	// log.Printf("hey %v", scene)
+	g.InitShopBuildings()
 	g.ActivateWindow(scene.Windows, scene.Windows["ShopWindow"])
 }
 
@@ -107,6 +108,33 @@ func (g *Game) InitHUD() {
 	g.LoadSceneShortcuts("Board")
 	log.Printf("shorcuts %v", scene.KeyBindings)
 
+	shopButton := g.NewButton(
+		"Shop",
+		rl.NewRectangle(10, 240, 150, 40),
+		OnClickShopWindowButton,
+	)
+	scene.Components = append(scene.Components, shopButton)
+
+	priceButton := g.NewButton(
+		"Market",
+		rl.NewRectangle(10, 290, 150, 40),
+		OnClickOpenMarketWindow,
+	)
+	scene.Components = append(scene.Components, priceButton)
+
+	viewEndRoundButton := g.NewButton(
+		"End Round",
+		rl.NewRectangle(10, 340, 150, 40),
+		OnClickOpenEndRoundPage1Window,
+	)
+	scene.Components = append(scene.Components, viewEndRoundButton)
+
+	settingsButton := g.NewButton(
+		"Settings",
+		rl.NewRectangle(10, float32(g.screenHeight)-60, 150, 40),
+		OnClickOpenSettings,
+	)
+	scene.Components = append(scene.Components, settingsButton)
 }
 
 func UpdateHUD(g *Game) {
@@ -146,7 +174,7 @@ func DrawHUD(g *Game) {
 
 func DrawSidebar(g *Game) {
 
-	scene := g.Scenes["Board"]
+	//	scene := g.Scenes["Board"]
 	rl.DrawRectangle(0, 0, g.SidebarWidth, g.screenHeight, rl.Black)
 
 	rl.DrawText(
@@ -159,34 +187,6 @@ func DrawSidebar(g *Game) {
 	rl.DrawText(fmt.Sprintf("Productivity: %v", g.Run.Productivity), 30, 110, 20, rl.White)
 	rl.DrawText(fmt.Sprintf("Season: %v", g.Run.CurrentSeason.String()), 30, 130, 20, rl.White)
 	rl.DrawText(fmt.Sprintf("Yield: %v", g.Run.Yield), 30, 150, 20, rl.White)
-
-	shopButton := g.NewButton(
-		"Shop",
-		rl.NewRectangle(10, 240, 150, 40),
-		OnClickShopWindowButton,
-	)
-	scene.Components = append(scene.Components, shopButton)
-
-	priceButton := g.NewButton(
-		"Market",
-		rl.NewRectangle(10, 290, 150, 40),
-		OnClickOpenMarketWindow,
-	)
-	scene.Components = append(scene.Components, priceButton)
-
-	viewEndRoundButton := g.NewButton(
-		"End Round",
-		rl.NewRectangle(10, 340, 150, 40),
-		OnClickOpenEndRoundPage1Window,
-	)
-	scene.Components = append(scene.Components, viewEndRoundButton)
-
-	settingsButton := g.NewButton(
-		"Settings",
-		rl.NewRectangle(10, float32(g.screenHeight)-60, 150, 40),
-		OnClickOpenSettings,
-	)
-	scene.Components = append(scene.Components, settingsButton)
 
 }
 

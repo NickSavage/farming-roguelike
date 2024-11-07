@@ -147,45 +147,34 @@ func (g *Game) DrawPlantPurchaseButton(shopButton *ShopButton, x, y float32) {
 
 func (g *Game) InitShopWindow() {
 	log.Printf("init shop")
-	tech := g.Technology
-	scene := g.Scenes["Board"]
-	buttons := []ShopButton{
-		ShopButton{
-			Width:      150,
-			Height:     300,
-			Image:      g.Data["ChickenCoopShopTile"].(Tile),
-			OnClick:    ShopClickChickenCoop,
-			Technology: tech["Chicken Coop"],
-		},
-		ShopButton{
-			Width:      150,
-			Height:     300,
-			Image:      g.Data["WorkstationTile"].(Tile),
-			OnClick:    ShopClickWorkstation,
-			Technology: tech["Workstation"],
-		},
-		ShopButton{
-			Width:      150,
-			Height:     300,
-			Image:      g.Data["ChickenEggWarmerShopTile"].(Tile),
-			OnClick:    ShopClickChickenEggWarmer,
-			Technology: tech["Chicken Egg Warmer"],
-		},
+}
+
+// run each time the shop is opened, maybe should be each time the round is changed
+func (g *Game) InitShopBuildings() {
+	window := g.Scenes["Board"].Windows["ShopWindow"]
+	window.Components = make([]engine.UIComponent, 0)
+
+	buildings := g.Run.CurrentRoundShopBuildings
+
+	for i, building := range buildings {
+		// for i, _ := range buildings {
+		rect := rl.NewRectangle(float32(215+i*160), 90, 150, 300)
+		button := ShopBuildingButton{
+			g:               g,
+			rect:            rect,
+			onClickFunction: building.ShopOnClick,
+			Technology:      building,
+		}
+		window.Components = append(window.Components, button)
 	}
-	scene.Data["ShopButtons"] = buttons
 }
 
 func DrawShopWindow(gi engine.GameInterface, win *engine.Window) {
 	g := gi.(*Game)
-	scene := g.Scenes["Board"]
+	// scene := g.Scenes["Board"]
 
 	rl.DrawRectangle(200, 50, 900, 500, rl.White)
 	rl.DrawText("Shop", 205, 55, 30, rl.Black)
-
-	buttons := scene.Data["ShopButtons"].([]ShopButton)
-	g.DrawShopButton(buttons[0], 215, 90)
-	g.DrawShopButton(buttons[1], 375, 90)
-	g.DrawShopButton(buttons[2], 535, 90)
 
 	plants := g.Run.CurrentRoundShopPlants
 

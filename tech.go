@@ -175,6 +175,7 @@ func (g *Game) CreateChickenCoopTech() *Technology {
 	tech.OnBuild = ChickenCoopOnBuild
 	tech.OnClick = ChickenCoopOnClick
 	tech.OnRoundEnd = ChickenCoopRoundEnd
+	tech.ShopOnClick = ShopClickChickenCoop
 	return tech
 }
 
@@ -213,6 +214,7 @@ func (g *Game) CreateWheatTech() *Technology {
 	tech.OnBuild = WheatFieldOnBuild
 	tech.OnClick = WheatFieldOnClick
 	tech.OnRoundEnd = WheatFieldRoundEnd
+	tech.ShopOnClick = ShopClickWheatField
 	return tech
 }
 
@@ -266,6 +268,7 @@ func (g *Game) CreatePotatoTech() *Technology {
 	tech.OnBuild = PotatoFieldOnBuild
 	tech.OnClick = PotatoFieldOnClick
 	tech.OnRoundEnd = PotatoFieldRoundEnd
+	tech.ShopOnClick = ShopClickPotatoField
 	return tech
 }
 
@@ -321,6 +324,7 @@ func (g *Game) CreateCarrotTech() *Technology {
 	tech.OnBuild = CarrotFieldOnBuild
 	tech.OnClick = CarrotFieldOnClick
 	tech.OnRoundEnd = CarrotFieldRoundEnd
+	tech.ShopOnClick = ShopClickCarrotField
 	return tech
 }
 
@@ -365,6 +369,7 @@ func (g *Game) CreateWorkstationTech() *Technology {
 	tech.OnBuild = WorkstationOnBuild
 	tech.OnClick = WorkstationOnClick
 	tech.OnRoundEnd = WorkstationRoundEnd
+	tech.ShopOnClick = ShopClickWorkstation
 	return tech
 
 }
@@ -396,6 +401,7 @@ func (g *Game) CreateChickenEggWarmer() *Technology {
 	tech.OnBuild = ChickenEggWarmerOnBuild
 	tech.OnClick = ChickenEggWarmerOnClick
 	tech.OnRoundEnd = ChickenEggWarmerRoundEnd
+	tech.ShopOnClick = ShopClickChickenEggWarmer
 	return tech
 }
 

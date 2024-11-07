@@ -1,7 +1,10 @@
 package main
 
 import (
+	"log"
 	"nsavage/farming-roguelike/engine"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 //import rl "github.com/gen2brain/raylib-go/raylib"
@@ -27,28 +30,29 @@ type Game struct {
 }
 
 type Run struct {
-	Technology             []*Technology
-	Products               map[ProductType]*Product
-	Money                  float32
-	Yield                  float32
-	Productivity           float32
-	EndRoundMoney          float32
-	MoneyRequirement       float32
-	MoneyRequirementStart  float32
-	MoneyRequirementRate   float32
-	CurrentRound           int
-	CurrentYear            int
-	CurrentSeason          Season
-	CurrentRoundShopPlants []*Technology
-	NextSeason             Season
-	EventChoices           []Event
-	Events                 []Event
-	PossibleEvents         []Event
-	triggerFunctions       map[string]func(*Game)
-	EventTracker           map[string]bool // track if its been called or not
-	TechnologySpaces       []*TechnologySpace
-	ActionsRemaining       int
-	ActionsMaximum         int
+	Technology                []*Technology
+	Products                  map[ProductType]*Product
+	Money                     float32
+	Yield                     float32
+	Productivity              float32
+	EndRoundMoney             float32
+	MoneyRequirement          float32
+	MoneyRequirementStart     float32
+	MoneyRequirementRate      float32
+	CurrentRound              int
+	CurrentYear               int
+	CurrentSeason             Season
+	CurrentRoundShopPlants    []*Technology
+	CurrentRoundShopBuildings []*Technology
+	NextSeason                Season
+	EventChoices              []Event
+	Events                    []Event
+	PossibleEvents            []Event
+	triggerFunctions          map[string]func(*Game)
+	EventTracker              map[string]bool // track if its been called or not
+	TechnologySpaces          []*TechnologySpace
+	ActionsRemaining          int
+	ActionsMaximum            int
 }
 
 type SaveFile struct {
@@ -115,6 +119,7 @@ type Technology struct {
 	CanBuild        func(*Game, *Technology) bool
 	OnBuild         func(*Game, *Technology) error
 	OnClick         func(*Game, *Technology) string
+	ShopOnClick     func(*Game)
 	OnRoundEnd      func(*Game, *Technology)
 	RoundEndProduce func(*Game, *Technology) float32
 	ShopButton      func(*Game) *ShopButton
@@ -235,4 +240,32 @@ type TechTileConfig struct {
 	Width     int    `json:"width"`
 	Height    int    `json:"height"`
 	FillSpace bool   `json:"fillSpace"`
+}
+
+type ShopBuildingButton struct {
+	g               *Game
+	rect            rl.Rectangle
+	onClickFunction func(*Game)
+	Technology      *Technology
+}
+
+func (b ShopBuildingButton) Render() {
+	rl.DrawRectangleRec(b.rect, rl.White)
+	rl.DrawRectangleLinesEx(b.rect, 1, rl.Black)
+
+	x := b.rect.X
+	y := b.rect.Y
+
+	textColor := rl.Black
+	rl.DrawText(b.Technology.Name, int32(x), int32(y+50), 20, textColor)
+	rl.DrawText(b.Technology.Description, int32(x), int32(y+70), 10, textColor)
+
+}
+func (b ShopBuildingButton) OnClick() {
+	b.onClickFunction(b.g)
+
+	log.Printf("wet fart")
+}
+func (b ShopBuildingButton) Rect() rl.Rectangle {
+	return b.rect
 }
