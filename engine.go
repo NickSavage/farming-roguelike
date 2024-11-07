@@ -10,17 +10,6 @@ import (
 	"github.com/gen2brain/raylib-go/raylib"
 )
 
-type Button struct {
-	Rectangle  rl.Rectangle
-	Color      rl.Color
-	HoverColor rl.Color
-	Text       string
-	TextColor  rl.Color
-	TextSize   int32
-	OnClick    func(*Game)
-	Active     bool
-}
-
 type ShopButton struct {
 	X               float32
 	Y               float32
@@ -32,34 +21,6 @@ type ShopButton struct {
 	BackgroundColor rl.Color
 	OnClick         func(*Game)
 	Technology      *Technology
-}
-type Scene struct {
-	Name                string
-	Active              bool
-	AutoDisable         bool
-	DrawScene           func(*Game)
-	UpdateScene         func(*Game)
-	Buttons             []Button
-	skip                bool
-	Data                map[string]interface{}
-	Camera              rl.Camera2D
-	Windows             map[string]*engine.Window
-	Menu                *BoardRightClickMenu
-	RenderMenu          bool
-	Messages            []engine.Message
-	KeyBindingFunctions map[string]func(*Game)
-	KeyBindings         map[string]*KeyBinding
-	Components          []engine.UIComponent
-}
-
-type KeyBinding struct {
-	Current      int32
-	Default      int32
-	Name         string
-	FunctionName string
-	Scene        string
-	Configurable bool
-	OnPress      func(*Game)
 }
 
 type KeyBindingJSON struct {
@@ -74,19 +35,6 @@ type Tile struct {
 	Texture   rl.Texture2D
 	TileFrame rl.Rectangle
 	Color     rl.Color
-}
-
-type BoardRightClickMenu struct {
-	Rectangle   rl.Rectangle
-	BoardSquare *BoardSquare
-	Items       []BoardMenuItem
-}
-
-type BoardMenuItem struct {
-	Rectangle       rl.Rectangle
-	Text            string
-	OnClick         func(*Game)
-	CheckIsDisabled func(*Game, *BoardSquare) bool
 }
 
 func InitEngine() {
@@ -132,39 +80,6 @@ func (g *Game) NewButton(text string, rect rl.Rectangle, onClick func(engine.Gam
 		OnClickFunction: onClick,
 	}
 	return button
-}
-
-func (g *Game) DrawButton(button Button) {
-	var boxColor rl.Color
-	mousePosition := rl.GetMousePosition()
-	if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {
-		if button.HoverColor == rl.Blank {
-			button.HoverColor = button.Color
-		}
-		boxColor = button.HoverColor
-	} else {
-		boxColor = button.Color
-	}
-	rl.DrawRectangle(button.Rectangle.ToInt32().X, button.Rectangle.ToInt32().Y, button.Rectangle.ToInt32().Width, button.Rectangle.ToInt32().Height, boxColor)
-	textSize := button.TextSize
-	if textSize == 0 {
-		textSize = int32(button.Rectangle.Height - 15)
-	}
-
-	rl.DrawText(
-		button.Text,
-		button.Rectangle.ToInt32().X+5,
-		button.Rectangle.ToInt32().Y+5,
-		textSize,
-		button.TextColor,
-	)
-}
-
-func (g *Game) DrawButtons(buttons []Button) {
-	for _, button := range buttons {
-		g.DrawButton(button)
-	}
-
 }
 
 func (g *Game) Draw() {
@@ -287,60 +202,6 @@ func (g *Game) ActivateWindow(windows map[string]*engine.Window, window *engine.
 }
 
 // menus
-
-func (g *Game) DrawContextMenu(scene *Scene) {
-	if !scene.RenderMenu {
-		return
-	}
-
-	mousePosition := rl.GetMousePosition()
-
-	var color rl.Color
-	var textColor rl.Color
-
-	x := scene.Menu.Rectangle.X
-	y := scene.Menu.Rectangle.Y
-
-	square := scene.Menu.BoardSquare
-
-	for _, item := range scene.Menu.Items {
-		rec := item.Rectangle
-		rec.X = x
-		rec.Y = y
-		if rl.CheckCollisionPointRec(mousePosition, rec) {
-			color = rl.Gray
-		} else {
-			color = rl.White
-		}
-		if !item.CheckIsDisabled(g, square) {
-			textColor = rl.Black
-		} else {
-			textColor = rl.LightGray
-
-		}
-		rl.DrawRectangleRec(rec, color)
-		rl.DrawText(item.Text, int32(rec.X+5), int32(rec.Y+5), 15, textColor)
-
-		y = rec.Y + rec.Height
-
-		if g.ScreenSkip {
-			if rl.IsMouseButtonUp(rl.MouseButtonLeft) {
-				g.ScreenSkip = false
-			}
-		}
-		if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
-			mousePosition := rl.GetMousePosition()
-			if rl.CheckCollisionPointRec(mousePosition, rec) {
-				if !item.CheckIsDisabled(g, square) {
-					item.OnClick(g)
-					scene.RenderMenu = false
-				}
-			}
-
-		}
-	}
-
-}
 
 // save files
 
