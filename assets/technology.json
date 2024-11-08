@@ -112,5 +112,21 @@
     "costMoney": 25,
     "description": "asdasd",
     "production": 50
+  },
+  {
+    "name": "Fertilizer",
+    "technologyType": "BuildingSpace",
+    "productType": "Building",
+    "rarity": "Impossible",
+    "shopIcon": "FertilizerTile",
+    "tile": {
+      "id": "FertilizerTile",
+      "width": 1,
+      "height": 1,
+      "fillSpace": false
+    },
+    "costMoney": 25,
+    "description": "asdasd",
+    "production": 50
   }
 ]

@@ -22,11 +22,33 @@ func (g *Game) InitTechnology() {
 	tech["Carrot Field"] = g.CreateCarrotTech()
 
 	tech["Workstation"] = g.CreateWorkstationTech()
+	tech["Fertilizer"] = g.CreateFertilizerTech()
 	tech["Chicken Egg Warmer"] = g.CreateChickenEggWarmer()
 
 	tech["Cell Tower"] = g.CreateCellTowerTech()
 
 	g.Technology = tech
+}
+
+func (g *Game) CanBuild(tech *Technology) bool {
+	if tech.TechnologyType == PlantSpace {
+		if tech.Name == "Wheat Field" {
+			if g.Run.CurrentSeason == Spring {
+				return true
+			}
+		} else if tech.Name == "Potato Field" {
+			if g.Run.CurrentSeason == Spring {
+				return true
+			}
+		} else if tech.Name == "Carrot Field" {
+			if g.Run.CurrentSeason == Spring || g.Run.CurrentSeason == Autumn {
+				return true
+			}
+		}
+		return false
+
+	}
+	return true
 }
 
 func (g *Game) CreateTechFromInitialData(input InitialData) *Technology {
@@ -171,16 +193,10 @@ func (g *Game) ShopButton(tech *Technology) *ShopButton {
 func (g *Game) CreateChickenCoopTech() *Technology {
 
 	tech := g.CreateTechFromInitialData(g.InitialData["Chicken Coop"])
-	tech.CanBuild = ChickenCoopCanBuild
 	tech.OnBuild = ChickenCoopOnBuild
 	tech.OnClick = ChickenCoopOnClick
 	tech.OnRoundEnd = ChickenCoopRoundEnd
-	tech.ShopOnClick = ShopClickChickenCoop
 	return tech
-}
-
-func ChickenCoopCanBuild(g *Game, tech *Technology) bool {
-	return true
 }
 
 func ChickenCoopOnBuild(g *Game, tech *Technology) error {
@@ -210,19 +226,10 @@ func ChickenCoopRoundEnd(g *Game, tech *Technology) {
 func (g *Game) CreateWheatTech() *Technology {
 
 	tech := g.CreateTechFromInitialData(g.InitialData["Wheat Field"])
-	tech.CanBuild = WheatFieldCanBuild
 	tech.OnBuild = WheatFieldOnBuild
 	tech.OnClick = WheatFieldOnClick
 	tech.OnRoundEnd = WheatFieldRoundEnd
-	tech.ShopOnClick = ShopClickWheatField
 	return tech
-}
-
-func WheatFieldCanBuild(g *Game, tech *Technology) bool {
-	if g.Run.CurrentSeason == Spring {
-		return true
-	}
-	return false
 }
 
 func WheatFieldOnBuild(g *Game, tech *Technology) error {
@@ -264,19 +271,10 @@ func WheatFieldOnClick(g *Game, tech *Technology) string {
 
 func (g *Game) CreatePotatoTech() *Technology {
 	tech := g.CreateTechFromInitialData(g.InitialData["Potato Field"])
-	tech.CanBuild = PotatoFieldCanBuild
 	tech.OnBuild = PotatoFieldOnBuild
 	tech.OnClick = PotatoFieldOnClick
 	tech.OnRoundEnd = PotatoFieldRoundEnd
-	tech.ShopOnClick = ShopClickPotatoField
 	return tech
-}
-
-func PotatoFieldCanBuild(g *Game, tech *Technology) bool {
-	if g.Run.CurrentSeason == Spring {
-		return true
-	}
-	return false
 }
 
 func PotatoFieldOnBuild(g *Game, tech *Technology) error {
@@ -320,19 +318,10 @@ func PotatoFieldOnClick(g *Game, tech *Technology) string {
 
 func (g *Game) CreateCarrotTech() *Technology {
 	tech := g.CreateTechFromInitialData(g.InitialData["Carrot Field"])
-	tech.CanBuild = CarrotFieldCanBuild
 	tech.OnBuild = CarrotFieldOnBuild
 	tech.OnClick = CarrotFieldOnClick
 	tech.OnRoundEnd = CarrotFieldRoundEnd
-	tech.ShopOnClick = ShopClickCarrotField
 	return tech
-}
-
-func CarrotFieldCanBuild(g *Game, tech *Technology) bool {
-	if g.Run.CurrentSeason == Spring || g.Run.CurrentSeason == Autumn {
-		return true
-	}
-	return false
 }
 
 func CarrotFieldOnBuild(g *Game, tech *Technology) error {
@@ -365,18 +354,11 @@ func CarrotFieldOnClick(g *Game, tech *Technology) string {
 func (g *Game) CreateWorkstationTech() *Technology {
 
 	tech := g.CreateTechFromInitialData(g.InitialData["Workstation"])
-	tech.CanBuild = WorkstationCanBuild
 	tech.OnBuild = WorkstationOnBuild
 	tech.OnClick = WorkstationOnClick
 	tech.OnRoundEnd = WorkstationRoundEnd
-	tech.ShopOnClick = ShopClickWorkstation
 	return tech
 
-}
-
-func WorkstationCanBuild(g *Game, tech *Technology) bool {
-	// if g.Run.CanSpendAction(g)
-	return true
 }
 
 func WorkstationOnBuild(g *Game, tech *Technology) error {
@@ -397,23 +379,10 @@ func (g *Game) CreateChickenEggWarmer() *Technology {
 
 	tech := g.CreateTechFromInitialData(g.InitialData["Chicken Egg Warmer"])
 
-	tech.CanBuild = ChickenEggWarmerCanBuild
 	tech.OnBuild = ChickenEggWarmerOnBuild
 	tech.OnClick = ChickenEggWarmerOnClick
 	tech.OnRoundEnd = ChickenEggWarmerRoundEnd
-	tech.ShopOnClick = ShopClickChickenEggWarmer
 	return tech
-}
-
-func ChickenEggWarmerCanBuild(g *Game, tech *Technology) bool {
-	hasCoop := false
-	for _, tech := range g.Run.Technology {
-		if tech.Name == "Chicken Coop" {
-			hasCoop = true
-			break
-		}
-	}
-	return hasCoop
 }
 
 func ChickenEggWarmerOnBuild(g *Game, tech *Technology) error {
@@ -435,17 +404,11 @@ func ChickenEggWarmerOnClick(g *Game, tech *Technology) string {
 func (g *Game) CreateCellTowerTech() *Technology {
 
 	tech := g.CreateTechFromInitialData(g.InitialData["Cell Tower"])
-	tech.CanBuild = CellTowerCanBuild
 	tech.OnBuild = CellTowerOnBuild
 	tech.OnClick = CellTowerOnClick
 	tech.OnRoundEnd = CellTowerRoundEnd
 	return tech
 
-}
-
-func CellTowerCanBuild(g *Game, tech *Technology) bool {
-	// if g.Run.CanSpendAction(g)
-	return true
 }
 
 func CellTowerOnBuild(g *Game, tech *Technology) error {
@@ -459,5 +422,30 @@ func CellTowerRoundEnd(g *Game, tech *Technology) {
 
 }
 func CellTowerOnClick(g *Game, tech *Technology) string {
+	return ""
+}
+
+// fertilizer
+
+func (g *Game) CreateFertilizerTech() *Technology {
+	tech := g.CreateTechFromInitialData(g.InitialData["Fertilizer"])
+
+	tech.OnBuild = CellTowerOnBuild
+	tech.OnClick = CellTowerOnClick
+	tech.OnRoundEnd = CellTowerRoundEnd
+
+	return tech
+}
+
+func FertilizerOnBuild(g *Game, tech *Technology) error {
+	g.Run.Productivity += 0.05
+	tech.ReadyToTouch = false
+
+	return nil
+}
+func FertilizerRoundEnd(g *Game, tech *Technology) {
+
+}
+func FertilizerOnClick(g *Game, tech *Technology) string {
 	return ""
 }

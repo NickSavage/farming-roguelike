@@ -14,7 +14,7 @@ func (g *Game) ShopChooseTech(tech *Technology) {
 	if !g.Run.CanSpendAction(tech.CostActions) {
 		return
 	}
-	if !tech.CanBuild(g, tech) {
+	if !g.CanBuild(tech) {
 		return
 	}
 	g.Scenes["Board"].Windows["ShopWindow"].Display = false
@@ -25,37 +25,8 @@ func (g *Game) ShopChooseTech(tech *Technology) {
 	}
 }
 
-func ShopClickChickenCoop(g *Game) {
-
-	tech := g.CreateChickenCoopTech()
-	g.ShopChooseTech(tech)
-}
-
-func ShopClickWheatField(g *Game) {
-
-	tech := g.CreateWheatTech()
-	g.ShopChooseTech(tech)
-}
-func ShopClickPotatoField(g *Game) {
-
-	tech := g.CreatePotatoTech()
-	g.ShopChooseTech(tech)
-}
-
-func ShopClickCarrotField(g *Game) {
-
-	tech := g.CreateCarrotTech()
-	g.ShopChooseTech(tech)
-}
-func ShopClickWorkstation(g *Game) {
-
-	tech := g.CreateWorkstationTech()
-	g.ShopChooseTech(tech)
-}
-
-func ShopClickChickenEggWarmer(g *Game) {
-	tech := g.CreateChickenEggWarmer()
-	g.ShopChooseTech(tech)
+func ShopButtonOnClick(g *Game, b ShopBuildingButton) {
+	g.ShopChooseTech(b.Technology)
 }
 
 func (g *Game) InitShopWindow() {

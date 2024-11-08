@@ -71,6 +71,7 @@ func (g *Game) InitRun(loadSave bool) {
 
 	g.Run.CurrentRoundShopPlants = g.ShopRandomPlants(2)
 	g.Run.CurrentRoundShopBuildings = g.ShopRandomBuildings(3)
+	g.InitShopRoundComponents()
 }
 
 func (g *Game) InitTechSpaces() {

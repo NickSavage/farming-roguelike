@@ -62,6 +62,8 @@ func (g *Game) LoadAssets() {
 	image = rl.LoadImage("assets/icons/cell_tower.png")
 	g.Data["CellTowerTile"] = LoadImage(image, 0, 0, 2, 2)
 
+	image = rl.LoadImage("assets/icons/fertilizer.png")
+	g.Data["FertilizerTile"] = LoadImage(image, 0, 0, 2, 2)
 }
 
 func (g *Game) LoadScenes() {

@@ -8,8 +8,6 @@ import (
 	"nsavage/farming-roguelike/engine"
 )
 
-func OnClickNull(g *Game) {}
-
 func OnClickShopWindowButton(gi engine.GameInterface) {
 	g := gi.(*Game)
 	scene := g.Scenes["Board"]

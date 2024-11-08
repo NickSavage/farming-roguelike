@@ -22,7 +22,7 @@ func (b ShopBuildingButton) Render() {
 	backgroundColor := rl.White
 
 	if !g.Run.CanSpendMoney(b.Technology.CostMoney) ||
-		!b.Technology.CanBuild(g, b.Technology) {
+		!g.CanBuild(b.Technology) {
 		textColor = rl.LightGray
 		canBuild = false
 	}
@@ -56,7 +56,7 @@ func (b ShopBuildingButton) Render() {
 
 }
 func (b ShopBuildingButton) OnClick() {
-	b.Technology.ShopOnClick(b.g)
+	ShopButtonOnClick(b.g, b)
 }
 func (b ShopBuildingButton) Rect() rl.Rectangle {
 	return b.rect
