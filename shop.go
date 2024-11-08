@@ -63,7 +63,7 @@ func (g *Game) InitShopWindow() {
 }
 
 // run each time the shop is opened, maybe should be each time the round is changed
-func (g *Game) InitShopBuildings() {
+func (g *Game) InitShopRoundComponents() {
 	window := g.Scenes["Board"].Windows["ShopWindow"]
 	window.Components = make([]engine.UIComponent, 0)
 

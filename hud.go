@@ -14,7 +14,6 @@ func OnClickShopWindowButton(gi engine.GameInterface) {
 	g := gi.(*Game)
 	scene := g.Scenes["Board"]
 	// log.Printf("hey %v", scene)
-	g.InitShopBuildings()
 	g.ActivateWindow(scene.Windows, scene.Windows["ShopWindow"])
 }
 

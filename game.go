@@ -230,6 +230,8 @@ func OnClickEndRound(g *Game) {
 		g.Run.CurrentRoundShopBuildings = g.ShopRandomBuildings(3)
 	}
 	g.Run.SaveRun()
+
+	g.InitShopRoundComponents()
 }
 
 func (g *Game) CheckGameOver() bool {
