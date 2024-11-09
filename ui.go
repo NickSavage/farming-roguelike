@@ -12,6 +12,8 @@ type ShopBuildingButton struct {
 	rect           rl.Rectangle
 	Technology     *Technology
 	ExpandedButton bool // displays title and description
+	Position       int
+	Purchased      bool // whether its been purchased or not
 }
 
 func (b ShopBuildingButton) Render() {
@@ -39,7 +41,7 @@ func (b ShopBuildingButton) Render() {
 	mousePosition := rl.GetMousePosition()
 
 	if rl.CheckCollisionPointRec(mousePosition, b.rect) {
-		if canBuild {
+		if canBuild && !b.Purchased {
 			backgroundColor = rl.LightGray
 		}
 	}
@@ -48,14 +50,20 @@ func (b ShopBuildingButton) Render() {
 
 	rl.DrawRectangleRec(b.rect, backgroundColor)
 	rl.DrawRectangleLinesEx(b.rect, 1, rl.Black)
-	DrawTile(b.Technology.Tile, x+5, y+2)
-	if b.ExpandedButton {
-		rl.DrawText(b.Technology.Name, int32(x), int32(y+100), 20, textColor)
-		rl.DrawText(b.Technology.Description, int32(x), int32(y+120), 10, textColor)
+	//	log.Printf("button %v", b)
+	if !b.Purchased {
+		DrawTile(b.Technology.Tile, x+5, y+2)
+		if b.ExpandedButton {
+			rl.DrawText(b.Technology.Name, int32(x), int32(y+100), 20, textColor)
+			rl.DrawText(b.Technology.Description, int32(x), int32(y+120), 10, textColor)
+		}
 	}
 
 }
 func (b ShopBuildingButton) OnClick() {
+	if b.Purchased {
+		return
+	}
 	ShopButtonOnClick(b.g, b)
 }
 func (b ShopBuildingButton) Rect() rl.Rectangle {

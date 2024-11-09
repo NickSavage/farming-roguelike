@@ -75,6 +75,10 @@ func (g *Game) InitHUD() {
 		Name:       "Shop Window",
 		Display:    false,
 		DrawWindow: DrawShopWindow,
+		Width:      570,
+		X:          (g.screenWidth-g.SidebarWidth-570)/2 + g.SidebarWidth,
+		Y:          55,
+		Height:     500,
 	}
 
 	scene.Windows["EndRound1"] = &engine.Window{
