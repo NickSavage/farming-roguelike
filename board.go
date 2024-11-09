@@ -43,7 +43,12 @@ func (g *Game) GetOpenSpace(tech *Technology) (*TechnologySpace, error) {
 		if space.IsFilled {
 			continue
 		}
-		if space.TechnologyType != tech.TechnologyType {
+		if tech.Name == "Solar Panels" {
+			if space.TechnologyType != PlantSpace {
+				continue
+			}
+
+		} else if space.TechnologyType != tech.TechnologyType {
 			continue
 		}
 		return space, nil
@@ -135,8 +140,6 @@ func (g *Game) InitBoard() {
 
 	g.Scenes["Board"].Data["HoverVector"] = engine.BoardCoord{}
 	g.Scenes["Board"].Data["HoverVectorCounter"] = 0
-	//	g.InitPlaceRandomTrees(215)
-	//	g.InitPlaceTech()
 
 	scene.KeyBindingFunctions = make(map[string]func(engine.GameInterface))
 	scene.KeyBindingFunctions["MoveCursorLeft"] = MoveCursorLeft

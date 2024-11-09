@@ -2,21 +2,36 @@
   {
     "name": "Nothing",
     "repeatable": true,
-    "description": "All is quiet tonight."
+    "description": "All is quiet tonight.",
+    "costMoney": 0,
+    "severity": 0
   },
   {
     "name": "Land Clearage",
     "repeatable": true,
-    "description": "Add a new field"
+    "description": "Add a new field",
+    "costMoney": 0,
+    "severity": -2
   },
   {
     "name": "Cell Tower",
     "repeatable": false,
-    "description": "A major telecom company has approached you about building a cell tower on your property."
+    "description": "A major telecom company has approached you about building a cell tower on your property.",
+    "costMoney": 0,
+    "severity": -1
   },
   {
     "name": "Hire Help",
     "repeatable": false,
-    "description": "Getting some extra hands for the harvest"
+    "description": "Getting some extra hands for the harvest.\n+1 Action\n-50 Money",
+    "costMoney": 50,
+    "severity": -1
+  },
+  {
+    "name": "Flood",
+    "repeatable": false,
+    "description": "A flood has destroyed one of your buildings.\nLose one building",
+    "costMoney": 0,
+    "severity": 5
   }
 ]

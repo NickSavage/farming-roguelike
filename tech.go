@@ -26,6 +26,7 @@ func (g *Game) InitTechnology() {
 	tech["Chicken Egg Warmer"] = g.CreateChickenEggWarmer()
 
 	tech["Cell Tower"] = g.CreateCellTowerTech()
+	tech["Solar Panels"] = g.CreateSolarPanelTech()
 
 	g.Technology = tech
 }
@@ -170,11 +171,14 @@ func (g *Game) RemoveTech(tech *Technology) {
 }
 
 func (g *Game) HandleClickTech(tech *Technology) string {
+	log.Printf("asdas")
 	return tech.OnClick(g, tech)
 }
 
 func (g *Game) RoundEndProduce(tech *Technology) float32 {
-
+	if tech.Name == "Solar Panels" {
+		return tech.BaseProduction * g.Run.Products[tech.ProductType].Yield * tech.TempYield
+	}
 	return tech.BaseProduction * g.Run.Productivity * g.Run.Products[tech.ProductType].Yield * tech.TempYield
 }
 
@@ -422,6 +426,44 @@ func CellTowerRoundEnd(g *Game, tech *Technology) {
 
 }
 func CellTowerOnClick(g *Game, tech *Technology) string {
+	return ""
+}
+
+// solar panels
+
+func (g *Game) CreateSolarPanelTech() *Technology {
+
+	tech := g.CreateTechFromInitialData(g.InitialData["Solar Panels"])
+	tech.OnBuild = SolarPanelOnBuild
+	tech.OnClick = SolarPanelOnClick
+	tech.OnRoundEnd = SolarPanelRoundEnd
+	return tech
+
+}
+
+func SolarPanelOnBuild(g *Game, tech *Technology) error {
+	tech.ReadyToTouch = false
+	g.InitProduct(tech.ProductType, tech.InitialPrice)
+
+	return nil
+
+}
+func SolarPanelRoundEnd(g *Game, tech *Technology) {
+	tech.ReadyToHarvest = true
+
+}
+func SolarPanelOnClick(g *Game, tech *Technology) string {
+	log.Printf("?")
+
+	if tech.ReadyToHarvest {
+		produced := g.RoundEndProduce(tech)
+		g.Run.Products["Solar"].Quantity += produced
+
+		moneyEarned := g.SellProduct(g.Run.Products["Solar"])
+		g.Run.Money += moneyEarned
+
+		return fmt.Sprintf("Solar: %v", moneyEarned)
+	}
 	return ""
 }
 

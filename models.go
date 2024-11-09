@@ -155,6 +155,8 @@ type EventJSON struct {
 	Name        string
 	Description string
 	Repeatable  bool
+	CostMoney   float32
+	Severity    float32
 }
 
 type Event struct {
@@ -165,6 +167,8 @@ type Event struct {
 	BlankEvent  bool
 	OnTrigger   func(*Game)
 	Repeatable  bool
+	CostMoney   float32
+	Severity    float32
 }
 
 type EventSave struct {
@@ -197,6 +201,7 @@ const (
 	Wheat   ProductType = "Wheat"
 	Potato  ProductType = "Potato"
 	Carrot  ProductType = "Carrot"
+	Solar   ProductType = "Solar"
 )
 
 // Define the type for the enum

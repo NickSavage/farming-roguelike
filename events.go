@@ -19,6 +19,7 @@ func (r *Run) InitEvents() ([]Event, error) {
 	triggerFunctions["Cell Tower"] = CellTowerOnTrigger
 	triggerFunctions["Land Clearage"] = LandClearageOnTrigger
 	triggerFunctions["Hire Help"] = HireHelpOnTrigger
+	triggerFunctions["Flood"] = FloodOnTrigger
 	r.triggerFunctions = triggerFunctions
 
 	file, err := os.Open("./assets/events.json")
@@ -45,6 +46,7 @@ func (r *Run) InitEvents() ([]Event, error) {
 			Description: item.Description,
 			Repeatable:  item.Repeatable,
 			OnTrigger:   triggerFunctions[item.Name],
+			Severity:    item.Severity,
 		}
 
 		events = append(events, event)
@@ -77,7 +79,7 @@ func (g *Game) PickEventChoices(choices int) []Event {
 			continue
 		}
 		log.Printf("event before %v", event)
-		event.Effects = g.RoundEndPriceChanges()
+		event.Effects = g.RoundEndPriceChanges(event)
 		log.Printf("event after %v", event.Effects)
 		results = append(results, event)
 		if len(results) >= choices {
@@ -87,11 +89,11 @@ func (g *Game) PickEventChoices(choices int) []Event {
 	return results
 }
 
-func (g *Game) RoundEndPriceChanges() []Effect {
+func (g *Game) RoundEndPriceChanges(event Event) []Effect {
 	effects := []Effect{}
 	productNames := g.GetProductNames()
 	for _, product := range productNames {
-		effect := g.RandomPriceChange(product)
+		effect := g.RandomPriceChange(product, event.Severity)
 		effects = append(effects, effect)
 	}
 	log.Printf("effects %v", effects)
@@ -103,6 +105,9 @@ func (g *Game) ApplyEvent(event Event) {
 	g.Run.Events = append(g.Run.Events, event)
 	g.ApplyPriceChanges(event)
 	event.OnTrigger(g)
+
+	g.Run.Money -= event.CostMoney
+
 	if !event.Repeatable {
 		log.Printf("save event")
 		g.Run.EventTracker[event.Name] = true
@@ -119,10 +124,19 @@ func (g *Game) ApplyPriceChanges(event Event) {
 	}
 }
 
-func (g *Game) RandomPriceChange(product ProductType) Effect {
-	baseRandom := rand.Float64()
+func (g *Game) RandomPriceChange(product ProductType, severity float32) Effect {
+	adjustment := severity / 10
+	baseRandom := rand.Float64() + float64(adjustment)
 
-	scaledRandom := baseRandom*0.2 - 0.1
+	var scaledRandom float64
+	if product == Solar {
+		scaledRandom = baseRandom*0.3 - 0.2
+
+	} else {
+		scaledRandom = baseRandom*0.2 - 0.1
+
+	}
+	log.Printf("base %v adjust %v final %v", baseRandom, adjustment, scaledRandom)
 	return Effect{
 		IsPriceChange:   true,
 		ProductImpacted: product,
@@ -138,6 +152,10 @@ func CheckCanUseEvent(g *Game, event Event) bool {
 		}
 		return true
 	} else {
+		if !g.Run.CanSpendMoney(event.CostMoney) {
+			return false
+
+		}
 		return true
 	}
 }
@@ -172,4 +190,16 @@ func CellTowerOnTrigger(g *Game) {
 func HireHelpOnTrigger(g *Game) {
 	g.Run.ActionsMaximum += 1
 	g.Run.ActionsRemaining += 1
+}
+
+func FloodOnTrigger(g *Game) {
+	for _, space := range g.Run.TechnologySpaces {
+		if !space.IsFilled {
+			continue
+		}
+		if space.TechnologyType != BuildingSpace {
+			continue
+		}
+		g.RemoveTech(space.Technology)
+	}
 }

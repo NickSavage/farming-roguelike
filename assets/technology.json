@@ -128,5 +128,23 @@
     "costMoney": 25,
     "description": "asdasd",
     "production": 50
+  },
+  {
+
+    "name": "Solar Panels",
+    "technologyType": "BuildingSpace",
+    "productType": "Solar",
+    "price": 1,
+    "rarity": "Impossible",
+    "shopIcon": "SolarPanelTile",
+    "tile": {
+      "id": "SolarPanelTile",
+      "width": 1,
+      "height": 1,
+      "fillSpace": true
+    },
+    "costMoney": 25,
+    "description": "asdasd",
+    "production": 50
   }
 ]
