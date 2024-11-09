@@ -38,6 +38,7 @@ func (g *Game) InitRun(loadSave bool) {
 		Products:              make(map[ProductType]*Product),
 		ActionsMaximum:        5,
 		ActionsRemaining:      5,
+		AutoSellRoundEnd:      false,
 	}
 
 	g.Run = run
@@ -205,7 +206,10 @@ func OnClickEndRound(g *Game) {
 	for _, tech := range g.Run.Technology {
 		tech.OnRoundEnd(g, tech)
 	}
-	g.Run.EndRoundMoney += g.sellAllProducts()
+	if g.Run.AutoSellRoundEnd {
+		g.Run.EndRoundMoney += g.sellAllProducts()
+
+	}
 	g.Run.Money += g.Run.EndRoundMoney * g.Run.Yield
 	g.Run.Money = float32(math.Round(float64(g.Run.Money)))
 	g.Run.EndRoundMoney = 0

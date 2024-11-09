@@ -49,6 +49,7 @@ type Run struct {
 	TechnologySpaces          []*TechnologySpace
 	ActionsRemaining          int
 	ActionsMaximum            int
+	AutoSellRoundEnd          bool //whether the player wants to autosell
 }
 
 type SaveFile struct {
@@ -124,6 +125,13 @@ type Technology struct {
 	ReadyToHarvest  bool
 	ReadyToTouch    bool
 	TempYield       float32
+	Inputs          []Input
+}
+
+type Input struct {
+	ProductType    ProductType
+	MaximumInput   float32
+	OutputPerInput float32
 }
 
 type TechnologySave struct {
@@ -229,11 +237,13 @@ type InitialData struct {
 	ProductType    string         `json:"productType"`
 	TechnologyType string         `json:"technologyType"`
 	CostMoney      float32        `json:"costMoney"`
+	CostActions    int            `json:"costActions"`
 	Production     float32        `json:"production"`
 	Rarity         string         `json:"rarity"`
 	Description    string         `json:"description"`
 	TileConfig     TechTileConfig `json:"tile"`
 	ShopIcon       string         `json:"shopIcon"`
+	Inputs         []Input        `json:"inputs"`
 }
 
 type TechTileConfig struct {

@@ -314,9 +314,9 @@ func DrawBoard(gi engine.GameInterface) {
 	g.drawGrid()
 	//	rl.EndMode2D()
 
-	g.DrawMessages()
 	g.HandleHover()
 	DrawHUD(g)
+	g.DrawMessages()
 	// g.DrawContextMenu(g.Scenes["Board"])
 }
 

@@ -22,6 +22,9 @@ func (b ShopBuildingButton) Render() {
 	canBuild := true
 
 	backgroundColor := rl.White
+	if b.Purchased {
+		backgroundColor = rl.LightGray
+	}
 
 	if !g.Run.CanSpendMoney(b.Technology.CostMoney) ||
 		!g.CanBuild(b.Technology) {

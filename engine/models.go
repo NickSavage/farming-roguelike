@@ -52,6 +52,7 @@ type Window struct {
 	Display    bool
 	Buttons    []Button
 	Components []UIComponent
+	Rectangle  rl.Rectangle
 	X          int32
 	Y          int32
 	Width      int32

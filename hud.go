@@ -75,10 +75,12 @@ func (g *Game) InitHUD() {
 		Name:       "Shop Window",
 		Display:    false,
 		DrawWindow: DrawShopWindow,
-		Width:      570,
-		X:          (g.screenWidth-g.SidebarWidth-570)/2 + g.SidebarWidth,
-		Y:          55,
-		Height:     500,
+		Rectangle: rl.Rectangle{
+			X:      float32((g.screenWidth-g.SidebarWidth-570)/2 + g.SidebarWidth),
+			Y:      55,
+			Width:  570,
+			Height: 500,
+		},
 	}
 
 	scene.Windows["EndRound1"] = &engine.Window{
@@ -297,6 +299,41 @@ func OnClickConfirmNextEvent(g *Game) {
 	g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["NextEvent"])
 }
 
+func (g *Game) DrawMarketSellButton(x, y float32, product *Product) {
+
+	if product.Quantity == 0 {
+		return
+	}
+
+	rect := rl.Rectangle{
+		X:      x - 3,
+		Y:      y,
+		Width:  50,
+		Height: 25,
+	}
+	rl.DrawRectangleRec(rect, rl.SkyBlue)
+	rl.DrawRectangleLinesEx(rect, 1, rl.Black)
+	rl.DrawText(fmt.Sprintf("Sell"), int32(x+5), int32(y), 20, rl.Black)
+
+	mousePosition := rl.GetMousePosition()
+	if rl.CheckCollisionPointRec(mousePosition, rect) {
+		if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
+
+			scene := g.Scenes["Board"]
+			result := g.SellProduct(product)
+			g.Run.Money += result
+
+			message := engine.Message{
+				Text:  fmt.Sprintf("%v", result),
+				Vec:   rl.Vector2{X: x, Y: y},
+				Timer: 30,
+			}
+			scene.Messages = append(scene.Messages, message)
+			g.ScreenSkip = true
+		}
+	}
+}
+
 func DrawMarketWindow(gi engine.GameInterface, win *engine.Window) {
 	g := gi.(*Game)
 	//	scene := g.Scenes["Board"]
@@ -328,6 +365,8 @@ func DrawMarketWindow(gi engine.GameInterface, win *engine.Window) {
 		value := g.Run.Products[product].TotalEarned
 		rl.DrawText(fmt.Sprintf("%v", value), x+columnOffset*4, y, 20, rl.Black)
 
+		g.DrawMarketSellButton(float32(x+columnOffset*5), float32(y), g.Run.Products[product])
+
 		if g.Run.Products[product].Quantity == 0 {
 			i += 1
 			continue
@@ -335,6 +374,7 @@ func DrawMarketWindow(gi engine.GameInterface, win *engine.Window) {
 		i += 1
 
 	}
+	g.DrawMessages()
 }
 
 func DrawGameOverWindow(gi engine.GameInterface, win *engine.Window) {

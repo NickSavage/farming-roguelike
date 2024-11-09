@@ -5,6 +5,7 @@
     "technologyType": "BuildingSpace",
     "price": 1.99,
     "costMoney": 50,
+    "costActions": 1,
     "production": 5,
     "rarity": "common",
     "description": "aoeaoeao",
@@ -22,6 +23,7 @@
     "technologyType": "PlantSpace",
     "price": 1,
     "costMoney": 50,
+    "costActions": 1,
     "production": 100,
     "rarity": "Common",
     "description": "asdasd",
@@ -38,6 +40,7 @@
     "rarity": "Common",
     "price": 2,
     "costMoney": 50,
+    "costActions": 1,
     "description": "asdasd",
     "production": 125,
     "productType": "Potato",
@@ -55,6 +58,7 @@
     "rarity": "Common",
     "price": 3,
     "costMoney": 100,
+    "costActions": 1,
     "description": "A delicious and healthy snack!",
     "production": 175,
     "productType": "Carrot",
@@ -80,6 +84,7 @@
       "fillSpace": false
     },
     "costMoney": 25,
+    "costActions": 1,
     "description": "asdasd"
   },
   {
@@ -95,6 +100,7 @@
       "fillSpace": false
     },
     "costMoney": 25,
+    "costActions": 1,
     "description": "asdasd"
   },
   {
@@ -110,6 +116,7 @@
       "fillSpace": false
     },
     "costMoney": 25,
+    "costActions": 1,
     "description": "asdasd",
     "production": 50
   },
@@ -126,11 +133,11 @@
       "fillSpace": false
     },
     "costMoney": 25,
+    "costActions": 1,
     "description": "asdasd",
     "production": 50
   },
   {
-
     "name": "Solar Panels",
     "technologyType": "BuildingSpace",
     "productType": "Solar",
@@ -144,7 +151,30 @@
       "fillSpace": true
     },
     "costMoney": 25,
+    "costActions": 1,
     "description": "asdasd",
     "production": 50
+  },
+  {
+    "name": "Abatoir",
+    "technologyType": "BuildingSpace",
+    "productType": "Beef",
+    "price": 10,
+    "rarity": "Rare",
+    "shopIcon": "SlaughterhouseTile",
+    "tile": {
+      "id": "SlaughterhouseTile",
+      "width": 3,
+      "height": 3,
+      "fillSpace": true
+    },
+    "costMoney": 25,
+    "costActions": 1,
+    "description": "asdasd",
+    "inputs": [{
+      "productType": "Cow",
+      "maximumInput": 10,
+      "outputPerInput": 1
+    }]
   }
 ]

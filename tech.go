@@ -65,6 +65,7 @@ func (g *Game) CreateTechFromInitialData(input InitialData) *Technology {
 		TileFillSpace:  input.TileConfig.FillSpace,
 		ShopIcon:       input.ShopIcon,
 		CostMoney:      input.CostMoney,
+		CostActions:    input.CostActions,
 		Square:         BoardSquare{},
 		TempYield:      1,
 		ReadyToTouch:   true,
@@ -95,9 +96,8 @@ func (g *Game) LoadInitialData() {
 	// Create an empty map to store the data
 	dataMap := make(map[string]InitialData)
 
-	// Iterate over each item in the initialData slice
 	for _, item := range initialData {
-		// Store the item in the map with its product type as key
+		log.Printf("item %v", item)
 		dataMap[item.Name] = item
 	}
 	g.InitialData = dataMap

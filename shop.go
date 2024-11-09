@@ -59,13 +59,12 @@ func (g *Game) InitShopWindow() {
 func (g *Game) InitShopRoundComponents() {
 	window := g.Scenes["Board"].Windows["ShopWindow"]
 	window.Components = make([]engine.UIComponent, 0)
-
 	buildings := g.Run.CurrentRoundShopBuildings
 
 	n := 0
 
-	var x float32 = float32(window.X)
-	var y float32 = float32(window.Y)
+	x := window.Rectangle.X
+	y := window.Rectangle.Y
 
 	for i, building := range buildings {
 		// for i, _ := range buildings {
@@ -92,9 +91,11 @@ func DrawShopWindow(gi engine.GameInterface, win *engine.Window) {
 	g := gi.(*Game)
 	window := g.Scenes["Board"].Windows["ShopWindow"]
 
-	var x int32 = window.X
-	var y int32 = window.Y
-	rl.DrawRectangle(x, y, window.Width, window.Height, rl.White)
+	x := int32(window.Rectangle.X)
+	y := int32(window.Rectangle.Y)
+
+	rl.DrawRectangleRec(window.Rectangle, rl.White)
+	rl.DrawRectangleLinesEx(window.Rectangle, 5, rl.Black)
 	rl.DrawText("Shop", x+5, y+5, 30, rl.Black)
 
 }
