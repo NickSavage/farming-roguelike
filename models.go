@@ -125,7 +125,7 @@ type Technology struct {
 	ReadyToHarvest  bool
 	ReadyToTouch    bool
 	TempYield       float32
-	Inputs          []Input
+	Input           Input
 }
 
 type Input struct {
@@ -210,6 +210,8 @@ const (
 	Potato  ProductType = "Potato"
 	Carrot  ProductType = "Carrot"
 	Solar   ProductType = "Solar"
+	Cow     ProductType = "Cow"
+	Beef    ProductType = "Beef"
 )
 
 // Define the type for the enum
@@ -243,7 +245,7 @@ type InitialData struct {
 	Description    string         `json:"description"`
 	TileConfig     TechTileConfig `json:"tile"`
 	ShopIcon       string         `json:"shopIcon"`
-	Inputs         []Input        `json:"inputs"`
+	Input          Input          `json:"input"`
 }
 
 type TechTileConfig struct {

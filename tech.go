@@ -21,6 +21,9 @@ func (g *Game) InitTechnology() {
 	tech["Potato Field"] = g.CreatePotatoTech()
 	tech["Carrot Field"] = g.CreateCarrotTech()
 
+	tech["Cow Pasture"] = g.CreateCowPastureTech()
+	tech["Cow Slaughterhouse"] = g.CreateCowSlaughterhouseTech()
+
 	tech["Workstation"] = g.CreateWorkstationTech()
 	tech["Fertilizer"] = g.CreateFertilizerTech()
 	tech["Chicken Egg Warmer"] = g.CreateChickenEggWarmer()
@@ -45,6 +48,8 @@ func (g *Game) CanBuild(tech *Technology) bool {
 			if g.Run.CurrentSeason == Spring || g.Run.CurrentSeason == Autumn {
 				return true
 			}
+		} else if tech.Name == "Cow Pasture" {
+			return true
 		}
 		return false
 
@@ -71,6 +76,7 @@ func (g *Game) CreateTechFromInitialData(input InitialData) *Technology {
 		ReadyToTouch:   true,
 		InitialPrice:   input.Price,
 		BaseProduction: input.Production,
+		Input:          input.Input,
 	}
 }
 
@@ -472,9 +478,9 @@ func SolarPanelOnClick(g *Game, tech *Technology) string {
 func (g *Game) CreateFertilizerTech() *Technology {
 	tech := g.CreateTechFromInitialData(g.InitialData["Fertilizer"])
 
-	tech.OnBuild = CellTowerOnBuild
-	tech.OnClick = CellTowerOnClick
-	tech.OnRoundEnd = CellTowerRoundEnd
+	tech.OnBuild = FertilizerOnBuild
+	tech.OnClick = FertilizerOnClick
+	tech.OnRoundEnd = FertilizerRoundEnd
 
 	return tech
 }
@@ -490,4 +496,84 @@ func FertilizerRoundEnd(g *Game, tech *Technology) {
 }
 func FertilizerOnClick(g *Game, tech *Technology) string {
 	return ""
+}
+
+// cow slaughterhouse
+
+func (g *Game) CreateCowSlaughterhouseTech() *Technology {
+
+	tech := g.CreateTechFromInitialData(g.InitialData["Cow Slaughterhouse"])
+
+	tech.OnBuild = CowSlaughterhouseOnBuild
+	tech.OnClick = CowSlaughterhouseOnClick
+	tech.OnRoundEnd = CowSlaughterhouseRoundEnd
+
+	return tech
+}
+
+func CowSlaughterhouseOnBuild(g *Game, tech *Technology) error {
+	g.InitProduct(tech.ProductType, tech.InitialPrice)
+	g.InitProduct(Cow, 2)
+	return nil
+
+}
+
+func CowSlaughterhouseOnClick(g *Game, tech *Technology) string {
+	if tech.ReadyToHarvest {
+		var input float32
+		input = tech.Input.MaximumInput
+		market := g.ConsumeOrBuyProduct(g.Run.Products["Cow"], tech.Input.MaximumInput)
+
+		produced := input * tech.Input.OutputPerInput * g.Run.Productivity
+		g.Run.Products[Beef].Quantity += produced
+		tech.ReadyToHarvest = false
+		if market > 0 {
+			return fmt.Sprintf("Beef: %v (-$%v)", produced, market)
+
+		} else {
+			return fmt.Sprintf("Beef: %v (-%v Cow)", produced, input)
+		}
+	}
+	return ""
+
+}
+
+func CowSlaughterhouseRoundEnd(g *Game, tech *Technology) {
+
+	tech.ReadyToHarvest = true
+}
+
+// cow pasture
+
+func (g *Game) CreateCowPastureTech() *Technology {
+
+	tech := g.CreateTechFromInitialData(g.InitialData["Cow Pasture"])
+
+	tech.OnBuild = CowPastureOnBuild
+	tech.OnClick = CowPastureOnClick
+	tech.OnRoundEnd = CowPastureRoundEnd
+
+	return tech
+}
+
+func CowPastureOnBuild(g *Game, tech *Technology) error {
+	g.InitProduct(tech.ProductType, tech.InitialPrice)
+	g.InitProduct(Cow, 2)
+	return nil
+
+}
+
+func CowPastureOnClick(g *Game, tech *Technology) string {
+	if tech.ReadyToHarvest {
+		produced := g.RoundEndProduce(tech)
+		g.Run.Products["Cow"].Quantity += produced
+		return fmt.Sprintf("Cow: %v", produced)
+	}
+	return ""
+
+}
+
+func CowPastureRoundEnd(g *Game, tech *Technology) {
+
+	tech.ReadyToHarvest = true
 }

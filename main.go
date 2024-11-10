@@ -68,6 +68,17 @@ func (g *Game) LoadAssets() {
 	image = rl.LoadImage("assets/icons/solarpanels.png")
 	rl.ImageResize(image, 45, 45)
 	g.Data["SolarPanelTile"] = LoadImage(image, 0, 0, 1, 1)
+
+	image = rl.LoadImage("assets/icons/cowslaughterhouse.png")
+	g.Data["CowSlaughterhouseTile"] = LoadImage(image, 0, 0, 3, 3)
+	rl.ImageResize(image, 90, 90)
+	g.Data["CowSlaughterhouseShopTile"] = LoadImage(image, 0, 0, 2, 2)
+
+	image = rl.LoadImage("assets/icons/cowpasture.png")
+	rl.ImageResize(image, 225, 225)
+	g.Data["CowPastureTile"] = LoadImage(image, 0, 0, 5, 5)
+	rl.ImageResize(image, 90, 90)
+	g.Data["CowPastureShopTile"] = LoadImage(image, 0, 0, 2, 2)
 }
 
 func (g *Game) LoadScenes() {

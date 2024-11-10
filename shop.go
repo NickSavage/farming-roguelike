@@ -30,6 +30,7 @@ func (g *Game) ShopChooseTech(tech *Technology) error {
 func ShopButtonOnClick(g *Game, b ShopBuildingButton) {
 	window := g.Scenes["Board"].Windows["ShopWindow"]
 	err := g.ShopChooseTech(b.Technology)
+	log.Printf("err %v", err)
 	log.Printf("does this happen???")
 	if err == nil {
 		// this is a bit of a cludge, think about another way at some point

@@ -233,10 +233,10 @@ func OnClickEndRound(g *Game) {
 		g.Run.MoneyRequirement = g.Run.calculateMoneyRequirement()
 		g.Run.CurrentRoundShopPlants = g.ShopRandomPlants(2)
 		g.Run.CurrentRoundShopBuildings = g.ShopRandomBuildings(3)
+		g.InitShopRoundComponents()
 	}
 	g.Run.SaveRun()
 
-	g.InitShopRoundComponents()
 }
 
 func (g *Game) CheckGameOver() bool {
@@ -346,6 +346,21 @@ func (g *Game) sellAllProducts() float32 {
 
 	log.Printf("sell %v", result)
 	return result
+}
+
+func (g *Game) ConsumeOrBuyProduct(product *Product, maximumInput float32) float32 {
+
+	var input float32
+	var market float32 = 0
+	if product.Quantity > maximumInput {
+		product.Quantity -= input
+
+	} else {
+		market = (maximumInput - product.Quantity) * product.Price
+		product.Quantity = 0
+		g.Run.Money -= market
+	}
+	return market
 }
 
 func (g *Game) SellProduct(product *Product) float32 {

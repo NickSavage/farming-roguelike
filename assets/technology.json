@@ -156,25 +156,43 @@
     "production": 50
   },
   {
-    "name": "Abatoir",
+    "name": "Cow Pasture",
+    "technologyType": "PlantSpace",
+    "productType": "Cow",
+    "price": 2,
+    "rarity": "Rare",
+    "shopIcon": "CowPastureShopTile",
+    "tile": {
+      "id": "CowPastureTile",
+      "width": 5,
+      "height": 5,
+      "fillSpace": false
+    },
+    "costMoney": 25,
+    "costActions": 1,
+    "production": 10,
+    "description": "asdasd"
+  },
+  {
+    "name": "Cow Slaughterhouse",
     "technologyType": "BuildingSpace",
     "productType": "Beef",
     "price": 10,
     "rarity": "Rare",
-    "shopIcon": "SlaughterhouseTile",
+    "shopIcon": "CowSlaughterhouseShopTile",
     "tile": {
-      "id": "SlaughterhouseTile",
+      "id": "CowSlaughterhouseTile",
       "width": 3,
       "height": 3,
-      "fillSpace": true
+      "fillSpace": false
     },
     "costMoney": 25,
     "costActions": 1,
     "description": "asdasd",
-    "inputs": [{
+    "input": {
       "productType": "Cow",
       "maximumInput": 10,
       "outputPerInput": 1
-    }]
+    }
   }
 ]
