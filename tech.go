@@ -396,6 +396,7 @@ func (g *Game) CreateChickenEggWarmer() *Technology {
 }
 
 func ChickenEggWarmerOnBuild(g *Game, tech *Technology) error {
+	g.InitProduct(tech.ProductType, tech.InitialPrice)
 	g.Run.Products["Chicken"].Yield += 0.05
 	tech.ReadyToTouch = false
 	return nil
@@ -450,7 +451,6 @@ func (g *Game) CreateSolarPanelTech() *Technology {
 func SolarPanelOnBuild(g *Game, tech *Technology) error {
 	tech.ReadyToTouch = false
 	g.InitProduct(tech.ProductType, tech.InitialPrice)
-
 	return nil
 
 }

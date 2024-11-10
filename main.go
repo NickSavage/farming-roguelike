@@ -156,8 +156,8 @@ func main() {
 
 	// dev shit
 
-	g.InitRun(false)
-	g.ActivateScene("Board")
+	// g.InitRun(false)
+	// g.ActivateScene("Board")
 
 	for !rl.WindowShouldClose() {
 		g.Counter += 1

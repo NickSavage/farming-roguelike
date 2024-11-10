@@ -76,16 +76,6 @@ func (g *Game) InitShopRoundComponents() {
 		button.ExpandedButton = true
 		window.Components = append(window.Components, button)
 	}
-
-	plants := g.Run.CurrentRoundShopPlants
-
-	for i, plant := range plants {
-		rect := rl.NewRectangle(x+50+float32(i*105), y+355, 100, 100)
-		button := g.NewShopPlantButton(rect, plant)
-		n += 1
-		button.Position = n
-		window.Components = append(window.Components, button)
-	}
 }
 
 func DrawShopWindow(gi engine.GameInterface, win *engine.Window) {

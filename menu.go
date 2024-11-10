@@ -60,41 +60,41 @@ func (g *Game) InitGameMenu() {
 		),
 		OnClickNewRun,
 	)
-	scene.Components = append(scene.Components, newButton)
+	scene.Components = append(scene.Components, &newButton)
 	continueButton := g.NewButton(
 		"Continue Run",
 		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2-60, 200, 50),
 		OnClickContinueRun,
 	)
-	scene.Components = append(scene.Components, continueButton)
+	scene.Components = append(scene.Components, &continueButton)
 
 	settingsButton := g.NewButton(
 		"Settings",
 		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+60, 200, 50),
 		OnClickSettings,
 	)
-	scene.Components = append(scene.Components, settingsButton)
+	scene.Components = append(scene.Components, &settingsButton)
 
 	statsButton := g.NewButton(
 		"Statistics",
 		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+120, 200, 50),
 		OnClickStats,
 	)
-	scene.Components = append(scene.Components, statsButton)
+	scene.Components = append(scene.Components, &statsButton)
 
 	aboutButton := g.NewButton(
 		"About",
 		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+180, 200, 50),
 		OnClickAbout,
 	)
-	scene.Components = append(scene.Components, aboutButton)
+	scene.Components = append(scene.Components, &aboutButton)
 
 	exitButton := g.NewButton(
 		"Exit",
 		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+240, 200, 50),
 		OnClickExit,
 	)
-	scene.Components = append(scene.Components, exitButton)
+	scene.Components = append(scene.Components, &exitButton)
 
 	scene.KeyBindingFunctions = make(map[string]func(engine.GameInterface))
 
@@ -105,7 +105,7 @@ func (g *Game) InitGameMenu() {
 		DrawWindow: DrawStatsWindow,
 		Buttons:    make([]engine.Button, 1),
 	}
-	scene.Windows["Stats"].Components = append(scene.Windows["Stats"].Components, g.NewButton(
+	statsCloseButton := g.NewButton(
 		"Close",
 		rl.NewRectangle(
 			50,
@@ -114,7 +114,8 @@ func (g *Game) InitGameMenu() {
 			50,
 		),
 		CloseStatsWindow,
-	))
+	)
+	scene.Windows["Stats"].Components = append(scene.Windows["Stats"].Components, &statsCloseButton)
 
 	scene.Windows["About"] = &engine.Window{
 		Name:       "About",
@@ -123,7 +124,7 @@ func (g *Game) InitGameMenu() {
 		Buttons:    make([]engine.Button, 1),
 	}
 
-	scene.Windows["About"].Components = append(scene.Windows["About"].Components, g.NewButton(
+	button := g.NewButton(
 		"Close",
 		rl.NewRectangle(
 			50,
@@ -132,7 +133,8 @@ func (g *Game) InitGameMenu() {
 			50,
 		),
 		CloseAboutWindow,
-	))
+	)
+	scene.Windows["About"].Components = append(scene.Windows["About"].Components, &button)
 }
 
 func DrawGameMenu(gi engine.GameInterface) {
@@ -140,6 +142,25 @@ func DrawGameMenu(gi engine.GameInterface) {
 }
 
 func UpdateGameMenu(gi engine.GameInterface) {
+	g := gi.(*Game)
+	scene := g.Scenes["GameMenu"]
+	if rl.IsKeyPressed(rl.KeyDown) {
+		if scene.SelectedComponentIndex == len(scene.Components)-1 {
+			scene.SelectedComponentIndex = 0
+		} else {
+			scene.SelectedComponentIndex += 1
+		}
+	}
+	if scene.SelectedComponentIndex > 0 {
+		for i, _ := range scene.Components {
+			if i == scene.SelectedComponentIndex {
+				scene.Components[i].Select()
+			} else {
+				scene.Components[i].Unselect()
+			}
+		}
+	}
+
 }
 
 func DrawStatsWindow(gi engine.GameInterface, win *engine.Window) {

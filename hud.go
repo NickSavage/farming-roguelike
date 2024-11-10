@@ -76,9 +76,9 @@ func (g *Game) InitHUD() {
 		Display:    false,
 		DrawWindow: DrawShopWindow,
 		Rectangle: rl.Rectangle{
-			X:      float32((g.screenWidth-g.SidebarWidth-570)/2 + g.SidebarWidth),
+			X:      float32((g.screenWidth-g.SidebarWidth-890)/2 + g.SidebarWidth),
 			Y:      55,
-			Width:  570,
+			Width:  890,
 			Height: 500,
 		},
 	}
@@ -116,28 +116,28 @@ func (g *Game) InitHUD() {
 		rl.NewRectangle(10, 240, 150, 40),
 		OnClickShopWindowButton,
 	)
-	scene.Components = append(scene.Components, shopButton)
+	scene.Components = append(scene.Components, &shopButton)
 
 	priceButton := g.NewButton(
 		"Market",
 		rl.NewRectangle(10, 290, 150, 40),
 		OnClickOpenMarketWindow,
 	)
-	scene.Components = append(scene.Components, priceButton)
+	scene.Components = append(scene.Components, &priceButton)
 
 	viewEndRoundButton := g.NewButton(
 		"End Round",
 		rl.NewRectangle(10, 340, 150, 40),
 		OnClickOpenEndRoundPage1Window,
 	)
-	scene.Components = append(scene.Components, viewEndRoundButton)
+	scene.Components = append(scene.Components, &viewEndRoundButton)
 
 	settingsButton := g.NewButton(
 		"Settings",
 		rl.NewRectangle(10, float32(g.screenHeight)-60, 150, 40),
 		OnClickOpenSettings,
 	)
-	scene.Components = append(scene.Components, settingsButton)
+	scene.Components = append(scene.Components, &settingsButton)
 }
 
 func UpdateHUD(g *Game) {
@@ -238,7 +238,7 @@ func DrawEndRoundWindowPage1(gi engine.GameInterface, win *engine.Window) {
 		rl.NewRectangle(500, 500, 150, 40),
 		OnClickEndRoundConfirmButton,
 	)
-	win.Components = append(win.Components, button)
+	win.Components = append(win.Components, &button)
 }
 
 func (g *Game) HandleChooseEvent(event Event) {

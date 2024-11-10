@@ -5,6 +5,14 @@ import (
 	"log"
 )
 
+type UIComponent interface {
+	Render()
+	OnClick()
+	Rect() rl.Rectangle
+	Select()
+	Unselect()
+}
+
 type Dropdown struct {
 	Rectangle     rl.Rectangle
 	Options       []*Option
@@ -28,8 +36,9 @@ type Button struct {
 	Text            string
 	TextColor       rl.Color
 	TextSize        int32
-	Active          bool
+	Active          bool // whether button is active or disabled
 	OnClickFunction func(GameInterface)
+	Selected        bool // whether user has selected the button with a controller
 }
 
 func DefaultOptionOnChange(g *GameInterface, o *Option) {}
@@ -77,6 +86,9 @@ func (dropdown *Dropdown) Rect() rl.Rectangle {
 	return dropdown.Rectangle
 }
 
+func (dropdown *Dropdown) Select()   {}
+func (dropdown *Dropdown) Unselect() {}
+
 func (button Button) Render() {
 	var boxColor rl.Color
 	mousePosition := rl.GetMousePosition()
@@ -84,6 +96,8 @@ func (button Button) Render() {
 		if button.HoverColor == rl.Blank {
 			button.HoverColor = button.Color
 		}
+		boxColor = button.HoverColor
+	} else if button.Selected {
 		boxColor = button.HoverColor
 	} else {
 		boxColor = button.Color
@@ -124,4 +138,12 @@ func (button *Button) WasButtonClicked() bool {
 		}
 	}
 	return false
+}
+
+func (button *Button) Select() {
+	button.Selected = true
+}
+
+func (button *Button) Unselect() {
+	button.Selected = false
 }

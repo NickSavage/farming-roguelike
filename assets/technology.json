@@ -74,6 +74,7 @@
   {
     "name": "Chicken Egg Warmer",
     "productType": "Chicken",
+    "price": 2,
     "technologyType": "BuildingSpace",
     "rarity": "Rare",
     "shopIcon": "ChickenEggWarmerTile",

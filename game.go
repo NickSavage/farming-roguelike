@@ -70,8 +70,7 @@ func (g *Game) InitRun(loadSave bool) {
 
 	g.Run.MoneyRequirement = g.Run.calculateMoneyRequirement()
 
-	g.Run.CurrentRoundShopPlants = g.ShopRandomPlants(2)
-	g.Run.CurrentRoundShopBuildings = g.ShopRandomBuildings(3)
+	g.Run.CurrentRoundShopBuildings = g.ShopRandomBuildings(5)
 	g.InitShopRoundComponents()
 }
 

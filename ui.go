@@ -73,6 +73,9 @@ func (b ShopBuildingButton) Rect() rl.Rectangle {
 	return b.rect
 }
 
+func (b ShopBuildingButton) Select()   {}
+func (b ShopBuildingButton) Unselect() {}
+
 func (g *Game) NewShopButton(rect rl.Rectangle, tech *Technology) ShopBuildingButton {
 	return ShopBuildingButton{
 		g:          g,

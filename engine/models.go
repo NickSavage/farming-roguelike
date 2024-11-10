@@ -22,12 +22,6 @@ func (g *Game) Scenes() map[string]*Scene {
 	return g.GameScenes
 }
 
-type UIComponent interface {
-	Render()
-	OnClick()
-	Rect() rl.Rectangle
-}
-
 type Scene struct {
 	Name                   string
 	Active                 bool

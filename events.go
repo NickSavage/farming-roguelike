@@ -47,6 +47,7 @@ func (r *Run) InitEvents() ([]Event, error) {
 			Repeatable:  item.Repeatable,
 			OnTrigger:   triggerFunctions[item.Name],
 			Severity:    item.Severity,
+			CostMoney:   item.CostMoney,
 		}
 
 		events = append(events, event)

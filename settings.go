@@ -45,7 +45,7 @@ func (g *Game) InitSettingsMenu() {
 	rect := rl.NewRectangle(10, float32(g.screenHeight)-50, 150, 50)
 
 	button := g.NewButton("Save", rect, SaveButtonOnClick)
-	scene.Components = append(scene.Components, button)
+	scene.Components = append(scene.Components, &button)
 
 	scene.Components = make([]engine.UIComponent, 0)
 	options := []*engine.Option{
