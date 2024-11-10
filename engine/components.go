@@ -11,16 +11,25 @@ type UIComponent interface {
 	Rect() rl.Rectangle
 	Select()
 	Unselect()
+	Directions() *SelectDirections
+}
+
+type SelectDirections struct {
+	Up    int
+	Left  int
+	Right int
+	Down  int
 }
 
 type Dropdown struct {
-	Rectangle     rl.Rectangle
-	Options       []*Option
-	CurrentOption *Option
-	Color         rl.Color
-	TextColor     rl.Color
-	TextSize      int32
-	IsOpen        bool
+	Rectangle        rl.Rectangle
+	Options          []*Option
+	CurrentOption    *Option
+	Color            rl.Color
+	TextColor        rl.Color
+	TextSize         int32
+	IsOpen           bool
+	SelectDirections SelectDirections
 }
 
 type Option struct {
@@ -30,15 +39,16 @@ type Option struct {
 
 type Button struct {
 	GameInterface
-	Rectangle       rl.Rectangle
-	Color           rl.Color
-	HoverColor      rl.Color
-	Text            string
-	TextColor       rl.Color
-	TextSize        int32
-	Active          bool // whether button is active or disabled
-	OnClickFunction func(GameInterface)
-	Selected        bool // whether user has selected the button with a controller
+	Rectangle        rl.Rectangle
+	Color            rl.Color
+	HoverColor       rl.Color
+	Text             string
+	TextColor        rl.Color
+	TextSize         int32
+	Active           bool // whether button is active or disabled
+	OnClickFunction  func(GameInterface)
+	Selected         bool // whether user has selected the button with a controller
+	SelectDirections SelectDirections
 }
 
 func DefaultOptionOnChange(g *GameInterface, o *Option) {}
@@ -86,8 +96,9 @@ func (dropdown *Dropdown) Rect() rl.Rectangle {
 	return dropdown.Rectangle
 }
 
-func (dropdown *Dropdown) Select()   {}
-func (dropdown *Dropdown) Unselect() {}
+func (dropdown *Dropdown) Select()                       {}
+func (dropdown *Dropdown) Unselect()                     {}
+func (dropdown *Dropdown) Directions() *SelectDirections { return &dropdown.SelectDirections }
 
 func (button Button) Render() {
 	var boxColor rl.Color
@@ -146,4 +157,31 @@ func (button *Button) Select() {
 
 func (button *Button) Unselect() {
 	button.Selected = false
+}
+func (button *Button) Directions() *SelectDirections { return &button.SelectDirections }
+
+type BlankComponent struct {
+	SelectDirections SelectDirections
+}
+
+func (c *BlankComponent) Render() {
+
+}
+
+func (c *BlankComponent) OnClick() {}
+
+func (c *BlankComponent) Rect() rl.Rectangle {
+	return rl.NewRectangle(0, 0, 0, 0)
+}
+
+func (c *BlankComponent) Select()   {}
+func (c *BlankComponent) Unselect() {}
+func (c *BlankComponent) Directions() *SelectDirections {
+	return &c.SelectDirections
+}
+
+func NewBlankComponent() BlankComponent {
+	return BlankComponent{
+		SelectDirections: SelectDirections{},
+	}
 }

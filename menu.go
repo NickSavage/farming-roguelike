@@ -49,7 +49,24 @@ func OnClickExit(gi engine.GameInterface) {
 func (g *Game) InitGameMenu() {
 	log.Printf("init menu")
 
+	// 0
 	scene := g.Scenes["GameMenu"]
+
+	blank := engine.NewBlankComponent()
+	blank.SelectDirections.Up = 6
+	blank.SelectDirections.Down = len(scene.Components) + 1
+
+	scene.Components = append(scene.Components, &blank)
+	continueButton := g.NewButton(
+		"Continue Run",
+		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2-60, 200, 50),
+		OnClickContinueRun,
+	)
+	continueButton.SelectDirections.Up = 6
+	continueButton.SelectDirections.Down = len(scene.Components) + 1
+	scene.Components = append(scene.Components, &continueButton)
+
+	// 1
 	newButton := g.NewButton(
 		"New Run",
 		rl.NewRectangle(
@@ -60,40 +77,46 @@ func (g *Game) InitGameMenu() {
 		),
 		OnClickNewRun,
 	)
+	newButton.SelectDirections.Up = len(scene.Components) - 1
+	newButton.SelectDirections.Down = len(scene.Components) + 1
 	scene.Components = append(scene.Components, &newButton)
-	continueButton := g.NewButton(
-		"Continue Run",
-		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2-60, 200, 50),
-		OnClickContinueRun,
-	)
-	scene.Components = append(scene.Components, &continueButton)
-
+	// 2
 	settingsButton := g.NewButton(
 		"Settings",
 		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+60, 200, 50),
 		OnClickSettings,
 	)
+	settingsButton.SelectDirections.Up = len(scene.Components) - 1
+	settingsButton.SelectDirections.Down = len(scene.Components) + 1
 	scene.Components = append(scene.Components, &settingsButton)
-
+	// 3
 	statsButton := g.NewButton(
 		"Statistics",
 		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+120, 200, 50),
 		OnClickStats,
 	)
+	statsButton.SelectDirections.Up = len(scene.Components) - 1
+	statsButton.SelectDirections.Down = len(scene.Components) + 1
 	scene.Components = append(scene.Components, &statsButton)
 
+	// 4
 	aboutButton := g.NewButton(
 		"About",
 		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+180, 200, 50),
 		OnClickAbout,
 	)
+	aboutButton.SelectDirections.Up = len(scene.Components) - 1
+	aboutButton.SelectDirections.Down = len(scene.Components) + 1
 	scene.Components = append(scene.Components, &aboutButton)
 
+	// 5
 	exitButton := g.NewButton(
 		"Exit",
 		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+240, 200, 50),
 		OnClickExit,
 	)
+	exitButton.SelectDirections.Up = len(scene.Components) - 1
+	exitButton.SelectDirections.Down = 1
 	scene.Components = append(scene.Components, &exitButton)
 
 	scene.KeyBindingFunctions = make(map[string]func(engine.GameInterface))
@@ -142,27 +165,26 @@ func DrawGameMenu(gi engine.GameInterface) {
 }
 
 func UpdateGameMenu(gi engine.GameInterface) {
-	g := gi.(*Game)
-	scene := g.Scenes["GameMenu"]
-	if rl.IsKeyPressed(rl.KeyDown) {
-		if scene.SelectedComponentIndex == len(scene.Components)-1 {
-			scene.SelectedComponentIndex = 0
-		} else {
-			scene.SelectedComponentIndex += 1
-		}
-	}
-	if scene.SelectedComponentIndex > 0 {
-		for i, _ := range scene.Components {
-			if i == scene.SelectedComponentIndex {
-				scene.Components[i].Select()
-			} else {
-				scene.Components[i].Unselect()
-			}
-		}
-	}
+	// g := gi.(*Game)
+	// scene := g.Scenes["GameMenu"]
+	// if rl.IsKeyPressed(rl.KeyDown) {
+	// 	if scene.SelectedComponentIndex == len(scene.Components)-1 {
+	// 		scene.SelectedComponentIndex = 0
+	// 	} else {
+	// 		scene.SelectedComponentIndex += 1
+	// 	}
+	// }
+	// if scene.SelectedComponentIndex > 0 {
+	// 	for i, _ := range scene.Components {
+	// 		if i == scene.SelectedComponentIndex {
+	// 			scene.Components[i].Select()
+	// 		} else {
+	// 			scene.Components[i].Unselect()
+	// 		}
+	// 	}
+	// }
 
 }
-
 func DrawStatsWindow(gi engine.GameInterface, win *engine.Window) {
 	g := gi.(*Game)
 	rect := rl.Rectangle{

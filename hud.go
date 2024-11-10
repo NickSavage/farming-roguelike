@@ -111,11 +111,18 @@ func (g *Game) InitHUD() {
 	g.LoadSceneShortcuts("Board")
 	log.Printf("shorcuts %v", scene.KeyBindings)
 
+	blank := engine.NewBlankComponent()
+	blank.SelectDirections.Up = 4
+	blank.SelectDirections.Down = len(scene.Components) + 1
+
+	scene.Components = append(scene.Components, &blank)
 	shopButton := g.NewButton(
 		"Shop",
 		rl.NewRectangle(10, 240, 150, 40),
 		OnClickShopWindowButton,
 	)
+	shopButton.SelectDirections.Up = 4
+	shopButton.SelectDirections.Down = len(scene.Components) + 1
 	scene.Components = append(scene.Components, &shopButton)
 
 	priceButton := g.NewButton(
@@ -123,6 +130,8 @@ func (g *Game) InitHUD() {
 		rl.NewRectangle(10, 290, 150, 40),
 		OnClickOpenMarketWindow,
 	)
+	priceButton.SelectDirections.Up = len(scene.Components) - 1
+	priceButton.SelectDirections.Down = len(scene.Components) + 1
 	scene.Components = append(scene.Components, &priceButton)
 
 	viewEndRoundButton := g.NewButton(
@@ -130,6 +139,8 @@ func (g *Game) InitHUD() {
 		rl.NewRectangle(10, 340, 150, 40),
 		OnClickOpenEndRoundPage1Window,
 	)
+	viewEndRoundButton.SelectDirections.Up = len(scene.Components) - 1
+	viewEndRoundButton.SelectDirections.Down = len(scene.Components) + 1
 	scene.Components = append(scene.Components, &viewEndRoundButton)
 
 	settingsButton := g.NewButton(
@@ -137,6 +148,8 @@ func (g *Game) InitHUD() {
 		rl.NewRectangle(10, float32(g.screenHeight)-60, 150, 40),
 		OnClickOpenSettings,
 	)
+	settingsButton.SelectDirections.Up = len(scene.Components) - 1
+	settingsButton.SelectDirections.Down = 1
 	scene.Components = append(scene.Components, &settingsButton)
 }
 

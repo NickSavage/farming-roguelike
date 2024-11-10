@@ -39,6 +39,7 @@ type Scene struct {
 	KeyBindings            map[string]*KeyBinding
 	Components             []UIComponent
 	SelectedComponentIndex int
+	SelectedKey            int32
 }
 
 type Window struct {

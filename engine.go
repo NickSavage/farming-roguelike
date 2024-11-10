@@ -70,14 +70,15 @@ func (g *Game) ActivateScene(sceneName string) {
 
 func (g *Game) NewButton(text string, rect rl.Rectangle, onClick func(engine.GameInterface)) engine.Button {
 	button := engine.Button{
-		GameInterface:   g,
-		Rectangle:       rect,
-		Color:           rl.SkyBlue,
-		HoverColor:      rl.LightGray,
-		Text:            text,
-		TextColor:       rl.Black,
-		Active:          true,
-		OnClickFunction: onClick,
+		GameInterface:    g,
+		Rectangle:        rect,
+		Color:            rl.SkyBlue,
+		HoverColor:       rl.LightGray,
+		Text:             text,
+		TextColor:        rl.Black,
+		Active:           true,
+		OnClickFunction:  onClick,
+		SelectDirections: engine.SelectDirections{},
 	}
 	return button
 }
@@ -119,24 +120,53 @@ func (g *Game) Draw() {
 }
 
 func (g *Game) Update() {
+	// check arrow keys
 	for _, scene := range g.Scenes {
 		if !scene.Active {
 			continue
 		}
+		key := rl.GetKeyPressed()
+		if key != int32(scene.SelectedKey) {
+			scene.SelectedKey = key
+
+			if key == rl.KeyDown {
+				scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Down
+			} else if key == rl.KeyUp {
+				scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Up
+			} else if key == rl.KeyLeft {
+
+				scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Left
+			} else if key == rl.KeyRight {
+				scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Right
+
+			}
+		}
+		// if rl.IsKeyPressed(rl.KeyDown) && scene.SelectedKey != rl.KeyDown {
+		// 	scene.SelectedKey = rl.KeyDown
+		// 	scene.SelectedComponentIndex += 1
+
+		// }
 		for _, binding := range scene.KeyBindings {
+			log.Printf("bindings %v", scene.KeyBindings)
 			if rl.IsKeyPressed(binding.Current) && !(g.ButtonSkip == binding.Current) {
+				log.Printf("binding %v", binding)
 				binding.OnPress(g)
 				g.ButtonSkip = binding.Current
 			}
 
 		}
-
-		for _, component := range scene.Components {
+		for i, component := range scene.Components {
 			if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
 				mousePosition := rl.GetMousePosition()
 				if rl.CheckCollisionPointRec(mousePosition, component.Rect()) {
 					component.OnClick()
 				}
+			}
+			if i == scene.SelectedComponentIndex {
+				scene.Components[i].Select()
+			} else {
+				scene.Components[i].Unselect()
+
 			}
 		}
 		for _, window := range scene.Windows {

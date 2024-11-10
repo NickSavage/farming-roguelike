@@ -1,19 +1,20 @@
 package main
 
 import (
-	// "nsavage/farming-roguelike/engine"
+	"nsavage/farming-roguelike/engine"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 // implements UIComponent
 type ShopBuildingButton struct {
-	g              *Game
-	rect           rl.Rectangle
-	Technology     *Technology
-	ExpandedButton bool // displays title and description
-	Position       int
-	Purchased      bool // whether its been purchased or not
+	g                *Game
+	rect             rl.Rectangle
+	Technology       *Technology
+	ExpandedButton   bool // displays title and description
+	Position         int
+	Purchased        bool // whether its been purchased or not
+	SelectDirections engine.SelectDirections
 }
 
 func (b ShopBuildingButton) Render() {
@@ -75,6 +76,12 @@ func (b ShopBuildingButton) Rect() rl.Rectangle {
 
 func (b ShopBuildingButton) Select()   {}
 func (b ShopBuildingButton) Unselect() {}
+
+func (b ShopBuildingButton) Directions() *engine.SelectDirections { return &b.SelectDirections }
+func (b ShopBuildingButton) Up() int                              { return 0 }
+func (b ShopBuildingButton) Left() int                            { return 0 }
+func (b ShopBuildingButton) Right() int                           { return 0 }
+func (b ShopBuildingButton) Down() int                            { return 0 }
 
 func (g *Game) NewShopButton(rect rl.Rectangle, tech *Technology) ShopBuildingButton {
 	return ShopBuildingButton{

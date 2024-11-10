@@ -141,11 +141,7 @@ func (g *Game) InitBoard() {
 	g.Scenes["Board"].Data["HoverVector"] = engine.BoardCoord{}
 	g.Scenes["Board"].Data["HoverVectorCounter"] = 0
 
-	scene.KeyBindingFunctions = make(map[string]func(engine.GameInterface))
-	scene.KeyBindingFunctions["MoveCursorLeft"] = MoveCursorLeft
-	scene.KeyBindingFunctions["MoveCursorRight"] = MoveCursorLeft
-	scene.KeyBindingFunctions["MoveCursorDown"] = MoveCursorLeft
-	scene.KeyBindingFunctions["MoveCursorUp"] = MoveCursorLeft
+	// scene.KeyBindingFunctions = make(map[string]func(engine.GameInterface))
 }
 
 func (g *Game) drawTiles() {
