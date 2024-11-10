@@ -29,34 +29,36 @@ type UIComponent interface {
 }
 
 type Scene struct {
-	Name                string
-	Active              bool
-	AutoDisable         bool
-	DrawScene           func(GameInterface)
-	UpdateScene         func(GameInterface)
-	Buttons             []Button
-	skip                bool
-	Data                map[string]interface{}
-	Camera              rl.Camera2D
-	Windows             map[string]*Window
-	RenderMenu          bool
-	Messages            []Message
-	KeyBindingFunctions map[string]func(GameInterface)
-	KeyBindings         map[string]*KeyBinding
-	Components          []UIComponent
+	Name                   string
+	Active                 bool
+	AutoDisable            bool
+	DrawScene              func(GameInterface)
+	UpdateScene            func(GameInterface)
+	Buttons                []Button
+	skip                   bool
+	Data                   map[string]interface{}
+	Camera                 rl.Camera2D
+	Windows                map[string]*Window
+	RenderMenu             bool
+	Messages               []Message
+	KeyBindingFunctions    map[string]func(GameInterface)
+	KeyBindings            map[string]*KeyBinding
+	Components             []UIComponent
+	SelectedComponentIndex int
 }
 
 type Window struct {
-	Name       string
-	DrawWindow func(GameInterface, *Window)
-	Display    bool
-	Buttons    []Button
-	Components []UIComponent
-	Rectangle  rl.Rectangle
-	X          int32
-	Y          int32
-	Width      int32
-	Height     int32
+	Name                   string
+	DrawWindow             func(GameInterface, *Window)
+	Display                bool
+	Buttons                []Button
+	Components             []UIComponent
+	SelectedComponentIndex int
+	Rectangle              rl.Rectangle
+	X                      int32
+	Y                      int32
+	Width                  int32
+	Height                 int32
 }
 type Message struct {
 	Text  string

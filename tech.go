@@ -520,6 +520,11 @@ func CowSlaughterhouseOnBuild(g *Game, tech *Technology) error {
 
 func CowSlaughterhouseOnClick(g *Game, tech *Technology) string {
 	if tech.ReadyToHarvest {
+		err := g.Run.SpendAction(1)
+		if err != nil {
+			return ""
+		}
+
 		var input float32
 		input = tech.Input.MaximumInput
 		market := g.ConsumeOrBuyProduct(g.Run.Products["Cow"], tech.Input.MaximumInput)
@@ -565,9 +570,13 @@ func CowPastureOnBuild(g *Game, tech *Technology) error {
 
 func CowPastureOnClick(g *Game, tech *Technology) string {
 	if tech.ReadyToHarvest {
-		produced := g.RoundEndProduce(tech)
-		g.Run.Products["Cow"].Quantity += produced
-		return fmt.Sprintf("Cow: %v", produced)
+		err := g.Run.SpendAction(1)
+		if err == nil {
+			produced := g.RoundEndProduce(tech)
+			g.Run.Products["Cow"].Quantity += produced
+			tech.ReadyToHarvest = false
+			return fmt.Sprintf("Cow: %v", produced)
+		}
 	}
 	return ""
 
