@@ -75,8 +75,10 @@ func (g *Game) InitRun(loadSave bool) {
 }
 
 func (g *Game) InitTechSpaces() {
+	scene := g.Scenes["Board"]
 	spaces := []*TechnologySpace{
-		{
+		{ // 5
+			Game:           g,
 			ID:             0,
 			TechnologyType: PlantSpace,
 			Row:            7,
@@ -85,8 +87,15 @@ func (g *Game) InitTechSpaces() {
 			Height:         5,
 			IsFilled:       false,
 			Active:         true,
+			SelectDirections: engine.SelectDirections{
+				Left:  1,
+				Right: 11,
+				Down:  6,
+				Up:    10,
+			},
 		},
-		{
+		{ // 6
+			Game:           g,
 			ID:             1,
 			TechnologyType: PlantSpace,
 			Row:            7,
@@ -95,8 +104,15 @@ func (g *Game) InitTechSpaces() {
 			Height:         5,
 			IsFilled:       false,
 			Active:         true,
+			SelectDirections: engine.SelectDirections{
+				Left:  1,
+				Right: 11,
+				Down:  7,
+				Up:    5,
+			},
 		},
-		{
+		{ // 7
+			Game:           g,
 			ID:             2,
 			TechnologyType: PlantSpace,
 			Row:            7,
@@ -105,8 +121,15 @@ func (g *Game) InitTechSpaces() {
 			Height:         5,
 			IsFilled:       false,
 			Active:         true,
+			SelectDirections: engine.SelectDirections{
+				Left:  1,
+				Right: 11,
+				Down:  5,
+				Up:    6,
+			},
 		},
-		{
+		{ // 8
+			Game:           g,
 			ID:             3,
 			TechnologyType: PlantSpace,
 			Row:            19,
@@ -115,8 +138,15 @@ func (g *Game) InitTechSpaces() {
 			Height:         5,
 			IsFilled:       false,
 			Active:         false,
+			SelectDirections: engine.SelectDirections{
+				Left:  14,
+				Right: 8,
+				Down:  9,
+				Up:    10,
+			},
 		},
-		{
+		{ // 9
+			Game:           g,
 			ID:             4,
 			TechnologyType: PlantSpace,
 			Row:            19,
@@ -125,8 +155,15 @@ func (g *Game) InitTechSpaces() {
 			Height:         5,
 			IsFilled:       false,
 			Active:         false,
+			SelectDirections: engine.SelectDirections{
+				Left:  1,
+				Right: 9,
+				Down:  10,
+				Up:    8,
+			},
 		},
-		{
+		{ // 10
+			Game:           g,
 			ID:             5,
 			TechnologyType: PlantSpace,
 			Row:            19,
@@ -135,8 +172,15 @@ func (g *Game) InitTechSpaces() {
 			Height:         5,
 			IsFilled:       false,
 			Active:         false,
+			SelectDirections: engine.SelectDirections{
+				Left:  1,
+				Right: 10,
+				Down:  8,
+				Up:    9,
+			},
 		},
-		{
+		{ // 11
+			Game:           g,
 			ID:             6,
 			TechnologyType: BuildingSpace,
 			Row:            13,
@@ -145,8 +189,15 @@ func (g *Game) InitTechSpaces() {
 			Height:         2,
 			IsFilled:       false,
 			Active:         true,
+			SelectDirections: engine.SelectDirections{
+				Left:  1,
+				Right: 14,
+				Down:  12,
+				Up:    13,
+			},
 		},
-		{
+		{ // 12
+			Game:           g,
 			ID:             7,
 			TechnologyType: BuildingSpace,
 			Row:            13,
@@ -155,8 +206,15 @@ func (g *Game) InitTechSpaces() {
 			Height:         2,
 			IsFilled:       false,
 			Active:         true,
+			SelectDirections: engine.SelectDirections{
+				Left:  1,
+				Right: 14,
+				Down:  13,
+				Up:    11,
+			},
 		},
-		{
+		{ // 13
+			Game:           g,
 			ID:             8,
 			TechnologyType: BuildingSpace,
 			Row:            13,
@@ -165,8 +223,15 @@ func (g *Game) InitTechSpaces() {
 			Height:         2,
 			IsFilled:       false,
 			Active:         true,
+			SelectDirections: engine.SelectDirections{
+				Left:  1,
+				Right: 14,
+				Down:  11,
+				Up:    12,
+			},
 		},
-		{
+		{ // 14
+			Game:           g,
 			ID:             9,
 			TechnologyType: CellTowerSpace,
 			Row:            16,
@@ -175,11 +240,19 @@ func (g *Game) InitTechSpaces() {
 			Height:         2,
 			IsFilled:       false,
 			Active:         true,
+			SelectDirections: engine.SelectDirections{
+				Left:  11,
+				Right: 14,
+				Down:  14,
+				Up:    14,
+			},
 		},
+	}
+	for _, space := range spaces {
+		scene.Components = append(scene.Components, space)
 	}
 	g.Run.TechnologySpaces = spaces
 
-	scene := g.Scenes["Board"]
 	grid := scene.Data["Grid"].([][]BoardSquare)
 	for _, space := range g.Run.TechnologySpaces {
 		if !space.Active {

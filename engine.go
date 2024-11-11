@@ -125,18 +125,27 @@ func (g *Game) Update() {
 		if !scene.Active {
 			continue
 		}
+		log.Printf("selected %v", scene.SelectedComponentIndex)
 		key := rl.GetKeyPressed()
 		if key != int32(scene.SelectedKey) {
 			scene.SelectedKey = key
 
 			if key == rl.KeyDown {
+				g.MouseMode = false
+				g.KeyboardMode = true
 				scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Down
 			} else if key == rl.KeyUp {
+				g.MouseMode = false
+				g.KeyboardMode = true
 				scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Up
 			} else if key == rl.KeyLeft {
 
+				g.MouseMode = false
+				g.KeyboardMode = true
 				scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Left
 			} else if key == rl.KeyRight {
+				g.MouseMode = false
+				g.KeyboardMode = true
 				scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Right
 
 			}

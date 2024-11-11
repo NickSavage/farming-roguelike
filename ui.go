@@ -74,14 +74,11 @@ func (b ShopBuildingButton) Rect() rl.Rectangle {
 	return b.rect
 }
 
-func (b ShopBuildingButton) Select()   {}
-func (b ShopBuildingButton) Unselect() {}
+func (b ShopBuildingButton) Select()          {}
+func (b ShopBuildingButton) Unselect()        {}
+func (b ShopBuildingButton) IsSelected() bool { return false }
 
 func (b ShopBuildingButton) Directions() *engine.SelectDirections { return &b.SelectDirections }
-func (b ShopBuildingButton) Up() int                              { return 0 }
-func (b ShopBuildingButton) Left() int                            { return 0 }
-func (b ShopBuildingButton) Right() int                           { return 0 }
-func (b ShopBuildingButton) Down() int                            { return 0 }
 
 func (g *Game) NewShopButton(rect rl.Rectangle, tech *Technology) ShopBuildingButton {
 	return ShopBuildingButton{

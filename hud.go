@@ -116,6 +116,7 @@ func (g *Game) InitHUD() {
 	blank.SelectDirections.Down = len(scene.Components) + 1
 
 	scene.Components = append(scene.Components, &blank)
+	// 1
 	shopButton := g.NewButton(
 		"Shop",
 		rl.NewRectangle(10, 240, 150, 40),
@@ -123,8 +124,9 @@ func (g *Game) InitHUD() {
 	)
 	shopButton.SelectDirections.Up = 4
 	shopButton.SelectDirections.Down = len(scene.Components) + 1
+	shopButton.SelectDirections.Right = 5
 	scene.Components = append(scene.Components, &shopButton)
-
+	// 2
 	priceButton := g.NewButton(
 		"Market",
 		rl.NewRectangle(10, 290, 150, 40),
@@ -132,8 +134,9 @@ func (g *Game) InitHUD() {
 	)
 	priceButton.SelectDirections.Up = len(scene.Components) - 1
 	priceButton.SelectDirections.Down = len(scene.Components) + 1
+	priceButton.SelectDirections.Right = 5
 	scene.Components = append(scene.Components, &priceButton)
-
+	// 3
 	viewEndRoundButton := g.NewButton(
 		"End Round",
 		rl.NewRectangle(10, 340, 150, 40),
@@ -141,8 +144,10 @@ func (g *Game) InitHUD() {
 	)
 	viewEndRoundButton.SelectDirections.Up = len(scene.Components) - 1
 	viewEndRoundButton.SelectDirections.Down = len(scene.Components) + 1
-	scene.Components = append(scene.Components, &viewEndRoundButton)
+	viewEndRoundButton.SelectDirections.Right = 5
 
+	scene.Components = append(scene.Components, &viewEndRoundButton)
+	// 4
 	settingsButton := g.NewButton(
 		"Settings",
 		rl.NewRectangle(10, float32(g.screenHeight)-60, 150, 40),
@@ -150,6 +155,7 @@ func (g *Game) InitHUD() {
 	)
 	settingsButton.SelectDirections.Up = len(scene.Components) - 1
 	settingsButton.SelectDirections.Down = 1
+	settingsButton.SelectDirections.Right = 5
 	scene.Components = append(scene.Components, &settingsButton)
 }
 

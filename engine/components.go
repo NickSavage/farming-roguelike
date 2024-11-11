@@ -11,6 +11,7 @@ type UIComponent interface {
 	Rect() rl.Rectangle
 	Select()
 	Unselect()
+	IsSelected() bool
 	Directions() *SelectDirections
 }
 
@@ -98,6 +99,7 @@ func (dropdown *Dropdown) Rect() rl.Rectangle {
 
 func (dropdown *Dropdown) Select()                       {}
 func (dropdown *Dropdown) Unselect()                     {}
+func (dropdown *Dropdown) IsSelected() bool              { return false }
 func (dropdown *Dropdown) Directions() *SelectDirections { return &dropdown.SelectDirections }
 
 func (button Button) Render() {
@@ -158,6 +160,7 @@ func (button *Button) Select() {
 func (button *Button) Unselect() {
 	button.Selected = false
 }
+func (button *Button) IsSelected() bool              { return button.Selected }
 func (button *Button) Directions() *SelectDirections { return &button.SelectDirections }
 
 type BlankComponent struct {
@@ -174,8 +177,9 @@ func (c *BlankComponent) Rect() rl.Rectangle {
 	return rl.NewRectangle(0, 0, 0, 0)
 }
 
-func (c *BlankComponent) Select()   {}
-func (c *BlankComponent) Unselect() {}
+func (c *BlankComponent) Select()          {}
+func (c *BlankComponent) Unselect()        {}
+func (c *BlankComponent) IsSelected() bool { return false }
 func (c *BlankComponent) Directions() *SelectDirections {
 	return &c.SelectDirections
 }

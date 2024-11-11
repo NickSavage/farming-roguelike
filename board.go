@@ -141,6 +141,8 @@ func (g *Game) InitBoard() {
 	g.Scenes["Board"].Data["HoverVector"] = engine.BoardCoord{}
 	g.Scenes["Board"].Data["HoverVectorCounter"] = 0
 
+	g.Scenes["Board"].Data["PreviousMousePosition"] = rl.Vector2{X: 0, Y: 0}
+
 	// scene.KeyBindingFunctions = make(map[string]func(engine.GameInterface))
 }
 
@@ -169,63 +171,14 @@ func (g *Game) drawTiles() {
 }
 func (g *Game) DrawTechnologySpaces() {
 
-	scene := g.Scenes["Board"]
-	mousePosition := rl.GetMousePosition()
-	var rect rl.Rectangle
+	// scene := g.Scenes["Board"]
+	// mousePosition := rl.GetMousePosition()
+	// var rect rl.Rectangle
 	for _, space := range g.Run.TechnologySpaces {
 		if !space.Active {
 			continue
 		}
-		vec := g.GetVecFromCoords(engine.BoardCoord{Row: space.Row, Column: space.Column})
-		x := vec.X
-		y := vec.Y
-		width := float32(space.Width * TILE_WIDTH)
-		height := float32(space.Height * TILE_HEIGHT)
-		rect = rl.NewRectangle(x, y, width, height)
-		rl.DrawRectangleRec(rect, rl.Blue)
-		if !space.IsFilled {
-			continue
-		}
-		mousePosition = rl.GetMousePosition()
-
-		if !g.WindowOpen && rl.CheckCollisionPointRec(mousePosition, rect) {
-
-			space.Technology.Tile.Color = rl.Green
-			if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-				result := g.HandleClickTech(space.Technology)
-				message := engine.Message{
-					Text:  result,
-					Vec:   rl.Vector2{X: x, Y: y},
-					Timer: 30,
-				}
-				scene.Messages = append(scene.Messages, message)
-			}
-
-		} else {
-			if space.Technology.ReadyToHarvest {
-				space.Technology.Tile.Color = rl.Blue
-			} else if space.Technology.ReadyToTouch {
-				space.Technology.Tile.Color = rl.Red
-			} else {
-				space.Technology.Tile.Color = rl.White
-			}
-		}
-
-		if space.Technology.TileFillSpace {
-			for i := range space.Width {
-				for j := range space.Height {
-					DrawTile(
-						space.Technology.Tile,
-						float32(float32(x)+float32(i*TILE_WIDTH)),
-						float32(float32(y)+float32(j*TILE_HEIGHT)),
-					)
-				}
-			}
-
-		} else {
-			DrawTile(space.Technology.Tile, float32(x), float32(y))
-
-		}
+		space.Render()
 	}
 }
 
@@ -306,11 +259,10 @@ func DrawBoard(gi engine.GameInterface) {
 	//	scene := g.Scenes["Board"]
 	//	rl.BeginMode2D(g.Scenes["Board"].Camera)
 	g.drawTiles()
-	g.DrawTechnologySpaces()
 	g.drawGrid()
 	//	rl.EndMode2D()
 
-	g.HandleHover()
+	//	g.HandleHover()
 	DrawHUD(g)
 	g.DrawMessages()
 	// g.DrawContextMenu(g.Scenes["Board"])
@@ -370,7 +322,39 @@ func (g *Game) HandleHover() {
 
 func UpdateBoard(gi engine.GameInterface) {
 	g := gi.(*Game)
+	scene := g.Scenes["Board"]
 	UpdateHUD(g)
+
+	key := rl.GetKeyPressed()
+	if key == rl.KeyEnter {
+		for _, component := range scene.Components {
+			if component.IsSelected() {
+			}
+
+		}
+	}
+
+	// handle selecting
+	// mousePosition := rl.GetMousePosition()
+	// old := scene.Data["PreviousMousePosition"].(rl.Vector2)
+	// if old.X != mousePosition.X && old.Y != mousePosition.Y {
+	// 	g.MouseMode = true
+	// } else {
+	// 	g.MouseMode = false
+	// }
+
+	// if g.MouseMode {
+	// 	g.Data["PreviousMousePosition"] = mousePosition
+	// 	for _, component := range scene.Components {
+	// 		if rl.CheckCollisionPointRec(mousePosition, component.Rect()) {
+	// 			component.Select()
+	// 		} else {
+	// 			component.Unselect()
+
+	// 		}
+	// 	}
+	// }
+
 }
 
 // cursor

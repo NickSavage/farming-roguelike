@@ -1,8 +1,9 @@
 package main
 
 import (
+	rl "github.com/gen2brain/raylib-go/raylib"
+	"log"
 	"nsavage/farming-roguelike/engine"
-	// rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type Game struct {
@@ -23,6 +24,8 @@ type Game struct {
 	GameOverTriggered bool
 	KeyBindingJSONs   []KeyBindingJSON
 	ExistingSave      bool
+	MouseMode         bool
+	KeyboardMode      bool
 }
 
 type Run struct {
@@ -86,15 +89,116 @@ type BoardSquare struct {
 }
 
 type TechnologySpace struct {
-	ID             int
-	Technology     *Technology
-	TechnologyType TechnologyType
-	Row            int
-	Column         int
-	Width          int // in tiles
-	Height         int // in tiles
-	IsFilled       bool
-	Active         bool // whether the game displays or not
+	Game             *Game
+	ID               int
+	Technology       *Technology
+	TechnologyType   TechnologyType
+	Row              int
+	Column           int
+	Width            int // in tiles
+	Height           int // in tiles
+	IsFilled         bool
+	Active           bool // whether the game displays or not
+	SelectDirections engine.SelectDirections
+	Selected         bool
+}
+
+func (space *TechnologySpace) Render() {
+
+	g := space.Game
+	scene := space.Game.Scenes["Board"]
+	if !space.Active {
+		return
+	}
+	boxColor := rl.Blue
+	if space.Selected {
+		boxColor = rl.Green
+	}
+
+	vec := g.GetVecFromCoords(engine.BoardCoord{Row: space.Row, Column: space.Column})
+	x := vec.X
+	y := vec.Y
+	width := float32(space.Width * TILE_WIDTH)
+	height := float32(space.Height * TILE_HEIGHT)
+	rect := rl.NewRectangle(x, y, width, height)
+	rl.DrawRectangleRec(rect, boxColor)
+	if !space.IsFilled {
+		return
+	}
+	mousePosition := rl.GetMousePosition()
+
+	if !g.WindowOpen && rl.CheckCollisionPointRec(mousePosition, rect) {
+
+		space.Technology.Tile.Color = rl.Green
+		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+			result := g.HandleClickTech(space.Technology)
+			message := engine.Message{
+				Text:  result,
+				Vec:   rl.Vector2{X: x, Y: y},
+				Timer: 30,
+			}
+			scene.Messages = append(scene.Messages, message)
+		}
+
+	} else {
+		if space.Technology.ReadyToHarvest {
+			space.Technology.Tile.Color = rl.Blue
+		} else if space.Technology.ReadyToTouch {
+			space.Technology.Tile.Color = rl.Red
+		} else {
+			space.Technology.Tile.Color = rl.White
+		}
+	}
+
+	if space.Technology.TileFillSpace {
+		for i := range space.Width {
+			for j := range space.Height {
+				DrawTile(
+					space.Technology.Tile,
+					float32(float32(x)+float32(i*TILE_WIDTH)),
+					float32(float32(y)+float32(j*TILE_HEIGHT)),
+				)
+			}
+		}
+
+	} else {
+		DrawTile(space.Technology.Tile, float32(x), float32(y))
+
+	}
+
+}
+
+func (space *TechnologySpace) OnClick() {
+
+}
+
+func (space *TechnologySpace) Rect() rl.Rectangle {
+
+	vec := space.Game.GetVecFromCoords(engine.BoardCoord{Row: space.Row, Column: space.Column})
+	return rl.Rectangle{
+		X:      vec.X,
+		Y:      vec.Y,
+		Width:  float32(space.Width * TILE_WIDTH),
+		Height: float32(space.Height) * TILE_HEIGHT,
+	}
+
+}
+func (space *TechnologySpace) Select() {
+	log.Printf("selected")
+	space.Selected = true
+
+}
+
+func (space *TechnologySpace) Unselect() {
+	space.Selected = false
+}
+
+func (space *TechnologySpace) IsSelected() bool {
+	return space.Selected
+}
+
+func (space *TechnologySpace) Directions() *engine.SelectDirections {
+	return &space.SelectDirections
 }
 
 type Technology struct {
