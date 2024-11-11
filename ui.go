@@ -15,9 +15,10 @@ type ShopBuildingButton struct {
 	Position         int
 	Purchased        bool // whether its been purchased or not
 	SelectDirections engine.SelectDirections
+	Selected         bool
 }
 
-func (b ShopBuildingButton) Render() {
+func (b *ShopBuildingButton) Render() {
 	g := b.g
 	textColor := rl.Black
 	canBuild := true
@@ -49,6 +50,9 @@ func (b ShopBuildingButton) Render() {
 			backgroundColor = rl.LightGray
 		}
 	}
+	if b.IsSelected() {
+		backgroundColor = rl.LightGray
+	}
 	x := b.rect.X
 	y := b.rect.Y
 
@@ -70,21 +74,22 @@ func (b ShopBuildingButton) OnClick() {
 	}
 	ShopButtonOnClick(b.g, b)
 }
-func (b ShopBuildingButton) Rect() rl.Rectangle {
+func (b *ShopBuildingButton) Rect() rl.Rectangle {
 	return b.rect
 }
 
-func (b ShopBuildingButton) Select()          {}
-func (b ShopBuildingButton) Unselect()        {}
-func (b ShopBuildingButton) IsSelected() bool { return false }
+func (b *ShopBuildingButton) Select()          { b.Selected = true }
+func (b *ShopBuildingButton) Unselect()        { b.Selected = false }
+func (b *ShopBuildingButton) IsSelected() bool { return b.Selected }
 
-func (b ShopBuildingButton) Directions() *engine.SelectDirections { return &b.SelectDirections }
+func (b *ShopBuildingButton) Directions() *engine.SelectDirections { return &b.SelectDirections }
 
 func (g *Game) NewShopButton(rect rl.Rectangle, tech *Technology) ShopBuildingButton {
 	return ShopBuildingButton{
-		g:          g,
-		rect:       rect,
-		Technology: tech,
+		g:                g,
+		rect:             rect,
+		Technology:       tech,
+		SelectDirections: engine.SelectDirections{},
 	}
 }
 func (g *Game) NewShopPlantButton(rect rl.Rectangle, tech *Technology) ShopBuildingButton {

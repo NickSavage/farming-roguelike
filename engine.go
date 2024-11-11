@@ -119,36 +119,86 @@ func (g *Game) Draw() {
 	rl.EndDrawing()
 }
 
+func (g *Game) HandleKeystrokes(scene *engine.Scene) {
+
+	key := rl.GetKeyPressed()
+
+	if key != int32(scene.SelectedKey) {
+		scene.SelectedKey = key
+
+		if key == rl.KeyDown {
+			g.MouseMode = false
+			g.KeyboardMode = true
+			scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Down
+		} else if key == rl.KeyUp {
+			g.MouseMode = false
+			g.KeyboardMode = true
+			scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Up
+		} else if key == rl.KeyLeft {
+
+			g.MouseMode = false
+			g.KeyboardMode = true
+			scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Left
+		} else if key == rl.KeyRight {
+			g.MouseMode = false
+			g.KeyboardMode = true
+			scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Right
+
+		} else if key == rl.KeyEnter {
+			for _, component := range scene.Components {
+				if component.IsSelected() {
+					component.OnClick()
+				}
+			}
+		}
+	}
+
+}
+
+func (g *Game) HandleKeystrokesWindow(window *engine.Window) {
+
+	key := rl.GetKeyPressed()
+
+	if key != int32(window.SelectedKey) {
+		window.SelectedKey = key
+
+		if key == rl.KeyDown {
+			g.MouseMode = false
+			g.KeyboardMode = true
+			window.SelectedComponentIndex = window.Components[window.SelectedComponentIndex].Directions().Down
+		} else if key == rl.KeyUp {
+			g.MouseMode = false
+			g.KeyboardMode = true
+			window.SelectedComponentIndex = window.Components[window.SelectedComponentIndex].Directions().Up
+		} else if key == rl.KeyLeft {
+
+			g.MouseMode = false
+			g.KeyboardMode = true
+			window.SelectedComponentIndex = window.Components[window.SelectedComponentIndex].Directions().Left
+		} else if key == rl.KeyRight {
+			g.MouseMode = false
+			g.KeyboardMode = true
+			window.SelectedComponentIndex = window.Components[window.SelectedComponentIndex].Directions().Right
+
+		} else if key == rl.KeyEnter {
+			for _, component := range window.Components {
+				if component.IsSelected() {
+					component.OnClick()
+				}
+			}
+		}
+	}
+}
+
 func (g *Game) Update() {
 	// check arrow keys
 	for _, scene := range g.Scenes {
 		if !scene.Active {
 			continue
 		}
-		log.Printf("selected %v", scene.SelectedComponentIndex)
-		key := rl.GetKeyPressed()
-		if key != int32(scene.SelectedKey) {
-			scene.SelectedKey = key
 
-			if key == rl.KeyDown {
-				g.MouseMode = false
-				g.KeyboardMode = true
-				scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Down
-			} else if key == rl.KeyUp {
-				g.MouseMode = false
-				g.KeyboardMode = true
-				scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Up
-			} else if key == rl.KeyLeft {
-
-				g.MouseMode = false
-				g.KeyboardMode = true
-				scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Left
-			} else if key == rl.KeyRight {
-				g.MouseMode = false
-				g.KeyboardMode = true
-				scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Right
-
-			}
+		if !scene.WindowOpen {
+			g.HandleKeystrokes(scene)
 		}
 		// if rl.IsKeyPressed(rl.KeyDown) && scene.SelectedKey != rl.KeyDown {
 		// 	scene.SelectedKey = rl.KeyDown
@@ -175,22 +225,30 @@ func (g *Game) Update() {
 				scene.Components[i].Select()
 			} else {
 				scene.Components[i].Unselect()
-
 			}
 		}
+		open := false
 		for _, window := range scene.Windows {
 			if window.Display {
-				for _, component := range window.Components {
+				open = true
+				for i, component := range window.Components {
 					if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
 						mousePosition := rl.GetMousePosition()
 						if rl.CheckCollisionPointRec(mousePosition, component.Rect()) {
 							component.OnClick()
 						}
 					}
+					if i == window.SelectedComponentIndex {
+						window.Components[i].Select()
+					} else {
+						window.Components[i].Unselect()
+					}
 				}
+				g.HandleKeystrokesWindow(window)
 			}
 
 		}
+		scene.WindowOpen = open
 
 		scene.UpdateScene(g)
 	}

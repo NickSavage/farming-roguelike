@@ -40,6 +40,7 @@ type Scene struct {
 	Components             []UIComponent
 	SelectedComponentIndex int
 	SelectedKey            int32
+	WindowOpen             bool
 }
 
 type Window struct {
@@ -49,6 +50,7 @@ type Window struct {
 	Buttons                []Button
 	Components             []UIComponent
 	SelectedComponentIndex int
+	SelectedKey            int32
 	Rectangle              rl.Rectangle
 	X                      int32
 	Y                      int32

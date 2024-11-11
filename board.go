@@ -322,17 +322,8 @@ func (g *Game) HandleHover() {
 
 func UpdateBoard(gi engine.GameInterface) {
 	g := gi.(*Game)
-	scene := g.Scenes["Board"]
+	// scene := g.Scenes["Board"]
 	UpdateHUD(g)
-
-	key := rl.GetKeyPressed()
-	if key == rl.KeyEnter {
-		for _, component := range scene.Components {
-			if component.IsSelected() {
-			}
-
-		}
-	}
 
 	// handle selecting
 	// mousePosition := rl.GetMousePosition()

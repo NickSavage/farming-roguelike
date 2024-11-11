@@ -26,6 +26,7 @@ func OnClickOpenMarketWindow(gi engine.GameInterface) {
 	g := gi.(*Game)
 	scene := g.Scenes["Board"]
 	g.ActivateWindow(scene.Windows, scene.Windows["Prices"])
+	log.Printf("?")
 }
 
 func OnClickOpenSettings(gi engine.GameInterface) {

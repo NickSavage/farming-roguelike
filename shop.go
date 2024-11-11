@@ -35,18 +35,13 @@ func ShopButtonOnClick(g *Game, b ShopBuildingButton) {
 	if err == nil {
 		// this is a bit of a cludge, think about another way at some point
 		var button ShopBuildingButton
-		var ok bool
 		for i, component := range window.Components {
 			log.Printf("component %v i %v", component, i)
-			if button, ok = component.(ShopBuildingButton); !ok {
-				log.Printf("button is not a shopbuilding button")
-				continue
-			}
 			log.Printf("button %v b %v", button.Position, b.Position)
 			if button.Position == b.Position {
 				log.Printf("does this happen?")
 				button.Purchased = true
-				window.Components[i] = button
+				window.Components[i] = &button
 			}
 		}
 	}
@@ -62,7 +57,11 @@ func (g *Game) InitShopRoundComponents() {
 	window.Components = make([]engine.UIComponent, 0)
 	buildings := g.Run.CurrentRoundShopBuildings
 
-	n := 0
+	n := 1
+	blank := engine.NewBlankComponent()
+	blank.SelectDirections.Right = 1
+	blank.SelectDirections.Left = 5
+	window.Components = append(window.Components, &blank)
 
 	x := window.Rectangle.X
 	y := window.Rectangle.Y
@@ -71,10 +70,16 @@ func (g *Game) InitShopRoundComponents() {
 		// for i, _ := range buildings {
 		rect := rl.NewRectangle(x+50+float32(i*160), y+45, 150, 300)
 		button := g.NewShopButton(rect, building)
-		n += 1
+		button.SelectDirections.Right = n + 1
+		button.SelectDirections.Left = n - 1
+
 		button.Position = n
 		button.ExpandedButton = true
-		window.Components = append(window.Components, button)
+		n += 1
+		if n == 6 {
+			button.SelectDirections.Right = 1
+		}
+		window.Components = append(window.Components, &button)
 	}
 }
 
