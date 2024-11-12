@@ -24,6 +24,7 @@ func (g *Game) GetScenes() map[string]*engine.Scene {
 func (g *Game) InitRun(loadSave bool) {
 
 	run := &Run{
+		Game:                  g,
 		Money:                 100,
 		MoneyRequirementStart: 200,
 		MoneyRequirementRate:  2,
@@ -64,6 +65,7 @@ func (g *Game) InitRun(loadSave bool) {
 			run.Technology = g.UnpackTechnology(save.Technology)
 			run.Events = g.Run.UnpackEvents(save.Events)
 			// todo: place tech
+			g.Run.UnpackUnlocks(save.Unlocks)
 		}
 
 	}
@@ -304,8 +306,7 @@ func OnClickEndRound(g *Game) {
 
 		// if game isn't over, increment this
 		g.Run.MoneyRequirement = g.Run.calculateMoneyRequirement()
-		g.Run.CurrentRoundShopPlants = g.ShopRandomPlants(2)
-		g.Run.CurrentRoundShopBuildings = g.ShopRandomBuildings(3)
+		g.Run.CurrentRoundShopBuildings = g.ShopRandomBuildings(5)
 		g.InitShopRoundComponents()
 	}
 	g.Run.SaveRun()
@@ -495,23 +496,14 @@ func (g *Game) PickRandomTechnologies(needed int, keys []string) []*Technology {
 	return results
 }
 
-func (g *Game) ShopRandomPlants(needed int) []*Technology {
-	keysToPickFrom := make([]string, 0)
-	for key, tech := range g.Technology {
-		if tech.TechnologyType == PlantSpace {
-			keysToPickFrom = append(keysToPickFrom, key)
-
-		}
-	}
-	results := g.PickRandomTechnologies(needed, keysToPickFrom)
-
-	return results
-}
-
 func (g *Game) ShopRandomBuildings(needed int) []*Technology {
 
 	keysToPickFrom := make([]string, 0)
 	for key, tech := range g.Technology {
+		log.Printf("tech %v unlocked %v", tech, tech.Unlocked)
+		if !tech.Unlocked {
+			continue
+		}
 		if tech.TechnologyType == BuildingSpace {
 			keysToPickFrom = append(keysToPickFrom, key)
 
@@ -598,6 +590,30 @@ func (r *Run) UnpackEvents(saved []EventSave) []Event {
 	return results
 }
 
+func (r *Run) PackUnlocks() []UnlockSave {
+	results := []UnlockSave{}
+
+	for _, unlock := range r.Game.Unlocks {
+		new := UnlockSave{
+			TechnologyName: unlock.Technology.Name,
+			Unlocked:       unlock.Unlocked,
+		}
+		results = append(results, new)
+
+	}
+	return results
+
+}
+
+func (r *Run) UnpackUnlocks(saved []UnlockSave) {
+	for _, save := range saved {
+		log.Printf("save %v", save)
+		r.Game.Unlocks[save.TechnologyName].Unlocked = save.Unlocked
+		r.Game.Technology[save.TechnologyName].Unlocked = save.Unlocked
+	}
+
+}
+
 func (r *Run) SaveRun() {
 
 	saveFile := SaveFile{
@@ -615,6 +631,7 @@ func (r *Run) SaveRun() {
 		Technology:            r.PackTechnology(),
 		Products:              r.Products,
 		Events:                r.PackEvents(),
+		Unlocks:               r.PackUnlocks(),
 	}
 	SaveRun(saveFile)
 }

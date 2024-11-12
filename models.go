@@ -25,9 +25,12 @@ type Game struct {
 	KeyBindingJSONs   []KeyBindingJSON
 	ExistingSave      bool
 	ActiveRun         bool
+	UnlockBaseData    []UnlockJSON
+	Unlocks           map[string]*Unlock
 }
 
 type Run struct {
+	Game                      *Game
 	Technology                []*Technology
 	Products                  map[ProductType]*Product
 	Money                     float32
@@ -69,6 +72,7 @@ type SaveFile struct {
 	Technology            []TechnologySave         `json:"technology_save"`
 	Products              map[ProductType]*Product `json:"products"`
 	Events                []EventSave              `json:"event_save"`
+	Unlocks               []UnlockSave             `json:"unlock_save"`
 }
 
 type BoardSquare struct {
@@ -232,6 +236,7 @@ type Technology struct {
 	ReadyToTouch    bool
 	TempYield       float32
 	Input           Input
+	Unlocked        bool
 }
 
 type Input struct {
@@ -340,18 +345,31 @@ func (s *Season) Next() {
 }
 
 type InitialData struct {
-	Name           string         `json:"name"`
-	Price          float32        `json:"price"`
-	ProductType    string         `json:"productType"`
-	TechnologyType string         `json:"technologyType"`
-	CostMoney      float32        `json:"costMoney"`
-	CostActions    int            `json:"costActions"`
-	Production     float32        `json:"production"`
-	Rarity         string         `json:"rarity"`
-	Description    string         `json:"description"`
-	TileConfig     TechTileConfig `json:"tile"`
-	ShopIcon       string         `json:"shopIcon"`
-	Input          Input          `json:"input"`
+	Name            string         `json:"name"`
+	Price           float32        `json:"price"`
+	ProductType     string         `json:"productType"`
+	TechnologyType  string         `json:"technologyType"`
+	CostMoney       float32        `json:"costMoney"`
+	CostActions     int            `json:"costActions"`
+	Production      float32        `json:"production"`
+	Rarity          string         `json:"rarity"`
+	Description     string         `json:"description"`
+	TileConfig      TechTileConfig `json:"tile"`
+	ShopIcon        string         `json:"shopIcon"`
+	Input           Input          `json:"input"`
+	Unlock          *UnlockJSON    `json:"unlock"`
+	DefaultUnlocked bool
+}
+
+type UnlockJSON struct {
+	CostActions    int  `json:"costActions"`
+	OtherCost      bool `json:"otherCost"`
+	TechnologyName string
+}
+
+type UnlockSave struct {
+	TechnologyName string `json:"technologyName"`
+	Unlocked       bool   `json:"Unlocked"`
 }
 
 type TechTileConfig struct {
@@ -359,4 +377,12 @@ type TechTileConfig struct {
 	Width     int    `json:"width"`
 	Height    int    `json:"height"`
 	FillSpace bool   `json:"fillSpace"`
+}
+
+type Unlock struct {
+	Technology        *Technology
+	Unlocked          bool
+	CostActions       int
+	OtherCost         bool
+	OtherCostFunction func(*Game) bool
 }

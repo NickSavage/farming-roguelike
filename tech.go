@@ -58,6 +58,7 @@ func (g *Game) CanBuild(tech *Technology) bool {
 }
 
 func (g *Game) CreateTechFromInitialData(input InitialData) *Technology {
+	log.Printf("input %v unlock %v", input.Name, input.DefaultUnlocked)
 	return &Technology{
 		Name:           input.Name,
 		Description:    input.Description,
@@ -77,6 +78,7 @@ func (g *Game) CreateTechFromInitialData(input InitialData) *Technology {
 		InitialPrice:   input.Price,
 		BaseProduction: input.Production,
 		Input:          input.Input,
+		Unlocked:       input.DefaultUnlocked,
 	}
 }
 
@@ -101,12 +103,19 @@ func (g *Game) LoadInitialData() {
 
 	// Create an empty map to store the data
 	dataMap := make(map[string]InitialData)
+	unlocks := []UnlockJSON{}
 
 	for _, item := range initialData {
-		log.Printf("item %v", item)
+		item.DefaultUnlocked = true
+		if item.Unlock != nil {
+			item.Unlock.TechnologyName = item.Name
+			unlocks = append(unlocks, *item.Unlock)
+			item.DefaultUnlocked = false
+		}
 		dataMap[item.Name] = item
 	}
 	g.InitialData = dataMap
+	g.UnlockBaseData = unlocks
 }
 
 func (g *Game) InitProduct(productType ProductType, price float32) {

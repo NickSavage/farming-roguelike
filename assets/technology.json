@@ -46,6 +46,10 @@
     "productType": "Potato",
     "technologyType": "PlantSpace",
     "shopIcon": "PotatoIcon",
+    "unlock": {
+      "costActions": 10,
+      "otherCost": false
+    },
     "tile": {
       "id": "PotatoTile",
       "width": 1,
@@ -64,6 +68,10 @@
     "productType": "Carrot",
     "technologyType": "PlantSpace",
     "shopIcon": "CarrotShopIcon",
+    "unlock": {
+      "costActions": 10,
+      "otherCost": false
+    },
     "tile": {
       "id": "CarrotIcon",
       "width": 1,
@@ -83,6 +91,10 @@
       "width": 1,
       "height": 1,
       "fillSpace": false
+    },
+    "unlock": {
+      "costActions": 10,
+      "otherCost": false
     },
     "costMoney": 25,
     "costActions": 1,
@@ -134,6 +146,10 @@
       "fillSpace": false
     },
     "costMoney": 25,
+    "unlock": {
+      "costActions": 10,
+      "otherCost": false
+    },
     "costActions": 1,
     "description": "asdasd",
     "production": 50
@@ -171,6 +187,10 @@
     },
     "costMoney": 25,
     "costActions": 1,
+    "unlock": {
+      "costActions": 10,
+      "otherCost": false
+    },
     "production": 10,
     "description": "asdasd"
   },
@@ -190,6 +210,10 @@
     "costMoney": 25,
     "costActions": 1,
     "description": "asdasd",
+    "unlock": {
+      "costActions": 10,
+      "otherCost": false
+    },
     "input": {
       "productType": "Cow",
       "maximumInput": 10,

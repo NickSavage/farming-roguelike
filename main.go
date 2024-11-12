@@ -146,6 +146,7 @@ func main() {
 	g.LoadScenes()
 
 	g.InitTechnology()
+	g.InitUnlocks()
 	g.InitBoard()
 	g.InitShopWindow()
 	g.InitGameMenu()
