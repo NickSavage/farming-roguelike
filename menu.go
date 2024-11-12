@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+func OnClickAbandonRun(gi *engine.GameInterface) {}
+
 func OnClickContinueRun(gi engine.GameInterface) {
 
 	g := gi.(*Game)
@@ -54,53 +56,76 @@ func (g *Game) InitGameMenu() {
 
 	// 0
 	scene := g.Scenes["GameMenu"]
+	components := make([]engine.UIComponent, 0)
 
 	blank := engine.NewBlankComponent()
-	blank.SelectDirections.Up = 6
-	blank.SelectDirections.Down = len(scene.Components) + 1
+	if g.ActiveRun {
+		blank.SelectDirections.Up = 5
+	} else {
+		blank.SelectDirections.Up = 6
+	}
+	blank.SelectDirections.Down = len(components) + 1
 
-	scene.Components = append(scene.Components, &blank)
-	continueButton := g.NewButton(
-		"Continue Run",
-		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2-60, 200, 50),
-		OnClickContinueRun,
-	)
-	continueButton.SelectDirections.Up = 6
-	continueButton.SelectDirections.Down = len(scene.Components) + 1
-	scene.Components = append(scene.Components, &continueButton)
+	components = append(components, &blank)
+	if g.ActiveRun {
+		abandonButton := g.NewButton(
+			"Abandon Run",
+			rl.NewRectangle(
+				float32(g.screenWidth)/2-100,
+				float32(g.screenHeight)/2,
+				200,
+				50,
+			),
+			OnClickContinueRun,
+		)
+		abandonButton.SelectDirections.Up = 5
+		abandonButton.SelectDirections.Down = len(components) + 1
+		components = append(components, &abandonButton)
 
-	// 1
-	newButton := g.NewButton(
-		"New Run",
-		rl.NewRectangle(
-			float32(g.screenWidth)/2-100,
-			float32(g.screenHeight)/2,
-			200,
-			50,
-		),
-		OnClickNewRun,
-	)
-	newButton.SelectDirections.Up = len(scene.Components) - 1
-	newButton.SelectDirections.Down = len(scene.Components) + 1
-	scene.Components = append(scene.Components, &newButton)
+	} else {
+
+		continueButton := g.NewButton(
+			"Continue Run",
+			rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2-60, 200, 50),
+			OnClickContinueRun,
+		)
+		continueButton.SelectDirections.Up = 6
+		continueButton.SelectDirections.Down = len(components) + 1
+		components = append(components, &continueButton)
+
+		// 1
+		newButton := g.NewButton(
+			"New Run",
+			rl.NewRectangle(
+				float32(g.screenWidth)/2-100,
+				float32(g.screenHeight)/2,
+				200,
+				50,
+			),
+			OnClickNewRun,
+		)
+		newButton.SelectDirections.Up = len(components) - 1
+		newButton.SelectDirections.Down = len(components) + 1
+		components = append(components, &newButton)
+	}
 	// 2
 	settingsButton := g.NewButton(
 		"Settings",
 		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+60, 200, 50),
 		OnClickSettings,
 	)
-	settingsButton.SelectDirections.Up = len(scene.Components) - 1
-	settingsButton.SelectDirections.Down = len(scene.Components) + 1
-	scene.Components = append(scene.Components, &settingsButton)
+	settingsButton.SelectDirections.Up = len(components) - 1
+	settingsButton.SelectDirections.Down = len(components) + 1
+	components = append(components, &settingsButton)
 	// 3
 	statsButton := g.NewButton(
 		"Statistics",
 		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+120, 200, 50),
 		OnClickStats,
 	)
-	statsButton.SelectDirections.Up = len(scene.Components) - 1
-	statsButton.SelectDirections.Down = len(scene.Components) + 1
-	scene.Components = append(scene.Components, &statsButton)
+	statsButton.SelectDirections.Up = len(components) - 1
+	statsButton.SelectDirections.Down = len(components) + 1
+	components = append(components, &statsButton)
 
 	// 4
 	aboutButton := g.NewButton(
@@ -108,9 +133,9 @@ func (g *Game) InitGameMenu() {
 		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+180, 200, 50),
 		OnClickAbout,
 	)
-	aboutButton.SelectDirections.Up = len(scene.Components) - 1
-	aboutButton.SelectDirections.Down = len(scene.Components) + 1
-	scene.Components = append(scene.Components, &aboutButton)
+	aboutButton.SelectDirections.Up = len(components) - 1
+	aboutButton.SelectDirections.Down = len(components) + 1
+	components = append(components, &aboutButton)
 
 	// 5
 	exitButton := g.NewButton(
@@ -118,9 +143,10 @@ func (g *Game) InitGameMenu() {
 		rl.NewRectangle(float32(g.screenWidth)/2-100, float32(g.screenHeight)/2+240, 200, 50),
 		OnClickExit,
 	)
-	exitButton.SelectDirections.Up = len(scene.Components) - 1
+	exitButton.SelectDirections.Up = len(components) - 1
 	exitButton.SelectDirections.Down = 1
-	scene.Components = append(scene.Components, &exitButton)
+	components = append(components, &exitButton)
+	scene.Components = components
 
 	scene.KeyBindingFunctions = make(map[string]func(engine.GameInterface))
 
@@ -141,7 +167,7 @@ func (g *Game) InitGameMenu() {
 		CloseStatsWindow,
 	)
 
-	components := make([]engine.UIComponent, 0)
+	components = make([]engine.UIComponent, 0)
 	blank = engine.NewBlankComponent()
 	blank.SelectDirections.Up = 1
 	blank.SelectDirections.Down = 1
@@ -218,4 +244,19 @@ func CloseAboutWindow(gi engine.GameInterface) {
 	g := gi.(*Game)
 	scene := g.Scenes["GameMenu"]
 	g.ActivateWindow(scene.Windows, scene.Windows["About"])
+}
+
+func ToggleMenu(gi engine.GameInterface) {
+	g := gi.(*Game)
+	scene := g.Scenes["GameMenu"]
+	if scene.Active {
+		if g.ActiveRun {
+			g.ActivateScene("Board")
+		}
+	} else {
+		g.InitGameMenu()
+		g.ActivateScene("GameMenu")
+
+	}
+
 }

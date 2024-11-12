@@ -24,8 +24,7 @@ type Game struct {
 	GameOverTriggered bool
 	KeyBindingJSONs   []KeyBindingJSON
 	ExistingSave      bool
-	MouseMode         bool
-	KeyboardMode      bool
+	ActiveRun         bool
 }
 
 type Run struct {

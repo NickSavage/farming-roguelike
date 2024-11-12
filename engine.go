@@ -127,21 +127,13 @@ func (g *Game) HandleKeystrokes(scene *engine.Scene) {
 		scene.SelectedKey = key
 
 		if key == rl.KeyDown {
-			g.MouseMode = false
-			g.KeyboardMode = true
 			scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Down
 		} else if key == rl.KeyUp {
-			g.MouseMode = false
-			g.KeyboardMode = true
 			scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Up
 		} else if key == rl.KeyLeft {
 
-			g.MouseMode = false
-			g.KeyboardMode = true
 			scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Left
 		} else if key == rl.KeyRight {
-			g.MouseMode = false
-			g.KeyboardMode = true
 			scene.SelectedComponentIndex = scene.Components[scene.SelectedComponentIndex].Directions().Right
 
 		} else if key == rl.KeyEnter {
@@ -150,6 +142,8 @@ func (g *Game) HandleKeystrokes(scene *engine.Scene) {
 					component.OnClick()
 				}
 			}
+		} else if key == rl.KeyEscape {
+			ToggleMenu(g)
 		}
 	}
 
@@ -163,21 +157,12 @@ func (g *Game) HandleKeystrokesWindow(window *engine.Window) {
 		window.SelectedKey = key
 
 		if key == rl.KeyDown {
-			g.MouseMode = false
-			g.KeyboardMode = true
 			window.SelectedComponentIndex = window.Components[window.SelectedComponentIndex].Directions().Down
 		} else if key == rl.KeyUp {
-			g.MouseMode = false
-			g.KeyboardMode = true
 			window.SelectedComponentIndex = window.Components[window.SelectedComponentIndex].Directions().Up
 		} else if key == rl.KeyLeft {
-
-			g.MouseMode = false
-			g.KeyboardMode = true
 			window.SelectedComponentIndex = window.Components[window.SelectedComponentIndex].Directions().Left
 		} else if key == rl.KeyRight {
-			g.MouseMode = false
-			g.KeyboardMode = true
 			window.SelectedComponentIndex = window.Components[window.SelectedComponentIndex].Directions().Right
 
 		} else if key == rl.KeyEnter {
