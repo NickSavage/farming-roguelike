@@ -186,6 +186,8 @@ func (g *Game) HandleKeystrokesWindow(window *engine.Window) {
 					component.OnClick()
 				}
 			}
+		} else if key == rl.KeyEscape {
+			CloseAllWindows(g)
 		}
 	}
 }
@@ -200,20 +202,15 @@ func (g *Game) Update() {
 		if !scene.WindowOpen {
 			g.HandleKeystrokes(scene)
 		}
-		// if rl.IsKeyPressed(rl.KeyDown) && scene.SelectedKey != rl.KeyDown {
-		// 	scene.SelectedKey = rl.KeyDown
-		// 	scene.SelectedComponentIndex += 1
+		// for _, binding := range scene.KeyBindings {
+		// 	log.Printf("bindings %v", scene.KeyBindings)
+		// 	if rl.IsKeyPressed(binding.Current) && !(g.ButtonSkip == binding.Current) {
+		// 		log.Printf("binding %v", binding)
+		// 		binding.OnPress(g)
+		// 		g.ButtonSkip = binding.Current
+		// 	}
 
 		// }
-		for _, binding := range scene.KeyBindings {
-			log.Printf("bindings %v", scene.KeyBindings)
-			if rl.IsKeyPressed(binding.Current) && !(g.ButtonSkip == binding.Current) {
-				log.Printf("binding %v", binding)
-				binding.OnPress(g)
-				g.ButtonSkip = binding.Current
-			}
-
-		}
 		for i, component := range scene.Components {
 			if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
 				mousePosition := rl.GetMousePosition()

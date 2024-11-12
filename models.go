@@ -169,6 +169,9 @@ func (space *TechnologySpace) Render() {
 }
 
 func (space *TechnologySpace) OnClick() {
+	if space.IsFilled {
+		space.Technology.OnClick(space.Game, space.Technology)
+	}
 
 }
 

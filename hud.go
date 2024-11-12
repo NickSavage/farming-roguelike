@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gen2brain/raylib-go/raylib"
 	"log"
-	"math"
 	"nsavage/farming-roguelike/engine"
 )
 
@@ -25,7 +24,36 @@ func OnClickOpenEndRoundPage1Window(gi engine.GameInterface) {
 func OnClickOpenMarketWindow(gi engine.GameInterface) {
 	g := gi.(*Game)
 	scene := g.Scenes["Board"]
+
+	components := make([]engine.UIComponent, 0)
+	products := g.GetProductNames()
+
+	blank := engine.NewBlankComponent()
+	blank.SelectDirections.Up = len(products)
+	blank.SelectDirections.Down = 1
+	components = append(components, &blank)
+
+	x := float32(230 + 150*5)
+	y := float32(50 + 80)
+	for i, product := range products {
+		rect := rl.NewRectangle(x, y+float32(i*30), 50, 25)
+		button := g.NewSellButton(rect, g.Run.Products[product])
+		button.SelectDirections.Up = i
+		button.SelectDirections.Down = i + 2
+		if i == len(products)-1 {
+			button.SelectDirections.Down = 1
+		}
+		log.Printf("up %v down %v", button.SelectDirections.Up, button.SelectDirections.Down)
+		components = append(components, &button)
+
+	}
+
+	scene.Windows["Prices"].Components = components
 	g.ActivateWindow(scene.Windows, scene.Windows["Prices"])
+	log.Printf("components %v directions %v", scene.Windows["Prices"].Components)
+	for _, component := range components {
+		log.Printf("component %v", component)
+	}
 	log.Printf("?")
 }
 
@@ -88,7 +116,18 @@ func (g *Game) InitHUD() {
 		Name:       "End Round 1",
 		Display:    false,
 		DrawWindow: DrawEndRoundWindowPage1,
+		Components: make([]engine.UIComponent, 0),
 	}
+	blank := engine.NewBlankComponent()
+	blank.SelectDirections.Right = 1
+	blank.SelectDirections.Left = 1
+	nextButton := g.NewButton(
+		"Next Page",
+		rl.NewRectangle(500, 500, 150, 40),
+		OnClickEndRoundConfirmButton,
+	)
+	scene.Windows["EndRound1"].Components = append(scene.Components, &blank)
+	scene.Windows["EndRound1"].Components = append(scene.Components, &nextButton)
 	scene.Windows["NextEvent"] = &engine.Window{
 		Name:       "Next Event",
 		Display:    false,
@@ -112,7 +151,7 @@ func (g *Game) InitHUD() {
 	g.LoadSceneShortcuts("Board")
 	log.Printf("shorcuts %v", scene.KeyBindings)
 
-	blank := engine.NewBlankComponent()
+	blank = engine.NewBlankComponent()
 	blank.SelectDirections.Up = 4
 	blank.SelectDirections.Down = len(scene.Components) + 1
 
@@ -214,6 +253,7 @@ func DrawSidebar(g *Game) {
 }
 
 func DrawEndRoundWindowPage1(gi engine.GameInterface, win *engine.Window) {
+	log.Printf("win %v", win.Components)
 
 	g := gi.(*Game)
 	windowRect := rl.NewRectangle(220, 50, 900, 500)
@@ -252,13 +292,6 @@ func DrawEndRoundWindowPage1(gi engine.GameInterface, win *engine.Window) {
 	rl.DrawText(text, x, y+50, 20, rl.Black)
 	text = fmt.Sprintf("Total: %v", total)
 	rl.DrawText(text, x, y+70, 20, rl.Black)
-
-	button := g.NewButton(
-		"Next Page",
-		rl.NewRectangle(500, 500, 150, 40),
-		OnClickEndRoundConfirmButton,
-	)
-	win.Components = append(win.Components, &button)
 }
 
 func (g *Game) HandleChooseEvent(event Event) {
@@ -271,87 +304,14 @@ func (g *Game) HandleChooseEvent(event Event) {
 }
 
 func DrawNextEventWindow(gi engine.GameInterface, win *engine.Window) {
-	g := gi.(*Game)
-
 	window := rl.NewRectangle(220, 50, 900, 500)
 	rl.DrawRectangleRec(window, rl.White)
 	rl.DrawRectangleLinesEx(window, 2, rl.Black)
 
-	events := g.Run.EventChoices
-	var x int32
-	var y int32 = 60
-
-	for i, event := range events {
-		x = int32(240 + (i * 300))
-		rect := rl.NewRectangle(float32(x)+5, float32(y), 300, 400)
-
-		rl.DrawRectangleRec(rect, rl.White)
-		mousePosition := rl.GetMousePosition()
-		if rl.CheckCollisionPointRec(mousePosition, rect) {
-			rl.DrawRectangleRec(rect, rl.LightGray)
-			if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-				g.HandleChooseEvent(event)
-			}
-		}
-		rl.DrawRectangleLinesEx(rect, 5, rl.Black)
-
-		rl.DrawText(event.Name, x+5, y+10, 30, rl.Black)
-
-		rl.DrawText(event.Description, x+5, y+45, 15, rl.Black)
-
-		rl.DrawText(fmt.Sprintf("%v", event.Severity), x+140, y+400-20, 15, rl.Black)
-		for i, effect := range event.Effects {
-			adjustedY := y + 400 - 40
-			if effect.IsPriceChange {
-				newPrice := g.Run.Products[effect.ProductImpacted].Price * float32(1+effect.PriceChange)
-				newPrice = float32(math.Round(float64(newPrice*100))) / 100
-
-				displayChange := math.Round(float64(effect.PriceChange*100*100)) / 100
-				text := fmt.Sprintf("%v: %v (%v%%)", effect.ProductImpacted, newPrice, displayChange)
-				rl.DrawText(text, x+5, adjustedY-int32((i*20)), 20, rl.Black)
-			}
-		}
-
-	}
 }
 
 func OnClickConfirmNextEvent(g *Game) {
 	g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["NextEvent"])
-}
-
-func (g *Game) DrawMarketSellButton(x, y float32, product *Product) {
-
-	if product.Quantity == 0 {
-		return
-	}
-
-	rect := rl.Rectangle{
-		X:      x - 3,
-		Y:      y,
-		Width:  50,
-		Height: 25,
-	}
-	rl.DrawRectangleRec(rect, rl.SkyBlue)
-	rl.DrawRectangleLinesEx(rect, 1, rl.Black)
-	rl.DrawText(fmt.Sprintf("Sell"), int32(x+5), int32(y), 20, rl.Black)
-
-	mousePosition := rl.GetMousePosition()
-	if rl.CheckCollisionPointRec(mousePosition, rect) {
-		if rl.IsMouseButtonPressed(rl.MouseLeftButton) && !g.ScreenSkip {
-
-			scene := g.Scenes["Board"]
-			result := g.SellProduct(product)
-			g.Run.Money += result
-
-			message := engine.Message{
-				Text:  fmt.Sprintf("%v", result),
-				Vec:   rl.Vector2{X: x, Y: y},
-				Timer: 30,
-			}
-			scene.Messages = append(scene.Messages, message)
-			g.ScreenSkip = true
-		}
-	}
 }
 
 func DrawMarketWindow(gi engine.GameInterface, win *engine.Window) {
@@ -384,8 +344,6 @@ func DrawMarketWindow(gi engine.GameInterface, win *engine.Window) {
 		rl.DrawText(fmt.Sprintf("%v", g.Run.Products[product].Price), x+columnOffset*3, y, 20, rl.Black)
 		value := g.Run.Products[product].TotalEarned
 		rl.DrawText(fmt.Sprintf("%v", value), x+columnOffset*4, y, 20, rl.Black)
-
-		g.DrawMarketSellButton(float32(x+columnOffset*5), float32(y), g.Run.Products[product])
 
 		if g.Run.Products[product].Quantity == 0 {
 			i += 1

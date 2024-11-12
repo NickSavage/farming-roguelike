@@ -25,18 +25,21 @@ func OnClickSettings(gi engine.GameInterface) {
 
 	g := gi.(*Game)
 	g.ActivateScene("Settings")
+	g.Scenes["Settings"].SelectedComponentIndex = 0
 	g.Scenes["Settings"].Data["Return"] = "GameMenu"
 }
 func OnClickStats(gi engine.GameInterface) {
 
 	g := gi.(*Game)
 	scene := g.Scenes["GameMenu"]
+	scene.Windows["Stats"].SelectedComponentIndex = 0
 	g.ActivateWindow(scene.Windows, scene.Windows["Stats"])
 }
 func OnClickAbout(gi engine.GameInterface) {
 
 	g := gi.(*Game)
 	scene := g.Scenes["GameMenu"]
+	scene.Windows["About"].SelectedComponentIndex = 0
 	g.ActivateWindow(scene.Windows, scene.Windows["About"])
 }
 
@@ -126,7 +129,6 @@ func (g *Game) InitGameMenu() {
 		Name:       "Stats",
 		Display:    false,
 		DrawWindow: DrawStatsWindow,
-		Buttons:    make([]engine.Button, 1),
 	}
 	statsCloseButton := g.NewButton(
 		"Close",
@@ -138,13 +140,19 @@ func (g *Game) InitGameMenu() {
 		),
 		CloseStatsWindow,
 	)
-	scene.Windows["Stats"].Components = append(scene.Windows["Stats"].Components, &statsCloseButton)
+
+	components := make([]engine.UIComponent, 0)
+	blank = engine.NewBlankComponent()
+	blank.SelectDirections.Up = 1
+	blank.SelectDirections.Down = 1
+	components = append(components, &blank)
+	components = append(components, &statsCloseButton)
+	scene.Windows["Stats"].Components = components
 
 	scene.Windows["About"] = &engine.Window{
 		Name:       "About",
 		Display:    false,
 		DrawWindow: DrawStatsWindow,
-		Buttons:    make([]engine.Button, 1),
 	}
 
 	button := g.NewButton(
@@ -157,7 +165,15 @@ func (g *Game) InitGameMenu() {
 		),
 		CloseAboutWindow,
 	)
-	scene.Windows["About"].Components = append(scene.Windows["About"].Components, &button)
+
+	components = make([]engine.UIComponent, 0)
+	blank = engine.NewBlankComponent()
+	blank.SelectDirections.Up = 1
+	blank.SelectDirections.Down = 1
+	components = append(components, &blank)
+	components = append(components, &button)
+
+	scene.Windows["About"].Components = components
 }
 
 func DrawGameMenu(gi engine.GameInterface) {
@@ -165,25 +181,6 @@ func DrawGameMenu(gi engine.GameInterface) {
 }
 
 func UpdateGameMenu(gi engine.GameInterface) {
-	// g := gi.(*Game)
-	// scene := g.Scenes["GameMenu"]
-	// if rl.IsKeyPressed(rl.KeyDown) {
-	// 	if scene.SelectedComponentIndex == len(scene.Components)-1 {
-	// 		scene.SelectedComponentIndex = 0
-	// 	} else {
-	// 		scene.SelectedComponentIndex += 1
-	// 	}
-	// }
-	// if scene.SelectedComponentIndex > 0 {
-	// 	for i, _ := range scene.Components {
-	// 		if i == scene.SelectedComponentIndex {
-	// 			scene.Components[i].Select()
-	// 		} else {
-	// 			scene.Components[i].Unselect()
-	// 		}
-	// 	}
-	// }
-
 }
 func DrawStatsWindow(gi engine.GameInterface, win *engine.Window) {
 	g := gi.(*Game)
@@ -201,7 +198,7 @@ func DrawStatsWindow(gi engine.GameInterface, win *engine.Window) {
 func CloseStatsWindow(gi engine.GameInterface) {
 	g := gi.(*Game)
 	scene := g.Scenes["GameMenu"]
-	g.ActivateWindow(scene.Windows, scene.Windows["About"])
+	g.ActivateWindow(scene.Windows, scene.Windows["Stats"])
 }
 
 func DrawAboutWindow(g *Game, win *engine.Window) {

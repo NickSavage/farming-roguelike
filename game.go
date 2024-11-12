@@ -330,8 +330,26 @@ func (g *Game) EndGame() {
 }
 
 func (g *Game) GetNextEvents() {
+	choices := 2
+	g.Run.EventChoices = g.PickEventChoices(choices)
+	window := g.Scenes["Board"].Windows["NextEvent"]
+	components := make([]engine.UIComponent, 0)
 
-	g.Run.EventChoices = g.PickEventChoices(2)
+	blank := engine.NewBlankComponent()
+	blank.SelectDirections.Left = choices
+	blank.SelectDirections.Right = 1
+	components = append(components, &blank)
+	var x float32
+	for i, event := range g.Run.EventChoices {
+
+		x = float32(240 + (i * 300))
+		rect := rl.Rectangle{X: x, Y: 60, Width: 300, Height: 400}
+		button := g.NewEventButton(rect, &event)
+		button.SelectDirections.Left = i + 1 - 1
+		button.SelectDirections.Right = i + 1 + 1
+		components = append(components, &button)
+	}
+	window.Components = components
 }
 
 func (g *Game) DrawTechHoverWindow(tech Technology, x, y float32) {

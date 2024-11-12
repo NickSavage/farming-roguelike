@@ -104,18 +104,24 @@ func (dropdown *Dropdown) Directions() *SelectDirections { return &dropdown.Sele
 
 func (button Button) Render() {
 	var boxColor rl.Color
+	var lineColor rl.Color
 	mousePosition := rl.GetMousePosition()
 	if rl.CheckCollisionPointRec(mousePosition, button.Rectangle) {
 		if button.HoverColor == rl.Blank {
 			button.HoverColor = button.Color
 		}
 		boxColor = button.HoverColor
+		lineColor = rl.Green
 	} else if button.Selected {
 		boxColor = button.HoverColor
+		lineColor = rl.Green
+		lineColor = rl.Black
 	} else {
 		boxColor = button.Color
+		lineColor = rl.Black
 	}
-	rl.DrawRectangle(button.Rectangle.ToInt32().X, button.Rectangle.ToInt32().Y, button.Rectangle.ToInt32().Width, button.Rectangle.ToInt32().Height, boxColor)
+	rl.DrawRectangleRec(button.Rectangle, boxColor)
+	rl.DrawRectangleLinesEx(button.Rectangle, 1, lineColor)
 	textSize := button.TextSize
 	if textSize == 0 {
 		textSize = int32(button.Rectangle.Height - 15)
