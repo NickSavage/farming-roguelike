@@ -121,6 +121,7 @@ func (g *Game) LoadInitialData() {
 func (g *Game) InitProduct(productType ProductType, price float32) {
 
 	log.Printf("init product %v  %v", productType, price)
+	log.Printf("stats %v", g.ProductStats[productType])
 	if _, exists := g.Run.Products[productType]; !exists {
 		g.Run.Products[productType] = &Product{
 			Type:     productType,

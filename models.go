@@ -26,7 +26,9 @@ type Game struct {
 	ExistingSave      bool
 	ActiveRun         bool
 	UnlockBaseData    []UnlockJSON
+	UnlockSave        []UnlockSave
 	Unlocks           map[string]*Unlock
+	ProductStats      map[ProductType]*ProductStat
 }
 
 type Run struct {
@@ -57,7 +59,7 @@ type Run struct {
 	AutoSellRoundEnd          bool //whether the player wants to autosell
 }
 
-type SaveFile struct {
+type RunSaveFile struct {
 	Money                 float32                  `json:"money"`
 	MoneyRequirementStart float32                  `json:"money_requirement_start"`
 	MoneyRequirementRate  float32                  `json:"money_requirement_rate"`
@@ -72,7 +74,6 @@ type SaveFile struct {
 	Technology            []TechnologySave         `json:"technology_save"`
 	Products              map[ProductType]*Product `json:"products"`
 	Events                []EventSave              `json:"event_save"`
-	Unlocks               []UnlockSave             `json:"unlock_save"`
 }
 
 type BoardSquare struct {
@@ -306,11 +307,12 @@ type Effect struct {
 }
 
 type Product struct {
-	Type        ProductType
-	Quantity    float32
-	Price       float32
-	Yield       float32
-	TotalEarned float32
+	Type          ProductType
+	Quantity      float32
+	Price         float32
+	Yield         float32
+	TotalProduced float32
+	TotalEarned   float32
 }
 
 type ProductType string
@@ -324,6 +326,16 @@ const (
 	Cow     ProductType = "Cow"
 	Beef    ProductType = "Beef"
 )
+
+type ProductStat struct {
+	ProductType          ProductType
+	MaxProduction        float32
+	TotalProduction      float32
+	CurrentRunProduction float32
+	MaxEarned            float32
+	TotalEarned          float32
+	CurrentRunEarned     float32
+}
 
 // Define the type for the enum
 type Season int

@@ -159,12 +159,13 @@ func (g *Game) InitUnlocks() {
 
 	}
 	g.Unlocks = unlocks
+	g.UnpackUnlocks(g.UnlockSave)
 }
 
-func (r *Run) PackUnlocks() []UnlockSave {
+func (g *Game) PackUnlocks() []UnlockSave {
 	results := []UnlockSave{}
 
-	for _, unlock := range r.Game.Unlocks {
+	for _, unlock := range g.Unlocks {
 		new := UnlockSave{
 			TechnologyName: unlock.Technology.Name,
 			Unlocked:       unlock.Unlocked,
@@ -176,11 +177,11 @@ func (r *Run) PackUnlocks() []UnlockSave {
 
 }
 
-func (r *Run) UnpackUnlocks(saved []UnlockSave) {
+func (g *Game) UnpackUnlocks(saved []UnlockSave) {
 	for _, save := range saved {
 		log.Printf("save %v", save)
-		r.Game.Unlocks[save.TechnologyName].Unlocked = save.Unlocked
-		r.Game.Technology[save.TechnologyName].Unlocked = save.Unlocked
+		g.Unlocks[save.TechnologyName].Unlocked = save.Unlocked
+		g.Technology[save.TechnologyName].Unlocked = save.Unlocked
 	}
 	// todo chain unlocks together
 }

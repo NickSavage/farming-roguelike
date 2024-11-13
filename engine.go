@@ -284,7 +284,40 @@ func (g *Game) ActivateWindow(windows map[string]*engine.Window, window *engine.
 
 // save files
 
-func SaveRun(saveFile SaveFile) error {
+func SaveData(save RunSaveFile) error {
+
+	json, err := json.Marshal(save)
+	if err != nil {
+		log.Printf("save marshalling error %v", err)
+		return err
+	}
+	err = os.WriteFile("game.json", json, 0644)
+	log.Printf("save write error %v", err)
+	return err
+}
+
+func LoadData() (RunSaveFile, error) {
+
+	var save RunSaveFile
+	file, err := os.Open("./game.json")
+	if err != nil {
+		fmt.Println(err)
+		return save, err
+	}
+	defer file.Close()
+
+	jsonDecoder := json.NewDecoder(file)
+
+	err = jsonDecoder.Decode(&save)
+	if err != nil {
+		fmt.Println(err)
+		return save, err
+	}
+
+	return save, nil
+}
+
+func SaveRun(saveFile RunSaveFile) error {
 	json, err := json.Marshal(saveFile)
 	if err != nil {
 		log.Printf("save marshalling error %v", err)
@@ -295,8 +328,8 @@ func SaveRun(saveFile SaveFile) error {
 	return err
 }
 
-func LoadRun() (SaveFile, error) {
-	var save SaveFile
+func LoadRun() (RunSaveFile, error) {
+	var save RunSaveFile
 	file, err := os.Open("./save.json")
 	if err != nil {
 		fmt.Println(err)

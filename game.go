@@ -65,7 +65,6 @@ func (g *Game) InitRun(loadSave bool) {
 			run.Technology = g.UnpackTechnology(save.Technology)
 			run.Events = g.Run.UnpackEvents(save.Events)
 			// todo: place tech
-			g.Run.UnpackUnlocks(save.Unlocks)
 		}
 
 	}
@@ -310,6 +309,7 @@ func OnClickEndRound(g *Game) {
 		g.InitShopRoundComponents()
 	}
 	g.Run.SaveRun()
+	g.WriteSettingsToDisk()
 
 }
 
@@ -458,9 +458,11 @@ func (g *Game) ConsumeOrBuyProduct(product *Product, maximumInput float32) float
 func (g *Game) SellProduct(product *Product) float32 {
 	result := +product.Quantity * product.Price
 	log.Printf("selling %v %v = %v", product.Quantity, string(product.Type), result)
+	g.RecordProductStat(product, product.Quantity, result)
+	product.TotalProduced += product.Quantity
+	product.TotalEarned += result
 	product.Quantity = 0
 	// TODO: add to round money for reporting?
-	product.TotalEarned += result
 
 	return result
 }
@@ -592,7 +594,7 @@ func (r *Run) UnpackEvents(saved []EventSave) []Event {
 
 func (r *Run) SaveRun() {
 
-	saveFile := SaveFile{
+	saveFile := RunSaveFile{
 		Money:                 r.Money,
 		MoneyRequirementStart: r.MoneyRequirementStart,
 		MoneyRequirementRate:  r.MoneyRequirementRate,
@@ -607,7 +609,6 @@ func (r *Run) SaveRun() {
 		Technology:            r.PackTechnology(),
 		Products:              r.Products,
 		Events:                r.PackEvents(),
-		Unlocks:               r.PackUnlocks(),
 	}
 	SaveRun(saveFile)
 }

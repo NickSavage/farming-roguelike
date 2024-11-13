@@ -129,6 +129,7 @@ func main() {
 		Counter: 0,
 	}
 	g.InitSettings()
+	rl.InitWindow(g.screenWidth, g.screenHeight, "Farming Roguelike")
 
 	g.Data["Message"] = ""
 
@@ -140,13 +141,11 @@ func main() {
 	}
 	file.Close()
 
-	rl.InitWindow(g.screenWidth, g.screenHeight, "Farming Roguelike")
-
 	g.LoadAssets()
 	g.LoadScenes()
-
 	g.InitTechnology()
 	g.InitUnlocks()
+
 	g.InitBoard()
 	g.InitShopWindow()
 	g.InitGameMenu()

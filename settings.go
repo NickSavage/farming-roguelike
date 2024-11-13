@@ -16,6 +16,8 @@ type Settings struct {
 	ScreenWidth  int32            `json:"screenWidth"`
 	ScreenHeight int32            `json:"screenHeight"`
 	KeyBindings  []KeyBindingJSON `json:"keyBindings"`
+	Unlocks      []UnlockSave     `json:"unlocks"`
+	ProductStats []ProductStat    `json:"product_stats"`
 }
 
 func (g *Game) InitSettings() {
@@ -119,6 +121,8 @@ func (g *Game) WriteSettingsToDisk() error {
 		ScreenWidth:  g.screenWidth,
 		ScreenHeight: g.screenHeight,
 		KeyBindings:  g.KeyBindingJSONs,
+		Unlocks:      g.PackUnlocks(),
+		ProductStats: g.PackProductStats(),
 	}
 
 	jsonSettings, err := json.Marshal(settings)
@@ -142,6 +146,8 @@ func (g *Game) LoadSettingsFromDisk() error {
 	g.screenWidth = settings.ScreenWidth
 	g.screenHeight = settings.ScreenHeight
 	g.KeyBindingJSONs = settings.KeyBindings
+	g.UnlockSave = settings.Unlocks
+	g.ProductStats = g.UnpackProductStats(settings.ProductStats)
 	return nil
 
 }
