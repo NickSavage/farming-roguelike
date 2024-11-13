@@ -362,11 +362,10 @@ type InitialData struct {
 }
 
 type UnlockJSON struct {
-	CostActions      int    `json:"costActions"`
-	OtherCost        bool   `json:"otherCost"`
-	OtherDescription string `json:"otherDescription"`
-	Dependency       string `json:"dependency"`
-	TechnologyName   string
+	CostActions    int    `json:"costActions"`
+	OtherCost      bool   `json:"otherCost"`
+	Dependency     string `json:"dependency"`
+	TechnologyName string
 }
 
 type UnlockSave struct {
@@ -382,12 +381,13 @@ type TechTileConfig struct {
 }
 
 type Unlock struct {
-	Technology        *Technology
-	Unlocked          bool
-	CostActions       int
-	OtherCost         bool
-	OtherDescription  string
-	OtherCostFunction func(*Game) bool
-	DependencyName    string
-	DependencyMet     bool
+	Technology                   *Technology
+	Unlocked                     bool
+	CostActions                  int
+	OtherCost                    bool
+	OtherCostFunction            func(*Game) bool
+	OtherCostDescriptionFunction func(*Game) string
+	DependencyName               string
+	DependencyMet                bool
+	RunSpentActions              int
 }

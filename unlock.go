@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"log"
 	"nsavage/farming-roguelike/engine"
@@ -37,10 +38,48 @@ func (b *UnlockButton) Render() {
 	rl.DrawRectangleRec(b.rect, backgroundColor)
 	rl.DrawRectangleLinesEx(b.rect, 1, rl.Black)
 	rl.DrawText(b.Unlock.Technology.Name, b.rect.ToInt32().X+5, b.rect.ToInt32().Y+5, 10, rl.Black)
+	rl.DrawText(
+		fmt.Sprintf("%v/%v", b.Unlock.RunSpentActions, b.Unlock.CostActions),
+		b.rect.ToInt32().X+5,
+		b.rect.ToInt32().Y+15,
+		10,
+		rl.Black,
+	)
+	var desc string
+	if b.Unlock.OtherCost {
+		desc = b.Unlock.OtherCostDescriptionFunction(b.g)
+	} else {
+		desc = ""
+	}
+	rl.DrawText(
+		desc,
+		b.rect.ToInt32().X+5,
+		b.rect.ToInt32().Y+55,
+		10,
+		rl.Black,
+	)
 
 }
 
-func (b *UnlockButton) OnClick()                             {}
+func (b *UnlockButton) OnClick() {
+	if b.g.Run.CanSpendAction(1) {
+		b.Unlock.RunSpentActions += 1
+		b.g.Run.SpendAction(1)
+	}
+	if b.Unlock.OtherCost {
+		// to implement
+		if !b.Unlock.OtherCostFunction(b.g) {
+			return
+		}
+	}
+
+	if b.Unlock.RunSpentActions >= b.Unlock.CostActions {
+		b.Unlock.Unlocked = true
+		b.Unlock.Technology.Unlocked = true
+
+	}
+
+}
 func (b *UnlockButton) Rect() rl.Rectangle                   { return b.rect }
 func (b *UnlockButton) Select()                              { b.Selected = true }
 func (b *UnlockButton) Unselect()                            { b.Selected = false }
@@ -92,7 +131,10 @@ func DrawTechUnlockWindow(gi engine.GameInterface, window *engine.Window) {
 func (g *Game) InitUnlocks() {
 	unlocks := make(map[string]*Unlock)
 	otherCostFunctions := make(map[string]func(*Game) bool)
+	otherCostDescriptionFunctions := make(map[string]func(*Game) string)
 
+	otherCostFunctions["Cow Slaughterhouse"] = CowSlaughterhouseUnlockOtherCost
+	otherCostDescriptionFunctions["Cow Slaughterhouse"] = CowSlaughterhouseUnlockOtherCostDescription
 	for _, data := range g.UnlockBaseData {
 		unlock := &Unlock{
 			Technology:     g.Technology[data.TechnologyName],
@@ -104,6 +146,7 @@ func (g *Game) InitUnlocks() {
 		}
 		if unlock.OtherCost {
 			unlock.OtherCostFunction = otherCostFunctions[unlock.Technology.Name]
+			unlock.OtherCostDescriptionFunction = otherCostDescriptionFunctions[unlock.Technology.Name]
 			if unlock.OtherCostFunction == nil {
 				log.Fatal("function not initialized for %v", unlock.Technology.Name)
 			}
@@ -140,4 +183,11 @@ func (r *Run) UnpackUnlocks(saved []UnlockSave) {
 		r.Game.Technology[save.TechnologyName].Unlocked = save.Unlocked
 	}
 	// todo chain unlocks together
+}
+
+func CowSlaughterhouseUnlockOtherCost(g *Game) bool {
+	return false
+}
+func CowSlaughterhouseUnlockOtherCostDescription(g *Game) string {
+	return "blah"
 }

@@ -48,6 +48,7 @@
     "shopIcon": "PotatoIcon",
     "unlock": {
       "costActions": 10,
+      "otherDescription": "",
       "otherCost": false
     },
     "tile": {
@@ -212,8 +213,7 @@
     "description": "asdasd",
     "unlock": {
       "costActions": 10,
-      "otherCost": false,
-      "otherDescription": "Sell 1000 Cows"
+      "otherCost": true
     },
     "input": {
       "productType": "Cow",

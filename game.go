@@ -504,7 +504,7 @@ func (g *Game) ShopRandomBuildings(needed int) []*Technology {
 		if !tech.Unlocked {
 			continue
 		}
-		if tech.TechnologyType == BuildingSpace {
+		if tech.TechnologyType == BuildingSpace || tech.TechnologyType == PlantSpace {
 			keysToPickFrom = append(keysToPickFrom, key)
 
 		}
