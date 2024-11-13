@@ -34,6 +34,18 @@ func (b *UnlockButton) Render() {
 	if b.IsSelected() {
 		backgroundColor = rl.LightGray
 	}
+	if b.Unlock.OtherCost {
+		if !b.Unlock.OtherCostFunction(b.g) {
+			backgroundColor = rl.LightGray
+		}
+	}
+
+	var desc string
+	if b.Unlock.OtherCost {
+		desc = b.Unlock.OtherCostDescriptionFunction(b.g)
+	} else {
+		desc = ""
+	}
 
 	rl.DrawRectangleRec(b.rect, backgroundColor)
 	rl.DrawRectangleLinesEx(b.rect, 1, rl.Black)
@@ -45,12 +57,6 @@ func (b *UnlockButton) Render() {
 		10,
 		rl.Black,
 	)
-	var desc string
-	if b.Unlock.OtherCost {
-		desc = b.Unlock.OtherCostDescriptionFunction(b.g)
-	} else {
-		desc = ""
-	}
 	rl.DrawText(
 		desc,
 		b.rect.ToInt32().X+5,
@@ -187,8 +193,27 @@ func (g *Game) UnpackUnlocks(saved []UnlockSave) {
 }
 
 func CowSlaughterhouseUnlockOtherCost(g *Game) bool {
+	var total float32
+
+	if current, exists := g.ProductStats[Cow]; exists {
+		total = current.TotalProduction
+	} else {
+		total = 0
+	}
+	if total > 1000 {
+		return true
+	}
 	return false
 }
 func CowSlaughterhouseUnlockOtherCostDescription(g *Game) string {
-	return "blah"
+
+	var total float32
+
+	if current, exists := g.ProductStats[Cow]; exists {
+		total = current.TotalProduction
+	} else {
+		total = 0
+	}
+
+	return fmt.Sprintf("Produce %v/%v Cows", total, 1000)
 }
