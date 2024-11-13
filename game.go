@@ -590,30 +590,6 @@ func (r *Run) UnpackEvents(saved []EventSave) []Event {
 	return results
 }
 
-func (r *Run) PackUnlocks() []UnlockSave {
-	results := []UnlockSave{}
-
-	for _, unlock := range r.Game.Unlocks {
-		new := UnlockSave{
-			TechnologyName: unlock.Technology.Name,
-			Unlocked:       unlock.Unlocked,
-		}
-		results = append(results, new)
-
-	}
-	return results
-
-}
-
-func (r *Run) UnpackUnlocks(saved []UnlockSave) {
-	for _, save := range saved {
-		log.Printf("save %v", save)
-		r.Game.Unlocks[save.TechnologyName].Unlocked = save.Unlocked
-		r.Game.Technology[save.TechnologyName].Unlocked = save.Unlocked
-	}
-
-}
-
 func (r *Run) SaveRun() {
 
 	saveFile := SaveFile{

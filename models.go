@@ -362,9 +362,11 @@ type InitialData struct {
 }
 
 type UnlockJSON struct {
-	CostActions    int  `json:"costActions"`
-	OtherCost      bool `json:"otherCost"`
-	TechnologyName string
+	CostActions      int    `json:"costActions"`
+	OtherCost        bool   `json:"otherCost"`
+	OtherDescription string `json:"otherDescription"`
+	Dependency       string `json:"dependency"`
+	TechnologyName   string
 }
 
 type UnlockSave struct {
@@ -384,5 +386,8 @@ type Unlock struct {
 	Unlocked          bool
 	CostActions       int
 	OtherCost         bool
+	OtherDescription  string
 	OtherCostFunction func(*Game) bool
+	DependencyName    string
+	DependencyMet     bool
 }

@@ -72,6 +72,12 @@ func OnClickEndRoundConfirmButton(gi engine.GameInterface) {
 	g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["NextEvent"])
 }
 
+func OnClickOpenTechUnlockWindow(gi engine.GameInterface) {
+	g := gi.(*Game)
+	g.InitTechUnlockWindow()
+	g.ActivateWindow(g.Scenes["Board"].Windows, g.Scenes["Board"].Windows["UnlockWindow"])
+}
+
 func CloseAllWindows(gi engine.GameInterface) {
 	g := gi.(*Game)
 	scene := g.Scenes["Board"]
@@ -104,6 +110,17 @@ func (g *Game) InitHUD() {
 		Name:       "Shop Window",
 		Display:    false,
 		DrawWindow: DrawShopWindow,
+		Rectangle: rl.Rectangle{
+			X:      float32((g.screenWidth-g.SidebarWidth-890)/2 + g.SidebarWidth),
+			Y:      55,
+			Width:  890,
+			Height: 500,
+		},
+	}
+	scene.Windows["UnlockWindow"] = &engine.Window{
+		Name:       "Tech Window",
+		Display:    false,
+		DrawWindow: DrawTechUnlockWindow,
 		Rectangle: rl.Rectangle{
 			X:      float32((g.screenWidth-g.SidebarWidth-890)/2 + g.SidebarWidth),
 			Y:      55,
@@ -152,7 +169,7 @@ func (g *Game) InitHUD() {
 	log.Printf("shorcuts %v", scene.KeyBindings)
 
 	blank = engine.NewBlankComponent()
-	blank.SelectDirections.Up = 4
+	blank.SelectDirections.Up = 5
 	blank.SelectDirections.Down = len(scene.Components) + 1
 
 	scene.Components = append(scene.Components, &blank)
@@ -177,9 +194,19 @@ func (g *Game) InitHUD() {
 	priceButton.SelectDirections.Right = 5
 	scene.Components = append(scene.Components, &priceButton)
 	// 3
+	unlockButton := g.NewButton(
+		"Technology",
+		rl.NewRectangle(10, 340, 150, 40),
+		OnClickOpenTechUnlockWindow,
+	)
+	priceButton.SelectDirections.Up = len(scene.Components) - 1
+	priceButton.SelectDirections.Down = len(scene.Components) + 1
+	priceButton.SelectDirections.Right = 5
+	scene.Components = append(scene.Components, &unlockButton)
+	// 4
 	viewEndRoundButton := g.NewButton(
 		"End Round",
-		rl.NewRectangle(10, 340, 150, 40),
+		rl.NewRectangle(10, 390, 150, 40),
 		OnClickOpenEndRoundPage1Window,
 	)
 	viewEndRoundButton.SelectDirections.Up = len(scene.Components) - 1
@@ -187,7 +214,7 @@ func (g *Game) InitHUD() {
 	viewEndRoundButton.SelectDirections.Right = 5
 
 	scene.Components = append(scene.Components, &viewEndRoundButton)
-	// 4
+	// 5
 	settingsButton := g.NewButton(
 		"Settings",
 		rl.NewRectangle(10, float32(g.screenHeight)-60, 150, 40),

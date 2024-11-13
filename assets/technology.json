@@ -212,7 +212,8 @@
     "description": "asdasd",
     "unlock": {
       "costActions": 10,
-      "otherCost": false
+      "otherCost": false,
+      "otherDescription": "Sell 1000 Cows"
     },
     "input": {
       "productType": "Cow",
