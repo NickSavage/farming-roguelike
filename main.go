@@ -150,7 +150,6 @@ func main() {
 	g.InitUnlocks()
 
 	g.InitBoard()
-	g.InitShopWindow()
 	g.InitGameMenu()
 	g.InitSettingsMenu()
 

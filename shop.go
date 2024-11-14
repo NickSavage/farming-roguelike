@@ -45,8 +45,14 @@ func ShopButtonOnClick(g *Game, b ShopBuildingButton) {
 	}
 }
 
+func ShopSeedButtonOnClick(g *Game, b *ShopSeedButton) {
+	// window := g.Scenes["Board"].Windows["ShopWindow"]
+	g.ShopChooseTech(b.Technology)
+	b.Technology.ToBeDeleted = true
+}
+
 func (g *Game) InitShopWindow() {
-	log.Printf("init shop")
+	g.InitShopRoundComponents()
 }
 
 // run each time the shop is opened, maybe should be each time the round is changed
@@ -81,6 +87,24 @@ func (g *Game) InitShopRoundComponents() {
 		}
 		window.Components = append(window.Components, &button)
 	}
+
+	seeds := make([]*Technology, 0)
+	for i, seed := range g.Run.CurrentSeeds {
+		log.Printf("seed %v", seed.ToBeDeleted)
+		if seed.ToBeDeleted {
+			continue
+		}
+		seeds = append(seeds, seed)
+
+		rect := rl.NewRectangle(x+50+float32(i*160), y+55+300, 150, 150)
+		button := g.NewShopSeedButton(rect, seed)
+		button.CanBuild = g.CanBuild(seed)
+		button.Position = n
+		window.Components = append(window.Components, &button)
+		n += 1
+	}
+	g.Run.CurrentSeeds = seeds
+
 }
 
 func DrawShopWindow(gi engine.GameInterface, win *engine.Window) {
@@ -94,4 +118,21 @@ func DrawShopWindow(gi engine.GameInterface, win *engine.Window) {
 	rl.DrawRectangleLinesEx(window.Rectangle, 5, rl.Black)
 	rl.DrawText("Shop", x+5, y+5, 30, rl.Black)
 
+}
+
+func (g *Game) ShopRandomBuildings(needed int) []*Technology {
+
+	keysToPickFrom := make([]string, 0)
+	for key, tech := range g.Technology {
+		log.Printf("tech %v unlocked %v", tech, tech.Unlocked)
+		if !tech.Unlocked {
+			continue
+		}
+		keysToPickFrom = append(keysToPickFrom, key)
+		// some sort of filtering is needed here
+
+	}
+	results := g.PickRandomTechnologies(needed, keysToPickFrom)
+
+	return results
 }

@@ -212,6 +212,9 @@ func (g *Game) GetProductNames() []ProductType {
 	return results
 }
 
+func (r *Run) AddSeed(tech *Technology) {
+	r.CurrentSeeds = append(r.CurrentSeeds, tech)
+}
 func (g *Game) PlaceSeed(tech *Technology, space *TechnologySpace) error {
 	tech.Space = space
 	copy := *tech
@@ -230,6 +233,13 @@ func (g *Game) PlaceSeed(tech *Technology, space *TechnologySpace) error {
 			g.Run.Technology = append(g.Run.Technology, &copy)
 		}
 	}
+	results := []*Technology{}
+	for _, tech := range g.Run.CurrentSeeds {
+		if !tech.ToBeDeleted {
+			results = append(results, tech)
+		}
+	}
+	g.Run.CurrentSeeds = results
 	return nil
 }
 
@@ -417,6 +427,8 @@ func (g *Game) CreateWheatTech() *Technology {
 
 func WheatFieldOnBuild(g *Game, tech *Technology) error {
 	g.InitProduct(tech.ProductType, tech.InitialPrice)
+	tech.ReadyToHarvest = false
+	tech.ReadyToTouch = true
 	return nil
 }
 
@@ -446,7 +458,12 @@ func WheatFieldOnClick(g *Game, tech *Technology) string {
 	} else if tech.ReadyToHarvest {
 		produced := g.RoundEndProduce(tech)
 		g.Run.Products["Wheat"].Quantity += produced
+
+		copy := *tech
+		g.Run.AddSeed(&copy)
+
 		g.RemoveTech(tech)
+
 		return fmt.Sprintf("Wheat: %v", produced)
 	}
 	return ""

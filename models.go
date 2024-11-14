@@ -45,6 +45,7 @@ type Run struct {
 	CurrentSeason             Season
 	CurrentRoundShopPlants    []*Technology
 	CurrentRoundShopBuildings []*Technology
+	CurrentSeeds              []*Technology
 	NextSeason                Season
 	EventChoices              []Event
 	Events                    []Event
@@ -70,6 +71,7 @@ type RunSaveFile struct {
 	ActionsMaximum        int                      `json:"actions_maximum"`
 	EventTracker          map[string]bool          `json:"event_tracker"`
 	Technology            []TechnologySave         `json:"technology_save"`
+	CurrentSeeds          []TechnologySave         `json:"current_seeds"`
 	Products              map[ProductType]*Product `json:"products"`
 	Events                []EventSave              `json:"event_save"`
 }

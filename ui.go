@@ -82,6 +82,67 @@ func (g *Game) NewShopButton(rect rl.Rectangle, tech *Technology) ShopBuildingBu
 }
 
 // implements UIComponent
+type ShopSeedButton struct {
+	g                *Game
+	rect             rl.Rectangle
+	Technology       *Technology
+	Position         int
+	SelectDirections engine.SelectDirections
+	Selected         bool
+	CanBuild         bool //determined in InitShopRoundComponents
+	ToBeDeleted      bool
+}
+
+func (b *ShopSeedButton) Render() {
+	// g := b.g
+	textColor := rl.Black
+
+	backgroundColor := rl.White
+	if b.IsSelected() || b.Technology.ToBeDeleted {
+		backgroundColor = rl.LightGray
+	}
+
+	if !b.CanBuild {
+		textColor = rl.LightGray
+	}
+
+	mousePosition := rl.GetMousePosition()
+	if rl.CheckCollisionPointRec(mousePosition, b.rect) {
+		if b.CanBuild {
+			backgroundColor = rl.LightGray
+		}
+	}
+
+	x := b.rect.X
+	y := b.rect.Y
+
+	rl.DrawRectangleRec(b.rect, backgroundColor)
+	rl.DrawRectangleLinesEx(b.rect, 1, rl.Black)
+	rl.DrawText(b.Technology.Name, int32(x), int32(y+100), 20, textColor)
+
+}
+func (b *ShopSeedButton) OnClick() {
+	ShopSeedButtonOnClick(b.g, b)
+}
+func (b *ShopSeedButton) Rect() rl.Rectangle {
+	return b.rect
+}
+
+func (b *ShopSeedButton) Select()                              { b.Selected = true }
+func (b *ShopSeedButton) Unselect()                            { b.Selected = false }
+func (b *ShopSeedButton) IsSelected() bool                     { return b.Selected }
+func (b *ShopSeedButton) Directions() *engine.SelectDirections { return &b.SelectDirections }
+
+func (g *Game) NewShopSeedButton(rect rl.Rectangle, tech *Technology) ShopSeedButton {
+	return ShopSeedButton{
+		g:                g,
+		rect:             rect,
+		Technology:       tech,
+		SelectDirections: engine.SelectDirections{},
+	}
+}
+
+// implements UIComponent
 type EventButton struct {
 	g                *Game
 	rect             rl.Rectangle

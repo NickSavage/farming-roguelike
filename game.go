@@ -50,6 +50,9 @@ func (g *Game) InitRun(loadSave bool) {
 	}
 
 	g.Run.PossibleEvents = events
+	g.Run.CurrentSeeds = []*Technology{
+		g.CreateWheatTech(),
+	}
 	if loadSave {
 		save, err := LoadRun()
 		if err == nil {
@@ -63,6 +66,7 @@ func (g *Game) InitRun(loadSave bool) {
 			run.ActionsMaximum = save.ActionsMaximum
 			run.Products = save.Products
 			run.Technology = g.UnpackTechnology(save.Technology)
+			run.CurrentSeeds = g.UnpackSeeds(save.CurrentSeeds)
 			run.Events = g.Run.UnpackEvents(save.Events)
 			// todo: place tech
 		}
@@ -499,23 +503,6 @@ func (g *Game) PickRandomTechnologies(needed int, keys []string) []*Technology {
 	return results
 }
 
-func (g *Game) ShopRandomBuildings(needed int) []*Technology {
-
-	keysToPickFrom := make([]string, 0)
-	for key, tech := range g.Technology {
-		log.Printf("tech %v unlocked %v", tech, tech.Unlocked)
-		if !tech.Unlocked {
-			continue
-		}
-		keysToPickFrom = append(keysToPickFrom, key)
-		// some sort of filtering is needed here
-
-	}
-	results := g.PickRandomTechnologies(needed, keysToPickFrom)
-
-	return results
-}
-
 // save files
 
 func createTechSave(tech *Technology) TechnologySave {
@@ -537,9 +524,9 @@ func createTechSave(tech *Technology) TechnologySave {
 
 }
 
-func (r *Run) PackTechnology() []TechnologySave {
+func (r *Run) PackTechnology(techs []*Technology) []TechnologySave {
 	results := []TechnologySave{}
-	for _, tech := range r.Technology {
+	for _, tech := range techs {
 		if tech.TechnologyType == Seed {
 			// we'll handle this elsewhere
 			continue
@@ -559,6 +546,16 @@ func (g *Game) unpackTech(save TechnologySave) *Technology {
 	copy.TempYield = save.TempYield
 	return copy
 
+}
+
+func (g *Game) UnpackSeeds(saved []TechnologySave) []*Technology {
+	results := []*Technology{}
+	for _, save := range saved {
+		copy := g.unpackTech(save)
+		results = append(results, copy)
+
+	}
+	return results
 }
 
 func (g *Game) UnpackTechnology(saved []TechnologySave) []*Technology {
@@ -640,9 +637,10 @@ func (r *Run) SaveRun() {
 		ActionsRemaining:      r.ActionsRemaining,
 		ActionsMaximum:        r.ActionsMaximum,
 		EventTracker:          r.EventTracker,
-		Technology:            r.PackTechnology(),
+		Technology:            r.PackTechnology(r.Technology),
 		Products:              r.Products,
 		Events:                r.PackEvents(),
+		CurrentSeeds:          r.PackTechnology(r.CurrentSeeds),
 	}
 	SaveRun(saveFile)
 }
