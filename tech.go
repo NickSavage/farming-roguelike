@@ -23,6 +23,8 @@ func (g *Game) InitTechnology() {
 	tech["Potato Field"] = g.CreatePotatoTech()
 	tech["Carrot Field"] = g.CreateCarrotTech()
 
+	tech["Flour Mill"] = g.CreateFlourMillTech()
+
 	tech["Cow Pasture"] = g.CreateCowPastureTech()
 	tech["Cow Slaughterhouse"] = g.CreateCowSlaughterhouseTech()
 
@@ -36,6 +38,31 @@ func (g *Game) InitTechnology() {
 	g.Technology = tech
 }
 
+// to check timing of whether the seed should be planted or not
+func (g *Game) CheckSeedPlanting(tech *Technology) bool {
+
+	if tech.ProductType == Wheat {
+		if g.Run.CurrentSeason == Spring {
+			return true
+		}
+		return false
+	}
+	if tech.ProductType == Potato {
+		if g.Run.CurrentSeason == Spring {
+			return true
+		}
+		return false
+	}
+	if tech.ProductType == Carrot {
+		if g.Run.CurrentSeason == Spring {
+			return true
+		}
+		return false
+	}
+	return false
+
+}
+
 func (g *Game) CanBuild(tech *Technology) bool {
 
 	if !g.Run.CanSpendMoney(tech.CostMoney) {
@@ -46,6 +73,11 @@ func (g *Game) CanBuild(tech *Technology) bool {
 		log.Printf("can't spend actions")
 		return false
 	}
+	_, err := g.GetOpenSpace(tech)
+	if err != nil {
+		log.Printf("no space")
+		return false
+	}
 	if tech.TechnologyType == Seed {
 		// check if available field
 		found := false
@@ -53,7 +85,16 @@ func (g *Game) CanBuild(tech *Technology) bool {
 			if !space.IsField {
 				continue
 			}
+			if len(space.PlantedSeeds) > 0 {
+				continue
+			}
 			found = true
+		}
+		if found {
+			check := g.CheckSeedPlanting(tech)
+			if !check {
+				return false
+			}
 		}
 		log.Printf("%v can build %v", tech.Name, found)
 		return found
@@ -221,6 +262,31 @@ func (g *Game) PlaceTech(tech *Technology, space *TechnologySpace) error {
 	return nil
 }
 
+func (g *Game) GetOpenSpace(tech *Technology) (*TechnologySpace, error) {
+
+	for _, space := range g.Run.TechnologySpaces {
+		if tech.TechnologyType == Seed && space.IsField {
+			if len(space.PlantedSeeds) != 0 {
+				continue
+			}
+			return space, nil
+		}
+		if space.IsFilled {
+			continue
+		}
+		if tech.Name == "Solar Panels" {
+			if space.TechnologyType != PlantSpace {
+				continue
+			}
+
+		} else if space.TechnologyType != tech.TechnologyType {
+			continue
+		}
+		return space, nil
+	}
+	return &TechnologySpace{}, errors.New("no empty space")
+}
+
 func (g *Game) RemoveTech(tech *Technology) {
 
 	log.Printf("space %v", tech.Space)
@@ -294,6 +360,7 @@ func (g *Game) CreateFieldTech() *Technology {
 }
 
 func FieldOnBuild(g *Game, tech *Technology) error {
+	tech.ReadyToTouch = false
 	return nil
 
 }
@@ -383,6 +450,77 @@ func WheatFieldOnClick(g *Game, tech *Technology) string {
 		return fmt.Sprintf("Wheat: %v", produced)
 	}
 	return ""
+}
+
+func (g *Game) CreateFlourMillTech() *Technology {
+
+	tech := g.CreateTechFromInitialData(g.InitialData["Flour Mill"])
+	tech.OnBuild = FlourMillOnBuild
+	tech.OnClick = FlourMillOnClick
+	tech.OnRoundEnd = FlourMillRoundEnd
+	return tech
+
+}
+
+func FlourMillOnBuild(g *Game, tech *Technology) error {
+	g.InitProduct(tech.ProductType, tech.InitialPrice)
+	g.InitProduct(Flour, 5)
+	tech.ReadyToTouch = false
+	return nil
+
+}
+func FlourMillRoundEnd(g *Game, tech *Technology) {
+	tech.ReadyToHarvest = true
+}
+func FlourMillOnClick(g *Game, tech *Technology) string {
+
+	if tech.ReadyToHarvest {
+		err := g.Run.SpendAction(1)
+		if err != nil {
+			return ""
+		}
+
+		var input float32
+		input = tech.Input.MaximumInput
+		market := g.ConsumeOrBuyProduct(g.Run.Products[Wheat], tech.Input.MaximumInput)
+
+		produced := input * tech.Input.OutputPerInput * g.Run.Productivity
+		g.Run.Products[Flour].Quantity += produced
+		tech.ReadyToHarvest = false
+		if market > 0 {
+			return fmt.Sprintf("Flour: %v (-$%v)", produced, market)
+
+		} else {
+			return fmt.Sprintf("Flour: %v (-%v Wheat)", produced, input)
+		}
+	}
+	return ""
+}
+
+func FlourMillUnlockOtherCost(g *Game) bool {
+	var total float32
+
+	if current, exists := g.ProductStats[Wheat]; exists {
+		total = current.TotalProduction
+	} else {
+		total = 0
+	}
+	if total > 500 {
+		return true
+	}
+	return false
+}
+func FlourMillUnlockOtherCostDescription(g *Game) string {
+
+	var total float32
+
+	if current, exists := g.ProductStats[Wheat]; exists {
+		total = current.TotalProduction
+	} else {
+		total = 0
+	}
+
+	return fmt.Sprintf("Sell %v/%v Wheat", total, 500)
 }
 
 // potato

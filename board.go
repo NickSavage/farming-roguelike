@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"log"
 	"math/rand"
 	"nsavage/farming-roguelike/engine"
@@ -37,27 +36,6 @@ func (g *Game) GetVecFromCoords(input engine.BoardCoord) rl.Vector2 {
 	}
 }
 
-func (g *Game) GetOpenSpace(tech *Technology) (*TechnologySpace, error) {
-
-	for _, space := range g.Run.TechnologySpaces {
-		if tech.TechnologyType == Seed && space.IsField {
-			return space, nil
-		}
-		if space.IsFilled {
-			continue
-		}
-		if tech.Name == "Solar Panels" {
-			if space.TechnologyType != PlantSpace {
-				continue
-			}
-
-		} else if space.TechnologyType != tech.TechnologyType {
-			continue
-		}
-		return space, nil
-	}
-	return &TechnologySpace{}, errors.New("no empty space")
-}
 func generateCoordinates(numPairs, maxX, maxY int) []rl.Vector2 {
 	coordinates := make([]rl.Vector2, numPairs)
 

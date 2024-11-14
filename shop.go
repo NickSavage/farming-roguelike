@@ -26,7 +26,13 @@ func ShopButtonOnClick(g *Game, b ShopBuildingButton) {
 	err := g.ShopChooseTech(b.Technology)
 	log.Printf("err %v", err)
 	if err == nil {
+		// setting purchased flag
 		// this is a bit of a cludge, think about another way at some point
+
+		// don't need to do it for seeds
+		if b.Technology.TechnologyType == Seed {
+			return
+		}
 		var button ShopBuildingButton
 		for i, _ := range window.Components {
 			// log.Printf("component %v i %v", component, i)

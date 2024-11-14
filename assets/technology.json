@@ -21,10 +21,10 @@
     "name": "Wheat Field",
     "productType": "Wheat",
     "technologyType": "Seed",
-    "price": 1,
+    "price": 2,
     "costMoney": 50,
     "costActions": 1,
-    "production": 100,
+    "production": 200,
     "rarity": "Common",
     "description": "asdasd",
     "shopIcon": "WheatIcon",
@@ -237,6 +237,32 @@
     },
     "input": {
       "productType": "Cow",
+      "maximumInput": 10,
+      "outputPerInput": 1
+    }
+  },
+  {
+    "name": "Flour Mill",
+    "technologyType": "BuildingSpace",
+    "productType": "Flour",
+    "price": 10,
+    "rarity": "Rare",
+    "shopIcon": "FlourMillTile",
+    "tile": {
+      "id": "FlourMillTile",
+      "width": 2,
+      "height": 2,
+      "fillSpace": false
+    },
+    "costMoney": 100,
+    "costActions": 1,
+    "description": "asdasd",
+    "unlock": {
+      "costActions": 10,
+      "otherCost": true
+    },
+    "input": {
+      "productType": "Wheat",
       "maximumInput": 10,
       "outputPerInput": 1
     }

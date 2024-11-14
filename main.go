@@ -79,6 +79,9 @@ func (g *Game) LoadAssets() {
 	g.Data["CowPastureTile"] = LoadImage(image, 0, 0, 5, 5)
 	rl.ImageResize(image, 90, 90)
 	g.Data["CowPastureShopTile"] = LoadImage(image, 0, 0, 2, 2)
+
+	image = rl.LoadImage("assets/icons/flourmill.png")
+	g.Data["FlourMillTile"] = LoadImage(image, 0, 0, 2, 2)
 }
 
 func (g *Game) LoadScenes() {

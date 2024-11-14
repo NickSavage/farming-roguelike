@@ -148,6 +148,8 @@ func (g *Game) InitUnlocks() {
 
 	otherCostFunctions["Cow Slaughterhouse"] = CowSlaughterhouseUnlockOtherCost
 	otherCostDescriptionFunctions["Cow Slaughterhouse"] = CowSlaughterhouseUnlockOtherCostDescription
+	otherCostFunctions["Flour Mill"] = FlourMillUnlockOtherCost
+	otherCostDescriptionFunctions["Flour Mill"] = FlourMillUnlockOtherCostDescription
 	for _, data := range g.UnlockBaseData {
 		unlock := &Unlock{
 			Technology:     g.Technology[data.TechnologyName],

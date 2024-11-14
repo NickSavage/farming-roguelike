@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"nsavage/farming-roguelike/engine"
 
@@ -22,40 +23,25 @@ type ShopBuildingButton struct {
 }
 
 func (b *ShopBuildingButton) Render() {
-	g := b.g
+	// g := b.g
 	textColor := rl.Black
-	canBuild := true
 
 	backgroundColor := rl.White
-	if b.Purchased {
+	if b.Purchased || b.IsSelected() {
 		backgroundColor = rl.LightGray
 	}
 
-	if !g.Run.CanSpendMoney(b.Technology.CostMoney) ||
-		!g.CanBuild(b.Technology) {
+	if !b.CanBuild {
 		textColor = rl.LightGray
-		canBuild = false
-	}
-	if !g.Run.CanSpendAction(b.Technology.CostActions) {
-		textColor = rl.LightGray
-		canBuild = false
-	}
-	_, err := g.GetOpenSpace(b.Technology)
-	if err != nil {
-		textColor = rl.LightGray
-		canBuild = false
 	}
 
 	mousePosition := rl.GetMousePosition()
-
 	if rl.CheckCollisionPointRec(mousePosition, b.rect) {
-		if canBuild && !b.Purchased {
+		if b.CanBuild && !b.Purchased {
 			backgroundColor = rl.LightGray
 		}
 	}
-	if b.IsSelected() {
-		backgroundColor = rl.LightGray
-	}
+
 	x := b.rect.X
 	y := b.rect.Y
 
@@ -212,4 +198,126 @@ func (g *Game) NewSellButton(rect rl.Rectangle, product *Product) SellButton {
 		SelectDirections: engine.SelectDirections{},
 	}
 
+}
+
+type TechnologySpace struct {
+	Game             *Game
+	ID               int
+	Technology       *Technology
+	TechnologyType   TechnologyType
+	IsField          bool
+	PlantedSeeds     []*Technology
+	Row              int
+	Column           int
+	Width            int // in tiles
+	Height           int // in tiles
+	IsFilled         bool
+	Active           bool // whether the game displays or not
+	SelectDirections engine.SelectDirections
+	Selected         bool
+}
+
+func (space *TechnologySpace) Render() {
+
+	g := space.Game
+	scene := space.Game.Scenes["Board"]
+	if !space.Active {
+		return
+	}
+	boxColor := rl.Blue
+	if space.Selected {
+		boxColor = rl.Green
+	}
+
+	vec := g.GetVecFromCoords(engine.BoardCoord{Row: space.Row, Column: space.Column})
+	x := vec.X
+	y := vec.Y
+	width := float32(space.Width * TILE_WIDTH)
+	height := float32(space.Height * TILE_HEIGHT)
+	rect := rl.NewRectangle(x, y, width, height)
+	rl.DrawRectangleRec(rect, boxColor)
+	if !space.IsFilled {
+		return
+	}
+	mousePosition := rl.GetMousePosition()
+
+	if !g.WindowOpen && rl.CheckCollisionPointRec(mousePosition, rect) {
+
+		space.Technology.Tile.Color = rl.Green
+		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+			result := g.HandleClickTech(space)
+			message := engine.Message{
+				Text:  result,
+				Vec:   rl.Vector2{X: x, Y: y},
+				Timer: 30,
+			}
+			scene.Messages = append(scene.Messages, message)
+		}
+
+	} else {
+		if space.Technology.ReadyToHarvest {
+			space.Technology.Tile.Color = rl.Blue
+		} else {
+			space.Technology.Tile.Color = rl.White
+		}
+	}
+
+	if space.Technology.TileFillSpace {
+		for i := range space.Width {
+			for j := range space.Height {
+				DrawTile(
+					space.Technology.Tile,
+					float32(float32(x)+float32(i*TILE_WIDTH)),
+					float32(float32(y)+float32(j*TILE_HEIGHT)),
+				)
+			}
+		}
+
+	} else {
+		DrawTile(space.Technology.Tile, float32(x), float32(y))
+
+	}
+	if space.IsField {
+		for _, seed := range space.PlantedSeeds {
+			rl.DrawText(string(seed.ProductType), int32(x), int32(y), 5, rl.Black)
+
+		}
+	}
+
+}
+
+func (space *TechnologySpace) OnClick() {
+	if space.IsFilled {
+		space.Technology.OnClick(space.Game, space.Technology)
+	}
+
+}
+
+func (space *TechnologySpace) Rect() rl.Rectangle {
+
+	vec := space.Game.GetVecFromCoords(engine.BoardCoord{Row: space.Row, Column: space.Column})
+	return rl.Rectangle{
+		X:      vec.X,
+		Y:      vec.Y,
+		Width:  float32(space.Width * TILE_WIDTH),
+		Height: float32(space.Height) * TILE_HEIGHT,
+	}
+
+}
+func (space *TechnologySpace) Select() {
+	log.Printf("selected")
+	space.Selected = true
+
+}
+
+func (space *TechnologySpace) Unselect() {
+	space.Selected = false
+}
+
+func (space *TechnologySpace) IsSelected() bool {
+	return space.Selected
+}
+
+func (space *TechnologySpace) Directions() *engine.SelectDirections {
+	return &space.SelectDirections
 }
