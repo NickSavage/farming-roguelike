@@ -20,7 +20,7 @@
   {
     "name": "Wheat Field",
     "productType": "Wheat",
-    "technologyType": "PlantSpace",
+    "technologyType": "Seed",
     "price": 1,
     "costMoney": 50,
     "costActions": 1,
@@ -94,8 +94,8 @@
       "fillSpace": false
     },
     "unlock": {
-      "costActions": 10,
-      "otherCost": false
+      "costActions": 5,
+      "otherCost": true
     },
     "costMoney": 25,
     "costActions": 1,
@@ -104,7 +104,7 @@
   {
     "name": "Workstation",
     "technologyType": "BuildingSpace",
-    "productTyle": "None",
+    "productType": "None",
     "rarity": "Uncommon",
     "shopIcon": "WorkstationTile",
     "tile": {
@@ -112,6 +112,22 @@
       "width": 1,
       "height": 1,
       "fillSpace": false
+    },
+    "costMoney": 25,
+    "costActions": 1,
+    "description": "asdasd"
+  },
+  {
+    "name": "Field",
+    "technologyType": "Field",
+    "productType": "None",
+    "rarity": "Common",
+    "shopIcon": "DirtTile",
+    "tile": {
+      "id": "DirtTile",
+      "width": 5,
+      "height": 5,
+      "fillSpace": true
     },
     "costMoney": 25,
     "costActions": 1,
@@ -167,6 +183,10 @@
       "width": 1,
       "height": 1,
       "fillSpace": true
+    },
+    "unlock": {
+      "costActions": 10,
+      "otherCost": false
     },
     "costMoney": 25,
     "costActions": 1,

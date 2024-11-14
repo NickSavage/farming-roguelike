@@ -40,6 +40,9 @@ func (g *Game) GetVecFromCoords(input engine.BoardCoord) rl.Vector2 {
 func (g *Game) GetOpenSpace(tech *Technology) (*TechnologySpace, error) {
 
 	for _, space := range g.Run.TechnologySpaces {
+		if tech.TechnologyType == Seed && space.IsField {
+			return space, nil
+		}
 		if space.IsFilled {
 			continue
 		}

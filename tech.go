@@ -16,6 +16,8 @@ func (g *Game) InitTechnology() {
 	g.LoadInitialData()
 	tech := make(map[string]*Technology)
 
+	tech["Field"] = g.CreateFieldTech()
+
 	tech["Chicken Coop"] = g.CreateChickenCoopTech()
 	tech["Wheat Field"] = g.CreateWheatTech()
 	tech["Potato Field"] = g.CreatePotatoTech()
@@ -35,6 +37,28 @@ func (g *Game) InitTechnology() {
 }
 
 func (g *Game) CanBuild(tech *Technology) bool {
+
+	if !g.Run.CanSpendMoney(tech.CostMoney) {
+		log.Printf("cant spend money")
+		return false
+	}
+	if !g.Run.CanSpendAction(tech.CostActions) {
+		log.Printf("can't spend actions")
+		return false
+	}
+	if tech.TechnologyType == Seed {
+		// check if available field
+		found := false
+		for _, space := range g.Run.TechnologySpaces {
+			if !space.IsField {
+				continue
+			}
+			found = true
+		}
+		log.Printf("%v can build %v", tech.Name, found)
+		return found
+
+	}
 	if tech.TechnologyType == PlantSpace {
 		if tech.Name == "Wheat Field" {
 			if g.Run.CurrentSeason == Spring {
@@ -147,7 +171,31 @@ func (g *Game) GetProductNames() []ProductType {
 	return results
 }
 
+func (g *Game) PlaceSeed(tech *Technology, space *TechnologySpace) error {
+	tech.Space = space
+	copy := *tech
+	space.PlantedSeeds = append(space.PlantedSeeds, &copy)
+
+	err := g.Run.SpendAction(tech.CostActions)
+	if err != nil {
+		return errors.New("cannot spend action")
+	}
+
+	err = g.Run.SpendMoney(tech.CostMoney)
+
+	if err == nil {
+		err := tech.OnBuild(g, tech)
+		if err == nil {
+			g.Run.Technology = append(g.Run.Technology, &copy)
+		}
+	}
+	return nil
+}
+
 func (g *Game) PlaceTech(tech *Technology, space *TechnologySpace) error {
+	if tech.TechnologyType == Seed {
+		return g.PlaceSeed(tech, space)
+	}
 	space.IsFilled = true
 	tech.Space = space
 	copy := *tech
@@ -161,6 +209,10 @@ func (g *Game) PlaceTech(tech *Technology, space *TechnologySpace) error {
 	err = g.Run.SpendMoney(tech.CostMoney)
 
 	if err == nil {
+		if tech.TechnologyType == Field {
+			log.Printf("yes this happens")
+			space.IsField = true
+		}
 		err := tech.OnBuild(g, tech)
 		if err == nil {
 			g.Run.Technology = append(g.Run.Technology, space.Technology)
@@ -173,9 +225,21 @@ func (g *Game) RemoveTech(tech *Technology) {
 
 	log.Printf("space %v", tech.Space)
 	tech.ToBeDeleted = true
-	space := tech.Space
-	space.IsFilled = false
-	space.Technology = &Technology{}
+	if tech.TechnologyType == Seed {
+		new := make([]*Technology, 0)
+		for _, seed := range tech.Space.PlantedSeeds {
+			if seed.ToBeDeleted {
+				continue
+			}
+			new = append(new, seed)
+		}
+		tech.Space.PlantedSeeds = new
+
+	} else {
+		space := tech.Space
+		space.IsFilled = false
+		space.Technology = &Technology{}
+	}
 
 	var results []*Technology
 	for _, tech := range g.Run.Technology {
@@ -186,9 +250,18 @@ func (g *Game) RemoveTech(tech *Technology) {
 	g.Run.Technology = results
 }
 
-func (g *Game) HandleClickTech(tech *Technology) string {
-	log.Printf("asdas")
-	return tech.OnClick(g, tech)
+func (g *Game) HandleClickTech(space *TechnologySpace) string {
+	if space.TechnologyType == Field {
+		log.Printf("test")
+		log.Printf("click %v", space.PlantedSeeds)
+		result := ""
+		for _, seed := range space.PlantedSeeds {
+			result += seed.OnClick(g, seed)
+		}
+		return result
+	} else {
+		return space.Technology.OnClick(g, space.Technology)
+	}
 }
 
 func (g *Game) RoundEndProduce(tech *Technology) float32 {
@@ -206,6 +279,29 @@ func (g *Game) ShopButton(tech *Technology) *ShopButton {
 		Technology: tech,
 	}
 	return result
+}
+
+// fields
+
+func (g *Game) CreateFieldTech() *Technology {
+
+	tech := g.CreateTechFromInitialData(g.InitialData["Field"])
+	tech.OnBuild = FieldOnBuild
+	tech.OnClick = FieldOnClick
+	tech.OnRoundEnd = FieldRoundEnd
+	return tech
+
+}
+
+func FieldOnBuild(g *Game, tech *Technology) error {
+	return nil
+
+}
+func FieldRoundEnd(g *Game, tech *Technology) {
+
+}
+func FieldOnClick(g *Game, tech *Technology) string {
+	return ""
 }
 
 // chicken
@@ -258,6 +354,7 @@ func WheatFieldOnBuild(g *Game, tech *Technology) error {
 }
 
 func WheatFieldRoundEnd(g *Game, tech *Technology) {
+	log.Printf("does this run?")
 	if g.Run.NextSeason == Autumn {
 		tech.ReadyToHarvest = true
 	} else if g.Run.NextSeason == Winter {
@@ -268,6 +365,7 @@ func WheatFieldRoundEnd(g *Game, tech *Technology) {
 	tech.Tile.TileFrame.X += 45
 }
 func WheatFieldOnClick(g *Game, tech *Technology) string {
+	log.Printf("tech %v", tech)
 	if tech.ReadyToTouch {
 		log.Printf("touch")
 		err := g.Run.SpendAction(1)
@@ -420,6 +518,32 @@ func ChickenEggWarmerOnClick(g *Game, tech *Technology) string {
 	return ""
 }
 
+func ChickenEggWarmerUnlockOtherCost(g *Game) bool {
+	var total float32
+
+	if current, exists := g.ProductStats[Chicken]; exists {
+		total = current.TotalProduction
+	} else {
+		total = 0
+	}
+	if total > 100 {
+		return true
+	}
+	return false
+}
+func ChickenEggWarmerUnlockOtherCostDescription(g *Game) string {
+
+	var total float32
+
+	if current, exists := g.ProductStats[Chicken]; exists {
+		total = current.TotalProduction
+	} else {
+		total = 0
+	}
+
+	return fmt.Sprintf("Sell %v/%v Chicken", total, 100)
+}
+
 // workstation
 
 func (g *Game) CreateCellTowerTech() *Technology {
@@ -556,6 +680,32 @@ func CowSlaughterhouseOnClick(g *Game, tech *Technology) string {
 func CowSlaughterhouseRoundEnd(g *Game, tech *Technology) {
 
 	tech.ReadyToHarvest = true
+}
+
+func CowSlaughterhouseUnlockOtherCost(g *Game) bool {
+	var total float32
+
+	if current, exists := g.ProductStats[Cow]; exists {
+		total = current.TotalProduction
+	} else {
+		total = 0
+	}
+	if total > 1000 {
+		return true
+	}
+	return false
+}
+func CowSlaughterhouseUnlockOtherCostDescription(g *Game) string {
+
+	var total float32
+
+	if current, exists := g.ProductStats[Cow]; exists {
+		total = current.TotalProduction
+	} else {
+		total = 0
+	}
+
+	return fmt.Sprintf("Sell %v/%v Cows", total, 1000)
 }
 
 // cow pasture

@@ -18,6 +18,7 @@ type ShopBuildingButton struct {
 	Purchased        bool // whether its been purchased or not
 	SelectDirections engine.SelectDirections
 	Selected         bool
+	CanBuild         bool //determined in InitShopRoundComponents
 }
 
 func (b *ShopBuildingButton) Render() {

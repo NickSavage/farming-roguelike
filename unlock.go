@@ -104,11 +104,15 @@ func (g *Game) InitTechUnlockWindow() {
 			continue
 		}
 
-		rect := rl.NewRectangle(x+50+float32(i*160), y+45, 150, 300)
+		rect := rl.NewRectangle(x+50+float32(i*160), y+45, 150, 150)
 		button := g.NewUnlockButton(rect, unlock)
 
 		temp = append(temp, &button)
 		i += 1
+		if i == 5 {
+			y = y + 160
+			i = 0
+		}
 	}
 
 	components := make([]engine.UIComponent, 0)
@@ -138,6 +142,9 @@ func (g *Game) InitUnlocks() {
 	unlocks := make(map[string]*Unlock)
 	otherCostFunctions := make(map[string]func(*Game) bool)
 	otherCostDescriptionFunctions := make(map[string]func(*Game) string)
+
+	otherCostFunctions["Chicken Egg Warmer"] = ChickenEggWarmerUnlockOtherCost
+	otherCostDescriptionFunctions["Chicken Egg Warmer"] = ChickenEggWarmerUnlockOtherCostDescription
 
 	otherCostFunctions["Cow Slaughterhouse"] = CowSlaughterhouseUnlockOtherCost
 	otherCostDescriptionFunctions["Cow Slaughterhouse"] = CowSlaughterhouseUnlockOtherCostDescription
@@ -190,30 +197,4 @@ func (g *Game) UnpackUnlocks(saved []UnlockSave) {
 		g.Technology[save.TechnologyName].Unlocked = save.Unlocked
 	}
 	// todo chain unlocks together
-}
-
-func CowSlaughterhouseUnlockOtherCost(g *Game) bool {
-	var total float32
-
-	if current, exists := g.ProductStats[Cow]; exists {
-		total = current.TotalProduction
-	} else {
-		total = 0
-	}
-	if total > 1000 {
-		return true
-	}
-	return false
-}
-func CowSlaughterhouseUnlockOtherCostDescription(g *Game) string {
-
-	var total float32
-
-	if current, exists := g.ProductStats[Cow]; exists {
-		total = current.TotalProduction
-	} else {
-		total = 0
-	}
-
-	return fmt.Sprintf("Produce %v/%v Cows", total, 1000)
 }

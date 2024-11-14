@@ -82,7 +82,7 @@ func (g *Game) InitTechSpaces() {
 		{ // 5
 			Game:           g,
 			ID:             0,
-			TechnologyType: PlantSpace,
+			TechnologyType: Field,
 			Row:            7,
 			Column:         1,
 			Width:          5,
@@ -99,7 +99,7 @@ func (g *Game) InitTechSpaces() {
 		{ // 6
 			Game:           g,
 			ID:             1,
-			TechnologyType: PlantSpace,
+			TechnologyType: Field,
 			Row:            7,
 			Column:         7,
 			Width:          5,
@@ -116,7 +116,7 @@ func (g *Game) InitTechSpaces() {
 		{ // 7
 			Game:           g,
 			ID:             2,
-			TechnologyType: PlantSpace,
+			TechnologyType: Field,
 			Row:            7,
 			Column:         13,
 			Width:          5,
@@ -133,7 +133,7 @@ func (g *Game) InitTechSpaces() {
 		{ // 8
 			Game:           g,
 			ID:             3,
-			TechnologyType: PlantSpace,
+			TechnologyType: Field,
 			Row:            19,
 			Column:         1,
 			Width:          5,
@@ -150,7 +150,7 @@ func (g *Game) InitTechSpaces() {
 		{ // 9
 			Game:           g,
 			ID:             4,
-			TechnologyType: PlantSpace,
+			TechnologyType: Field,
 			Row:            19,
 			Column:         7,
 			Width:          5,
@@ -167,7 +167,7 @@ func (g *Game) InitTechSpaces() {
 		{ // 10
 			Game:           g,
 			ID:             5,
-			TechnologyType: PlantSpace,
+			TechnologyType: Field,
 			Row:            19,
 			Column:         13,
 			Width:          5,
@@ -278,6 +278,7 @@ func PreEndRound(g *Game) {
 func OnClickEndRound(g *Game) {
 
 	for _, tech := range g.Run.Technology {
+		log.Printf("round end tech %v", tech)
 		tech.OnRoundEnd(g, tech)
 	}
 	if g.Run.AutoSellRoundEnd {
@@ -506,10 +507,9 @@ func (g *Game) ShopRandomBuildings(needed int) []*Technology {
 		if !tech.Unlocked {
 			continue
 		}
-		if tech.TechnologyType == BuildingSpace || tech.TechnologyType == PlantSpace {
-			keysToPickFrom = append(keysToPickFrom, key)
+		keysToPickFrom = append(keysToPickFrom, key)
+		// some sort of filtering is needed here
 
-		}
 	}
 	results := g.PickRandomTechnologies(needed, keysToPickFrom)
 
@@ -518,19 +518,47 @@ func (g *Game) ShopRandomBuildings(needed int) []*Technology {
 
 // save files
 
+func createTechSave(tech *Technology) TechnologySave {
+	saved := TechnologySave{
+		Name:           tech.Name,
+		ReadyToHarvest: tech.ReadyToHarvest,
+		ReadyToTouch:   tech.ReadyToTouch,
+		TempYield:      tech.TempYield,
+		SpaceID:        tech.Space.ID,
+	}
+	if tech.TechnologyType == Field {
+		seeds := make([]TechnologySave, 0)
+		for _, seed := range tech.Space.PlantedSeeds {
+			seeds = append(seeds, createTechSave(seed))
+		}
+		saved.Seeds = seeds
+	}
+	return saved
+
+}
+
 func (r *Run) PackTechnology() []TechnologySave {
 	results := []TechnologySave{}
 	for _, tech := range r.Technology {
-		saved := TechnologySave{
-			Name:           tech.Name,
-			ReadyToHarvest: tech.ReadyToHarvest,
-			ReadyToTouch:   tech.ReadyToTouch,
-			TempYield:      tech.TempYield,
-			SpaceID:        tech.Space.ID,
+		if tech.TechnologyType == Seed {
+			// we'll handle this elsewhere
+			continue
 		}
+		saved := createTechSave(tech)
 		results = append(results, saved)
 	}
 	return results
+}
+
+func (g *Game) unpackTech(save TechnologySave) *Technology {
+
+	new := *g.Technology[save.Name]
+	copy := &new
+	copy.ReadyToHarvest = save.ReadyToHarvest
+	copy.ReadyToTouch = save.ReadyToTouch
+	copy.TempYield = save.TempYield
+	return copy
+
 }
 
 func (g *Game) UnpackTechnology(saved []TechnologySave) []*Technology {
@@ -538,11 +566,7 @@ func (g *Game) UnpackTechnology(saved []TechnologySave) []*Technology {
 	for _, save := range saved {
 		log.Printf("tech %v", save.Name)
 
-		new := *g.Technology[save.Name]
-		copy := &new
-		copy.ReadyToHarvest = save.ReadyToHarvest
-		copy.ReadyToTouch = save.ReadyToTouch
-		copy.TempYield = save.TempYield
+		copy := g.unpackTech(save)
 		for _, space := range g.Run.TechnologySpaces {
 			if space.ID != save.SpaceID {
 				continue
@@ -550,6 +574,16 @@ func (g *Game) UnpackTechnology(saved []TechnologySave) []*Technology {
 			space.Technology = copy
 			space.IsFilled = true
 			copy.Space = space
+			if copy.TechnologyType == Field {
+				space.IsField = true
+				seeds := make([]*Technology, 0)
+				for _, saveSeed := range save.Seeds {
+					seed := g.unpackTech(saveSeed)
+					seeds = append(seeds, seed)
+
+				}
+				space.PlantedSeeds = seeds
+			}
 		}
 		results = append(results, copy)
 	}

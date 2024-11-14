@@ -9,12 +9,6 @@ import (
 
 func (g *Game) ShopChooseTech(tech *Technology) error {
 
-	if !g.Run.CanSpendMoney(tech.CostMoney) {
-		return errors.New("cannot spend money")
-	}
-	if !g.Run.CanSpendAction(tech.CostActions) {
-		return errors.New("cannot spend action")
-	}
 	if !g.CanBuild(tech) {
 		return errors.New("cannot build")
 	}
@@ -31,15 +25,13 @@ func ShopButtonOnClick(g *Game, b ShopBuildingButton) {
 	window := g.Scenes["Board"].Windows["ShopWindow"]
 	err := g.ShopChooseTech(b.Technology)
 	log.Printf("err %v", err)
-	log.Printf("does this happen???")
 	if err == nil {
 		// this is a bit of a cludge, think about another way at some point
 		var button ShopBuildingButton
-		for i, component := range window.Components {
-			log.Printf("component %v i %v", component, i)
-			log.Printf("button %v b %v", button.Position, b.Position)
+		for i, _ := range window.Components {
+			// log.Printf("component %v i %v", component, i)
+			// log.Printf("button %v b %v", button.Position, b.Position)
 			if button.Position == b.Position {
-				log.Printf("does this happen?")
 				button.Purchased = true
 				window.Components[i] = &button
 			}
@@ -75,6 +67,8 @@ func (g *Game) InitShopRoundComponents() {
 
 		button.Position = n
 		button.ExpandedButton = true
+		button.CanBuild = g.CanBuild(building)
+
 		n += 1
 		if n == 6 {
 			button.SelectDirections.Right = 1

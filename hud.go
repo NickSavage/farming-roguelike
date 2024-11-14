@@ -10,7 +10,10 @@ import (
 func OnClickShopWindowButton(gi engine.GameInterface) {
 	g := gi.(*Game)
 	scene := g.Scenes["Board"]
+	g.InitShopWindow()
 	// log.Printf("hey %v", scene)
+	log.Printf("INIT SHOP")
+	g.InitShopRoundComponents()
 	g.ActivateWindow(scene.Windows, scene.Windows["ShopWindow"])
 }
 

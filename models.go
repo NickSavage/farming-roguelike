@@ -97,6 +97,8 @@ type TechnologySpace struct {
 	ID               int
 	Technology       *Technology
 	TechnologyType   TechnologyType
+	IsField          bool
+	PlantedSeeds     []*Technology
 	Row              int
 	Column           int
 	Width            int // in tiles
@@ -135,7 +137,7 @@ func (space *TechnologySpace) Render() {
 
 		space.Technology.Tile.Color = rl.Green
 		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-			result := g.HandleClickTech(space.Technology)
+			result := g.HandleClickTech(space)
 			message := engine.Message{
 				Text:  result,
 				Vec:   rl.Vector2{X: x, Y: y},
@@ -168,6 +170,12 @@ func (space *TechnologySpace) Render() {
 	} else {
 		DrawTile(space.Technology.Tile, float32(x), float32(y))
 
+	}
+	if space.IsField {
+		for _, seed := range space.PlantedSeeds {
+			rl.DrawText(seed.Name, int32(x), int32(y), 5, rl.Black)
+
+		}
 	}
 
 }
@@ -252,12 +260,15 @@ type TechnologySave struct {
 	ReadyToTouch   bool
 	TempYield      float32
 	SpaceID        int
+	Seeds          []TechnologySave
 }
 
 type TechnologyType = string
 
 const (
 	PlantSpace     TechnologyType = "PlantSpace"
+	Seed           TechnologyType = "Seed"
+	Field          TechnologyType = "Field"
 	BuildingSpace  TechnologyType = "BuildingSpace"
 	CellTowerSpace TechnologyType = "CellTowerSpace"
 )
