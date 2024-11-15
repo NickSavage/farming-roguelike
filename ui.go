@@ -118,6 +118,7 @@ func (b *ShopSeedButton) Render() {
 
 	rl.DrawRectangleRec(b.rect, backgroundColor)
 	rl.DrawRectangleLinesEx(b.rect, 1, rl.Black)
+	DrawTile(b.Technology.Tile, x+5, y+2)
 	rl.DrawText(b.Technology.Name, int32(x), int32(y+100), 20, textColor)
 
 }
