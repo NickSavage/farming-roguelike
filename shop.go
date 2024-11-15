@@ -128,6 +128,9 @@ func (g *Game) ShopRandomBuildings(needed int) []*Technology {
 		if !tech.Unlocked {
 			continue
 		}
+		if !tech.ShowInShop {
+			continue
+		}
 		keysToPickFrom = append(keysToPickFrom, key)
 		// some sort of filtering is needed here
 

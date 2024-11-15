@@ -144,6 +144,7 @@ func (g *Game) CreateTechFromInitialData(input InitialData) *Technology {
 		BaseProduction: input.Production,
 		Input:          input.Input,
 		Unlocked:       input.DefaultUnlocked,
+		ShowInShop:     input.ShowInShop,
 	}
 }
 

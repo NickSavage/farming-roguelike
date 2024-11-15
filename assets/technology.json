@@ -10,6 +10,7 @@
     "rarity": "common",
     "description": "aoeaoeao",
     "shopIcon": "ChickenCoopTile",
+    "showInShop": true,
     "tile": {
       "id": "ChickenCoopTile",
       "width": 1,
@@ -28,6 +29,7 @@
     "rarity": "Common",
     "description": "asdasd",
     "shopIcon": "WheatIcon",
+    "showInShop": true,
     "tile": {
       "id": "WheatTile",
       "width": 1,
@@ -46,6 +48,7 @@
     "productType": "Potato",
     "technologyType": "PlantSpace",
     "shopIcon": "PotatoIcon",
+    "showInShop": true,
     "unlock": {
       "costActions": 10,
       "otherDescription": "",
@@ -69,6 +72,7 @@
     "productType": "Carrot",
     "technologyType": "PlantSpace",
     "shopIcon": "CarrotShopIcon",
+    "showInShop": true,
     "unlock": {
       "costActions": 10,
       "otherCost": false
@@ -87,6 +91,7 @@
     "technologyType": "BuildingSpace",
     "rarity": "Rare",
     "shopIcon": "ChickenEggWarmerTile",
+    "showInShop": true,
     "tile": {
       "id": "ChickenEggWarmerTile",
       "width": 1,
@@ -107,6 +112,7 @@
     "productType": "None",
     "rarity": "Uncommon",
     "shopIcon": "WorkstationTile",
+    "showInShop": true,
     "tile": {
       "id": "WorkstationTile",
       "width": 1,
@@ -123,6 +129,7 @@
     "productType": "None",
     "rarity": "Common",
     "shopIcon": "DirtTile",
+    "showInShop": true,
     "tile": {
       "id": "DirtTile",
       "width": 5,
@@ -139,6 +146,7 @@
     "productType": "CellTower",
     "rarity": "Impossible",
     "shopIcon": "CellTowerTile",
+    "showInShop": false,
     "tile": {
       "id": "CellTowerTile",
       "width": 1,
@@ -156,6 +164,7 @@
     "productType": "Building",
     "rarity": "Impossible",
     "shopIcon": "FertilizerTile",
+    "showInShop": true,
     "tile": {
       "id": "FertilizerTile",
       "width": 1,
@@ -178,6 +187,7 @@
     "price": 1,
     "rarity": "Impossible",
     "shopIcon": "SolarPanelTile",
+    "showInShop": true,
     "tile": {
       "id": "SolarPanelTile",
       "width": 1,
@@ -200,6 +210,7 @@
     "price": 2,
     "rarity": "Rare",
     "shopIcon": "CowPastureShopTile",
+    "showInShop": true,
     "tile": {
       "id": "CowPastureTile",
       "width": 5,
@@ -222,6 +233,7 @@
     "price": 10,
     "rarity": "Rare",
     "shopIcon": "CowSlaughterhouseShopTile",
+    "showInShop": true,
     "tile": {
       "id": "CowSlaughterhouseTile",
       "width": 3,
@@ -248,6 +260,7 @@
     "price": 10,
     "rarity": "Rare",
     "shopIcon": "FlourMillTile",
+    "showInShop": true,
     "tile": {
       "id": "FlourMillTile",
       "width": 2,

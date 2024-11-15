@@ -122,6 +122,7 @@ type Technology struct {
 	TempYield       float32
 	Input           Input
 	Unlocked        bool
+	ShowInShop      bool
 }
 
 type Input struct {
@@ -259,6 +260,7 @@ type InitialData struct {
 	Input           Input          `json:"input"`
 	Unlock          *UnlockJSON    `json:"unlock"`
 	DefaultUnlocked bool
+	ShowInShop      bool `json:"showInShop"`
 }
 
 type UnlockJSON struct {
